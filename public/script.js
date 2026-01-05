@@ -1,80 +1,95 @@
 const data = {
-    textbooks: [
+    planning: [
         {
-            name: "Textbooks",
+            name: "Weekly Schedule",
+            link: "schedule/schedule.pdf",
+            action: "PDF"
+        },
+        {
+            name: "Upcoming Dates",
             link: "#",
-            action: "Folder",
-            isFolder: true
+            action: "VIEW"
         }
     ],
     courses: [
         {
             code: "MTHE 281",
             name: "Introduction To Real Analysis",
-            link: "pdfs/MTHE281.pdf",
-            action: "PDF"
+            notes: "pdfs/MTHE281.pdf",
+            textbook: "textbooks/MTHE281.pdf",
+            assignments: "assignments/MTHE281"
         },
         {
             code: "ENPH 239",
             name: "Electromagnetism",
-            link: "pdfs/ENPH239.pdf",
-            action: "PDF"
+            notes: "pdfs/ENPH239.pdf",
+            textbook: "textbooks/ENPH239.pdf",
+            assignments: "assignments/ENPH239"
         },
         {
             code: "MTHE 212",
             name: "Linear Algebra II",
-            link: "pdfs/MTHE212.pdf",
-            action: "PDF"
+            notes: "pdfs/MTHE212.pdf",
+            textbook: "textbooks/MTHE212.pdf",
+            assignments: "assignments/MTHE212"
         },
         {
             code: "CMPE 212",
             name: "Intro Computing Science II",
-            link: "pdfs/CMPE212.pdf",
-            action: "PDF"
+            notes: "pdfs/CMPE212.pdf",
+            textbook: "textbooks/CMPE212.pdf",
+            assignments: "assignments/CMPE212"
         },
         {
             code: "ELEC 274",
             name: "Computer Architecture",
-            link: "pdfs/ELEC274.pdf",
-            action: "PDF"
+            notes: "pdfs/ELEC274.pdf",
+            textbook: "textbooks/ELEC274.pdf",
+            assignments: "assignments/ELEC274"
         }
     ]
 };
 
-function renderTextbooks() {
-    const container = document.getElementById('textbook-list');
-    container.innerHTML = data.textbooks.map(item => createLinkItem(item)).join('');
+function renderPlanning() {
+    const container = document.getElementById('planning-list');
+    if (!container) return;
+    container.innerHTML = data.planning.map(item => `
+        <a href="${item.link}" target="${item.action === 'PDF' ? '_blank' : '_self'}" class="link-item planning-item">
+            <span class="item-name">${item.name}</span>
+            <span class="item-action">${item.action}</span>
+        </a>
+    `).join('');
 }
 
 function renderCourses() {
     const container = document.getElementById('course-list');
-    container.innerHTML = data.courses.map(item => createLinkItem(item)).join('');
+    if (!container) return;
+    container.innerHTML = data.courses.map(course => createCourseCard(course)).join('');
 }
 
-function createLinkItem(item) {
-    // Determine target attribute
-    const target = item.action === "PDF" ? "_blank" : "_self";
-
-    // Conditional styling class
-    const nameClass = item.isFolder ? "item-name is-folder" : "item-name";
-
-    // Conditional code span (only if code exists)
-    const codeSpan = item.code
-        ? `<span class="item-code">${item.code}</span>`
-        : '';
-
+function createCourseCard(course) {
     return `
-        <a href="${item.link}" target="${target}" class="link-item">
-            ${codeSpan}
-            <div class="item-content">
-                <span class="${nameClass}">${item.name}</span>
-                <span class="item-action">${item.action}</span>
+        <div class="course-card">
+            <div class="course-header">
+                <span class="course-code">${course.code}</span>
+                <span class="course-title">${course.name}</span>
             </div>
-        </a>
+            <div class="course-actions">
+                <a href="${course.notes}" target="_blank" class="action-btn primary">
+                    <span>Notes</span>
+                </a>
+                <a href="${course.textbook}" target="_blank" class="action-btn secondary">
+                    <span>Textbook</span>
+                </a>
+                <a href="${course.assignments}" class="action-btn secondary">
+                    <span>Assignments</span>
+                </a>
+            </div>
+        </div>
     `;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderTextbooks();
+    renderPlanning();
     renderCourses();
 });

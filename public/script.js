@@ -11,31 +11,31 @@ const data = {
         {
             code: "MTHE 281",
             name: "Introduction To Real Analysis",
-            link: "public/pdfs/MTHE281.pdf",
+            link: "pdfs/MTHE281.pdf",
             action: "PDF"
         },
         {
             code: "ENPH 239",
             name: "Electromagnetism",
-            link: "public/pdfs/ENPH239.pdf",
+            link: "pdfs/ENPH239.pdf",
             action: "PDF"
         },
         {
             code: "MTHE 212",
             name: "Linear Algebra II",
-            link: "public/pdfs/MTHE212.pdf",
+            link: "pdfs/MTHE212.pdf",
             action: "PDF"
         },
         {
             code: "CMPE 212",
             name: "Intro Computing Science II",
-            link: "public/pdfs/CMPE212.pdf",
+            link: "pdfs/CMPE212.pdf",
             action: "PDF"
         },
         {
             code: "ELEC 274",
             name: "Computer Architecture",
-            link: "public/pdfs/ELEC274.pdf",
+            link: "pdfs/ELEC274.pdf",
             action: "PDF"
         }
     ]

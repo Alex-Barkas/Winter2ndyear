@@ -9,8 +9,63 @@ const data = {
             name: "Upcoming Dates",
             link: "#",
             action: "VIEW"
+        },
+        {
+            name: "Grade Dashboard",
+            link: "grades.html",
+            action: "VIEW"
         }
     ],
+    gradingSchemes: {
+        "MTHE 281": {
+            type: "max_option", // Logic for max of two options
+            options: [
+                {
+                    name: "Standard",
+                    weights: { "HOMEWORK": 10, "MIDTERM": 50, "FINAL": 40 } // Simplified for aggregation
+                },
+                {
+                    name: "Exam Bias",
+                    weights: { "HOMEWORK": 10, "MIDTERM": 40, "FINAL": 50 } // Logic needed for split midterms
+                }
+            ],
+            // For simple tracking MVP, we'll use a unified input and calculate dynamically
+            components: [
+                { name: "Homework", weight: 10, count: 10 },
+                { name: "Midterm 1", weight: 25, count: 1 },
+                { name: "Midterm 2", weight: 25, count: 1 },
+                { name: "Final Exam", weight: 40, count: 1 }
+            ]
+        },
+        "ENPH 239": {
+            components: [
+                { name: "Math Diagnostics", weight: 5, count: 1 },
+                { name: "Weekly Quizzes", weight: 15, count: 12 },
+                { name: "Assignments", weight: 40, count: 3 },
+                { name: "Final Exam", weight: 40, count: 1 }
+            ]
+        },
+        "MTHE 212": {
+            components: [
+                { name: "Quizzes", weight: 40, count: 5, dropLowest: 1 },
+                { name: "Final Exam", weight: 60, count: 1 }
+            ]
+        },
+        "CMPE 212": {
+            components: [
+                { name: "Lab Assignments", weight: 40, count: 8 },
+                { name: "Tests", weight: 30, count: 2 },
+                { name: "Final Exam", weight: 30, count: 1 }
+            ]
+        },
+        "ELEC 274": {
+            components: [
+                { name: "Laboratories", weight: 20, count: 5 }, // Assume 5 labs?
+                { name: "Midterm Quiz", weight: 20, count: 1 },
+                { name: "Final Exam", weight: 60, count: 1 }
+            ]
+        }
+    },
     courses: [
         {
             code: "MTHE 281",
@@ -52,11 +107,76 @@ const data = {
         }
     ],
     assignments: [
-        { course: "MTHE 281", title: "Assignment 1", date: "2026-01-23", time: "23:59", status: "PENDING" },
-        { course: "ENPH 239", title: "Problem Set 1", date: "2026-01-25", time: "16:00", status: "PENDING" },
-        { course: "CMPE 212", title: "Lab 1 Submission", date: "2026-01-27", time: "12:00", status: "PENDING" },
-        { course: "MTHE 212", title: "Quiz 1", date: "2026-01-30", time: "09:30", status: "UPCOMING" },
-        { course: "ELEC 274", title: "Midterm Prep", date: "2026-02-05", time: "14:00", status: "UPCOMING" }
+        {
+            id: "1",
+            course: "MTHE 281",
+            category: "ASSIGNMENT",
+            title: "Assignment 1",
+            date: "2026-01-23",
+            time: "23:59",
+            status: "PENDING",
+            details: { type: "pdf", url: "pdfs/MTHE281.pdf" }
+        },
+        {
+            id: "2",
+            course: "ENPH 239",
+            category: "LAB",
+            title: "Lab 1",
+            date: "2026-01-25",
+            time: "16:00",
+            status: "PENDING",
+            details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
+        },
+        {
+            id: "3",
+            course: "CMPE 212",
+            category: "LAB",
+            title: "Lab 1 Submission",
+            date: "2026-01-27",
+            time: "12:00",
+            status: "PENDING",
+            details: { type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
+        },
+        {
+            id: "4",
+            course: "MTHE 212",
+            category: "QUIZ",
+            title: "Quiz 1",
+            date: "2026-01-30",
+            time: "09:30",
+            status: "UPCOMING",
+            details: { type: "text", content: "Topics: Vector Spaces, Subspaces, Linear Independence." }
+        },
+        {
+            id: "5",
+            course: "ELEC 274",
+            category: "MIDTERM",
+            title: "Midterm Exam",
+            date: "2026-02-05",
+            time: "14:00",
+            status: "UPCOMING",
+            details: { type: "text", content: "Location: Walter Light Hall 205. Bring ID." }
+        },
+        {
+            id: "6",
+            course: "PERSONAL",
+            category: "REMINDER",
+            title: "Rent Payment",
+            date: "2026-02-01",
+            time: "09:00",
+            status: "PENDING",
+            details: { type: "text", content: "Pay $850 to Landlord via E-Transfer." }
+        },
+        {
+            id: "7",
+            course: "CAREER",
+            category: "REMINDER",
+            title: "RBC Internship Application",
+            date: "2026-01-31",
+            time: "23:59",
+            status: "PENDING",
+            details: { type: "link", url: "https://jobs.rbc.com", label: "Apply Here" }
+        }
     ]
 };
 
@@ -270,24 +390,34 @@ function createAssignmentCard(item) {
     const day = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
 
     // Status Color Logic
+    let status = item.status;
+    const localStatus = localStorage.getItem(`status_${item.id}`);
+    if (localStatus) status = localStatus;
+
     let statusClass = "status-pending";
-    if (item.status === 'DONE') statusClass = "status-done";
-    if (item.status === 'UPCOMING') statusClass = "status-upcoming";
+    if (status === 'DONE') statusClass = "status-done";
+    if (status === 'UPCOMING') statusClass = "status-upcoming";
+
+    // Category Color Logic
+    const categoryClass = `category-${item.category.toLowerCase()}`;
 
     return `
-        <div class="assignment-item">
+        <a href="details.html?id=${item.id}" class="assignment-item">
             <div class="assign-left">
                 <span class="assign-date">${day}</span>
                 <div class="assign-details">
-                    <span class="assign-course">${item.course}</span>
+                    <div class="assign-meta">
+                        <span class="assign-course">${item.course}</span>
+                        <span class="assign-category ${categoryClass}">${item.category}</span>
+                    </div>
                     <span class="assign-title">${item.title}</span>
                 </div>
             </div>
             <div class="assign-right">
                 <span class="assign-time">${item.time}</span>
-                <span class="assign-status ${statusClass}">${item.status}</span>
+                <span class="assign-status ${statusClass}">${status}</span>
             </div>
-        </div>
+        </a>
     `;
 }
 

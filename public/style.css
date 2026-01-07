@@ -525,3 +525,188 @@ footer p {
     margin-bottom: 1rem;
     display: block;
 }
+
+/* Categories */
+.assign-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.assign-category {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+}
+
+.category-assignment { color: #60a5fa; background: rgba(96, 165, 250, 0.15); }
+.category-lab { color: #4ade80; background: rgba(74, 222, 128, 0.15); }
+.category-quiz { color: #facc15; background: rgba(250, 204, 21, 0.15); }
+.category-midterm { color: #f87171; background: rgba(248, 113, 113, 0.15); }
+.category-final { color: #ef4444; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); }
+.category-homework { color: #2dd4bf; background: rgba(45, 212, 191, 0.15); }
+.category-reminder { color: #c084fc; background: rgba(192, 132, 252, 0.15); }
+
+
+/* Productivity Toolkit */
+.toolkit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.tool-card {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.tool-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Checklist */
+.checklist-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#checklist-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 0.25rem 0;
+}
+
+.checklist-item.checked span {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.checklist-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#new-item-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.35rem;
+    font-size: 0.8rem;
+    flex-grow: 1;
+}
+
+.checklist-input-group button {
+    background: var(--text-primary);
+    color: #000;
+    border: none;
+    border-radius: 0.35rem;
+    width: 2rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* Timer */
+.timer-display {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 1rem 0;
+    color: var(--text-primary);
+    letter-spacing: -0.05em;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.timer-controls button {
+    padding: 0.4rem 1rem;
+    border-radius: 0.35rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 500;
+ 
+  border: 1px solid transparent;}
+
+#timer-btn {
+    background: var(--text-primary);
+    color: #000;
+}
+
+.timer-controls button.secondary {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+/* Result Card */
+#grade-input-container {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+#grade-input-container label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+#assignment-grade {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border-radius: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+}
+
+.submit-btn {
+    width: 100%;
+    background: rgba(0, 230, 118, 0.1);
+    color: #00e676;
+    border: 1px solid rgba(0, 230, 118, 0.2);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.submit-btn:hover {
+    background: rgba(0, 230, 118, 0.2);
+}
+

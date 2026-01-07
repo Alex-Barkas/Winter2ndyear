@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade Dashboard - Notes.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .grade-card {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .grade-course {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .grade-score {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .grade-score.pending {
+            color: var(--text-muted);
+            opacity: 0.5;
+            font-size: 1rem;
+        }
+
+        .grade-table-header {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .grade-row {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .grade-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            width: 60px;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <header>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+            <h1>Grade Dashboard</h1>
+            <p class="subtitle">Track your academic performance across all courses.</p>
+        </header>
+
+        <div id="grade-list">
+            <!-- Grade cards injected here -->
+        </div>
+
+        <footer>
+            <p>© 2026 Patrick. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('grade-list');
+            const schemes = data.gradingSchemes;
+
+            for (const [course, scheme] of Object.entries(schemes)) {
+                let rowsHtml = '';
+                let totalWeight = 0;
+
+                scheme.components.forEach((comp, idx) => {
+                    const uniqueId = `grade-${course.replace(/\s/g, '')}-${idx}`;
+                    const savedGrade = localStorage.getItem(uniqueId) || '';
+                    totalWeight += comp.weight;
+
+                    rowsHtml += `
+                        <div class="grade-row">
+                            <span>${comp.name}</span>
+                            <span>${comp.weight}%</span>
+                            <input type="number" class="grade-input" id="${uniqueId}" value="${savedGrade}" onchange="updateGrade('${course}', '${uniqueId}')" placeholder="-">
+                            <span id="${uniqueId}-contrib">0.00%</span>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="grade-card" id="card-${course.replace(/\s/g, '')}">
+                        <div class="grade-header">
+                            <span class="grade-course">${course}</span>
+                            <span class="grade-score pending" id="score-${course.replace(/\s/g, '')}">--%</span>
+                        </div>
+                        <div class="grade-table-header">
+                            <span>Component</span>
+                            <span>Weight</span>
+                            <span>Grade</span>
+                            <span>Contrib</span>
+                        </div>
+                        ${rowsHtml}
+                    </div>
+                `;
+
+                // Initial Calculation
+                calculateCourseGrade(course, scheme.components);
+            }
+        });
+
+        function updateGrade(course, inputId) {
+            const input = document.getElementById(inputId);
+            localStorage.setItem(inputId, input.value);
+            const scheme = data.gradingSchemes[course];
+            calculateCourseGrade(course, scheme.components);
+        }
+
+        function calculateCourseGrade(course, components) {
+            let currentPoints = 0;
+            let currentWeight = 0;
+
+            components.forEach((comp, idx) => {
+                const uniqueId = `grade-${course.replace(/\s/g, '')}-${idx}`;
+                const val = parseFloat(localStorage.getItem(uniqueId));
+
+                if (!isNaN(val)) {
+                    const contribution = (val / 100) * comp.weight;
+                    document.getElementById(`${uniqueId}-contrib`).innerText = contribution.toFixed(2) + '%';
+
+                    // Simple weighted average for now (MVP)
+                    // If we wanted "current average" (ignoring future), we divide by currentWeight
+                    currentPoints += contribution;
+                    currentWeight += comp.weight;
+                } else {
+                    document.getElementById(`${uniqueId}-contrib`).innerText = '-';
+                }
+            });
+
+            const scoreElem = document.getElementById(`score-${course.replace(/\s/g, '')}`);
+            if (currentWeight > 0) {
+                // Showing "Current Average" (What you have so far out of what you've done)
+                const currentAvg = (currentPoints / currentWeight) * 100;
+                scoreElem.innerText = currentAvg.toFixed(1) + '%';
+                scoreElem.classList.remove('pending');
+                scoreElem.style.color = getGradeColor(currentAvg);
+            } else {
+                scoreElem.innerText = '--%';
+                scoreElem.classList.add('pending');
+            }
+        }
+
+        function getGradeColor(grade) {
+            if (grade >= 80) return '#4ade80'; // A - Green
+            if (grade >= 70) return '#facc15'; // B - Yellow
+            if (grade >= 60) return '#fb923c'; // C - Orange
+            return '#f87171'; // D/F - Red
+        }
+    </script>
+</body>
+
+</html>

@@ -53,9 +53,17 @@ const data = {
         },
         "CMPE 212": {
             components: [
-                { name: "Lab Assignments", weight: 40, count: 8 },
-                { name: "Tests", weight: 30, count: 2 },
-                { name: "Final Exam", weight: 30, count: 1 }
+                { name: "Lab 1", weight: 5 },
+                { name: "Lab 2", weight: 5 },
+                { name: "Lab 3", weight: 5 },
+                { name: "Lab 4", weight: 5 },
+                { name: "Lab 5", weight: 5 },
+                { name: "Lab 6", weight: 5 },
+                { name: "Lab 7", weight: 5 },
+                { name: "Lab 8", weight: 5 },
+                { name: "Test 1", weight: 15 },
+                { name: "Test 2", weight: 15 },
+                { name: "Final Exam", weight: 30 } // Adjusted to 30 to sum to 100 based on syllabus md
             ]
         },
         "ELEC 274": {
@@ -107,6 +115,21 @@ const data = {
         }
     ],
     assignments: [
+        // --- CMPE 212 ---
+        { id: "cmpe-l1", course: "CMPE 212", category: "LAB", title: "Lab 1", date: "2026-01-13", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 1" } },
+        { id: "cmpe-l2", course: "CMPE 212", category: "LAB", title: "Lab 2", date: "2026-01-20", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 2" } },
+        { id: "cmpe-l3", course: "CMPE 212", category: "LAB", title: "Lab 3", date: "2026-01-27", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 3" } },
+        { id: "cmpe-t1", course: "CMPE 212", category: "MIDTERM", title: "Test 1", date: "2026-02-05", time: "09:30", status: "UPCOMING", details: { type: "text", content: "Midterm Test 1" } },
+        { id: "cmpe-l4", course: "CMPE 212", category: "LAB", title: "Lab 4", date: "2026-02-10", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 4" } },
+        // Reading Week Feb 13-22
+        { id: "cmpe-l5", course: "CMPE 212", category: "LAB", title: "Lab 5", date: "2026-02-24", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 5" } },
+        { id: "cmpe-l6", course: "CMPE 212", category: "LAB", title: "Lab 6", date: "2026-03-10", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 6" } },
+        { id: "cmpe-t2", course: "CMPE 212", category: "MIDTERM", title: "Test 2", date: "2026-03-12", time: "09:30", status: "UPCOMING", details: { type: "text", content: "Midterm Test 2" } },
+        { id: "cmpe-l7", course: "CMPE 212", category: "LAB", title: "Lab 7", date: "2026-03-17", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 7" } },
+        { id: "cmpe-l8", course: "CMPE 212", category: "LAB", title: "Lab 8", date: "2026-03-31", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 8" } },
+        { id: "cmpe-fin", course: "CMPE 212", category: "FINAL", title: "Final Exam", date: "2026-04-30", time: "00:00", status: "UPCOMING", details: { type: "text", content: "Date TBD" } },
+
+        // --- OTHER COURSES (Retained) ---
         {
             id: "1",
             course: "MTHE 281",
@@ -126,16 +149,6 @@ const data = {
             time: "16:00",
             status: "PENDING",
             details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
-        },
-        {
-            id: "3",
-            course: "CMPE 212",
-            category: "LAB",
-            title: "Lab 1 Submission",
-            date: "2026-01-27",
-            time: "12:00",
-            status: "PENDING",
-            details: { type: "video", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
         },
         {
             id: "4",
@@ -199,9 +212,21 @@ function renderGlobalSchedule() {
     const listContainer = document.getElementById('global-schedule');
     if (listContainer) {
         // Render List View
-        const sorted = [...data.assignments].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sorted = [...data.assignments].sort((a, b) => {
+            // Handle TBD dates for sorting: place them at the end
+            if (a.date === '2026-04-30' && a.category === 'FINAL') return 1;
+            if (b.date === '2026-04-30' && b.category === 'FINAL') return -1;
+            return new Date(a.date) - new Date(b.date);
+        });
         const grouped = sorted.reduce((acc, curr) => {
-            const date = new Date(curr.date + 'T' + curr.time); // Fixed date parsing
+            // Handle TBD dates for grouping
+            if (curr.date === '2026-04-30' && curr.category === 'FINAL') {
+                if (!acc['To Be Scheduled']) acc['To Be Scheduled'] = [];
+                acc['To Be Scheduled'].push(curr);
+                return acc;
+            }
+
+            const date = new Date(curr.date + 'T' + curr.time);
             const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             if (!acc[month]) acc[month] = [];
             acc[month].push(curr);
@@ -246,6 +271,10 @@ function renderCalendar() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
 
+    // Reading Week Setup (Feb 13 - Feb 22, 2026)
+    const rwStart = new Date('2026-02-13T00:00:00');
+    const rwEnd = new Date('2026-02-22T23:59:59');
+
     let html = '';
 
     // Previous Month Days
@@ -257,16 +286,25 @@ function renderCalendar() {
     const today = new Date();
     for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const currentDayObj = new Date(year, month, i);
         const assignments = data.assignments.filter(a => a.date === dateStr);
 
+        // Reading Week Check
+        const isReadingWeek = currentDayObj >= rwStart && currentDayObj <= rwEnd;
+
         let classes = 'day-cell';
+        if (isReadingWeek) classes += ' reading-week';
+
         let dot = '';
 
         if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
             classes += ' today';
         }
 
+        // Check if any assignment is stored as DONE locally
+        let hasEvent = false;
         if (assignments.length > 0) {
+            hasEvent = true;
             classes += ' has-event';
             dot = '<div class="event-dot"></div>';
         }

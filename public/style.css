@@ -42,6 +42,19 @@ header {
     margin-bottom: 5rem;
 }
 
+.back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--text-primary);
+}
+
 h1 {
     font-size: 2.5rem;
     font-weight: 700;
@@ -123,6 +136,108 @@ section {
     background: rgba(255, 255, 255, 0.03);
     padding: 0.35rem 0.65rem;
     border-radius: 0.25rem;
+}
+
+/* Schedule / Calendar Styles */
+.month-group {
+    margin-bottom: 2rem;
+}
+
+.month-label {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.assignment-item {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.assignment-item:hover {
+    background-color: var(--card-hover-bg);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.assign-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.assign-date {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    min-width: 60px;
+    opacity: 0.8;
+}
+
+.assign-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.assign-course {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.assign-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.assign-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.assign-time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.assign-status {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.status-pending {
+    background-color: rgba(255, 171, 0, 0.1);
+    color: #ffab00;
+}
+
+.status-upcoming {
+    background-color: rgba(64, 196, 255, 0.1);
+    color: #40c4ff;
+}
+
+.status-done {
+    background-color: rgba(0, 230, 118, 0.1);
+    color: #00e676;
 }
 
 /* New Course Card Design */

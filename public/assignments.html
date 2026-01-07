@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignments - Notes.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <main class="container">
+        <!-- Header -->
+        <header>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+            <h1 id="course-title">Assignments</h1>
+            <p id="course-subtitle" class="subtitle">Upcoming deliverables and deadlines.</p>
+        </header>
+
+        <!-- Content -->
+        <div class="content-stack">
+            <section>
+                <h2 class="section-label">UPCOMING</h2>
+                <div id="assignment-list" class="list-grid">
+                    <!-- Assignments injected via JS -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>© 2026 Patrick. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for query param
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseCode = urlParams.get('course');
+
+            if (courseCode) {
+                filterAssignments(courseCode);
+            } else {
+                document.getElementById('course-title').innerText = "All Assignments";
+                renderAssignments(data.assignments);
+            }
+        });
+    </script>
+</body>
+
+</html>

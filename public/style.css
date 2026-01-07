@@ -710,3 +710,14 @@ footer p {
     background: rgba(0, 230, 118, 0.2);
 }
 
+
+/* Fix for blue underlines in schedule items */
+.assignment-item {
+    text-decoration: none;
+    color: inherit;
+}
+
+.assignment-item:hover {
+    text-decoration: none;
+}
+

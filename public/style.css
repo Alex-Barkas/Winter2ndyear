@@ -34,7 +34,6 @@ body {
 .container {
     width: 100%;
     max-width: 700px;
-    animation: fadeIn 0.8s ease-out;
 }
 
 /* Header */
@@ -48,7 +47,6 @@ header {
     color: var(--text-muted);
     text-decoration: none;
     font-size: 0.9rem;
-    transition: color 0.2s;
 }
 
 .back-link:hover {
@@ -102,7 +100,6 @@ section {
     padding: 1.25rem;
     margin: 0 -1.25rem;
     border-radius: 0.75rem;
-    transition: all 0.2s ease;
     border: 1px solid transparent;
 }
 
@@ -159,12 +156,14 @@ section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
 }
 
 .assignment-item:hover {
     background-color: var(--card-hover-bg);
     border-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
 }
 
 .assign-left {
@@ -249,7 +248,6 @@ section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .course-card:hover {
@@ -294,7 +292,6 @@ section {
     font-size: 0.8rem;
     font-weight: 500;
     text-decoration: none;
-    transition: all 0.2s;
     font-family: var(--font-sans);
 }
 
@@ -307,7 +304,6 @@ section {
 .action-btn.primary:hover {
     background-color: #e4e4e7;
     border-color: #e4e4e7;
-    transform: translateY(-1px);
 }
 
 .action-btn.secondary {
@@ -320,7 +316,6 @@ section {
     color: var(--text-primary);
     border-color: var(--text-muted);
     background-color: rgba(255, 255, 255, 0.03);
-    transform: translateY(-1px);
 }
 
 
@@ -339,18 +334,6 @@ footer p {
     opacity: 0.4;
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 /* Utility */
 .hidden {
     display: none !important;
@@ -385,7 +368,6 @@ footer p {
     padding: 0.35rem 0.75rem;
     border-radius: 0.35rem;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .view-btn:hover {
@@ -431,7 +413,6 @@ footer p {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
 }
 
 .nav-btn:hover {
@@ -467,7 +448,6 @@ footer p {
     font-size: 0.9rem;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s;
     position: relative;
     border: 1px solid transparent;
 }
@@ -510,8 +490,8 @@ footer p {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border-color);
-    display: none; /* Hidden by default until clicked */
-    animation: fadeIn 0.3s ease-out;
+    display: none;
+    /* Hidden by default until clicked */
 }
 
 #selected-day-details.active {
@@ -544,13 +524,41 @@ footer p {
     color: var(--text-muted);
 }
 
-.category-assignment { color: #60a5fa; background: rgba(96, 165, 250, 0.15); }
-.category-lab { color: #4ade80; background: rgba(74, 222, 128, 0.15); }
-.category-quiz { color: #facc15; background: rgba(250, 204, 21, 0.15); }
-.category-midterm { color: #f87171; background: rgba(248, 113, 113, 0.15); }
-.category-final { color: #ef4444; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); }
-.category-homework { color: #2dd4bf; background: rgba(45, 212, 191, 0.15); }
-.category-reminder { color: #c084fc; background: rgba(192, 132, 252, 0.15); }
+.category-assignment {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.15);
+}
+
+.category-lab {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+}
+
+.category-quiz {
+    color: #facc15;
+    background: rgba(250, 204, 21, 0.15);
+}
+
+.category-midterm {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+}
+
+.category-final {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.category-homework {
+    color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.15);
+}
+
+.category-reminder {
+    color: #c084fc;
+    background: rgba(192, 132, 252, 0.15);
+}
 
 
 /* Productivity Toolkit */
@@ -613,7 +621,7 @@ footer p {
 }
 
 #new-item-input {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 0.35rem 0.6rem;
@@ -655,8 +663,8 @@ footer p {
     font-size: 0.8rem;
     cursor: pointer;
     font-weight: 500;
- 
-  border: 1px solid transparent;}
+    border: 1px solid transparent;
+}
 
 #timer-btn {
     background: var(--text-primary);
@@ -685,7 +693,7 @@ footer p {
 }
 
 #assignment-grade {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 0.5rem;
@@ -703,21 +711,8 @@ footer p {
     border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .submit-btn:hover {
     background: rgba(0, 230, 118, 0.2);
 }
-
-
-/* Fix for blue underlines in schedule items */
-.assignment-item {
-    text-decoration: none;
-    color: inherit;
-}
-
-.assignment-item:hover {
-    text-decoration: none;
-}
-

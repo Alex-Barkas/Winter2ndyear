@@ -71,34 +71,174 @@ function renderPlanning() {
     `).join('');
 }
 
+// Calendar State
+let currentDate = new Date();
+let selectedDate = null;
+
 function renderGlobalSchedule() {
-    const container = document.getElementById('global-schedule');
-    if (!container) return; // Only runs on index.html
+    const listContainer = document.getElementById('global-schedule');
+    if (listContainer) {
+        // Render List View
+        const sorted = [...data.assignments].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const grouped = sorted.reduce((acc, curr) => {
+            const date = new Date(curr.date + 'T' + curr.time); // Fixed date parsing
+            const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            if (!acc[month]) acc[month] = [];
+            acc[month].push(curr);
+            return acc;
+        }, {});
 
-    // Sort by date
-    const sorted = [...data.assignments].sort((a, b) => new Date(a.date) - new Date(b.date));
+        let html = '';
+        for (const [month, items] of Object.entries(grouped)) {
+            html += `
+                <div class="month-group">
+                    <h3 class="month-label">${month}</h3>
+                    <div class="list-grid">
+                        ${items.map(item => createAssignmentCard(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
 
-    // Group by Month
-    const grouped = sorted.reduce((acc, curr) => {
-        const month = new Date(curr.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        if (!acc[month]) acc[month] = [];
-        acc[month].push(curr);
-        return acc;
-    }, {});
+        if (Object.keys(grouped).length === 0) {
+            html = '<p class="subtitle">No upcoming assignments.</p>';
+        }
+
+        listContainer.innerHTML = html;
+    }
+}
+
+// Calendar Logic
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendar-days');
+    const mothLabel = document.getElementById('current-month-year');
+
+    if (!calendarGrid || !mothLabel) return;
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    // Update Header
+    mothLabel.innerText = new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    // Days calculation
+    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 is Sunday
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevMonthDays = new Date(year, month, 0).getDate();
 
     let html = '';
-    for (const [month, items] of Object.entries(grouped)) {
-        html += `
-            <div class="month-group">
-                <h3 class="month-label">${month}</h3>
-                <div class="list-grid">
-                    ${items.map(item => createAssignmentCard(item)).join('')}
-                </div>
-            </div>
-        `;
+
+    // Previous Month Days
+    for (let i = firstDayIndex; i > 0; i--) {
+        html += `<div class="day-cell other-month">${prevMonthDays - i + 1}</div>`;
     }
-    container.innerHTML = html;
+
+    // Current Month Days
+    const today = new Date();
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        const assignments = data.assignments.filter(a => a.date === dateStr);
+
+        let classes = 'day-cell';
+        let dot = '';
+
+        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            classes += ' today';
+        }
+
+        if (assignments.length > 0) {
+            classes += ' has-event';
+            dot = '<div class="event-dot"></div>';
+        }
+
+        if (selectedDate === dateStr) {
+            classes += ' selected';
+        }
+
+        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${i}${dot}</div>`;
+    }
+
+    // Next Month Days (to fill grid)
+    const renderDays = firstDayIndex + daysInMonth;
+    const nextDays = 42 - renderDays; // 6 rows * 7 cols = 42 cells standard
+
+    for (let i = 1; i <= nextDays; i++) {
+        html += `<div class="day-cell other-month">${i}</div>`;
+    }
+
+    calendarGrid.innerHTML = html;
 }
+
+function selectDate(dateStr) {
+    selectedDate = dateStr;
+    renderCalendar(); // Re-render to update selected style
+
+    const detailsContainer = document.getElementById('selected-day-details');
+    const tasks = data.assignments.filter(a => a.date === dateStr);
+
+    const dateObj = new Date(dateStr + 'T12:00:00'); // Midday to avoid boundary issues
+    const displayDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    console.log(`Selected: ${dateStr}, Tasks: ${tasks.length}`);
+
+    if (tasks.length > 0) {
+        let html = `<span class="selected-date-label">${displayDate}</span><div class="list-grid">`;
+        html += tasks.map(item => createAssignmentCard(item)).join('');
+        html += '</div>';
+        detailsContainer.innerHTML = html;
+        detailsContainer.classList.add('active');
+    } else {
+        detailsContainer.classList.remove('active');
+        detailsContainer.innerHTML = '';
+    }
+}
+
+
+function setupCalendarControls() {
+    const prevBtn = document.getElementById('prev-month');
+    const nextBtn = document.getElementById('next-month');
+
+    if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
+
+    // View Switcher
+    const listBtn = document.getElementById('view-list-btn');
+    const calBtn = document.getElementById('view-calendar-btn');
+    const listView = document.getElementById('global-schedule');
+    const calView = document.getElementById('calendar-view');
+
+    if (listBtn && calBtn) {
+        listBtn.addEventListener('click', () => {
+            listBtn.classList.add('active');
+            calBtn.classList.remove('active');
+            listView.classList.remove('hidden');
+            calView.classList.add('hidden');
+        });
+
+        calBtn.addEventListener('click', () => {
+            calBtn.classList.add('active');
+            listBtn.classList.remove('active');
+            calView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            renderCalendar(); // Render when shown
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderPlanning();
+    renderGlobalSchedule();
+    renderCourses();
+    setupCalendarControls();
+});
 
 function renderAssignments(items) {
     const container = document.getElementById('assignment-list');

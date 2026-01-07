@@ -151,6 +151,12 @@ function createAssignmentCard(item) {
     `;
 }
 
+function renderCourses() {
+    const container = document.getElementById('course-list');
+    if (!container) return;
+    container.innerHTML = data.courses.map(course => createCourseCard(course)).join('');
+}
+
 function createCourseCard(course) {
     const solutionsButton = course.solutions ? `
         <a href="${course.solutions}" target="_blank" class="action-btn secondary">

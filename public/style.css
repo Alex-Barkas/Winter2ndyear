@@ -9,11 +9,32 @@
     --card-hover-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.05);
 
-    --font-sans: 'Inter', sans-serif;
+    --font-sans: 'Latin Modern Roman', serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     --accent-color: #dc5815;
     /* User preferred orange accent */
+}
+
+@font-face {
+    font-family: 'Latin Modern Roman';
+    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Latin Modern Roman';
+    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Latin Modern Roman';
+    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-italic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
 }
 
 * {
@@ -88,8 +109,8 @@ header {
 
 .header-image-container {
     width: 100%;
-    max-width: 400px;
-    /* Reduced from 600px */
+    max-width: 250px;
+    /* Reduced to 250px */
     margin: 0 auto 1.5rem auto;
     /* Centered */
     overflow: hidden;

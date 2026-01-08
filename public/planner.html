@@ -150,6 +150,66 @@
         .focus-active .focus-overlay {
             display: block;
         }
+
+        /* Create New Block Form */
+        .creation-form {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--border-color);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .creation-form h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 0.35rem;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .delete-btn {
+            background: transparent;
+            color: #ef4444;
+            border: none;
+            font-size: 0.7rem;
+            cursor: pointer;
+            opacity: 0.6;
+            padding: 0.2rem 0.5rem;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -183,6 +243,34 @@
             <!-- Main Column: Session Blocks -->
             <section>
                 <h2 class="planner-section-title">Session Blocks</h2>
+
+                <!-- Creation Form -->
+                <div class="creation-form">
+                    <h3>+ New Session Block</h3>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="new-block-title" class="form-input" placeholder="e.g. Prove Theorem 3.2">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Course</label>
+                            <select id="new-block-course" class="form-select">
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Duration (min)</label>
+                            <input type="number" id="new-block-duration" class="form-input" value="45">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Drive/Resource Link (Optional)</label>
+                        <input type="text" id="new-block-link" class="form-input" placeholder="https://...">
+                    </div>
+                    <button onclick="addNewBlock()" class="action-btn primary"
+                        style="width: 100%; justify-content: center;">Add to Plan</button>
+                </div>
+
                 <div id="blocks-container">
                     <!-- Injected via JS -->
                 </div>

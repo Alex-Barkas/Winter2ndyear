@@ -170,7 +170,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-            const item = data.assignments.find(a => a.id === id);
+
+            // 1. Try finding in static STUDENT_DATA
+            let item = data.assignments.find(a => a.id === id);
+
+            // 2. If not found, try LocalStorage (Planner Blocks)
+            if (!item) {
+                const localBlocks = JSON.parse(localStorage.getItem('planner_blocks')) || [];
+                item = localBlocks.find(b => b.id === id);
+            }
 
             if (!item) {
                 document.getElementById('loading').innerText = "Item not found.";

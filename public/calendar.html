@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - archive.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Academic Calendar">
+</head>
+
+<body>
+    <div class="signature-badge">
+        <div class="signature-row">
+            <span class="signature-text">patrick taylor 2026</span>
+            <img src="cooffe.gif" alt="Coffee" class="signature-gif">
+        </div>
+        <div class="nav-divider"></div>
+        <nav class="side-nav">
+            <a href="schedule/schedule.pdf" target="_blank" class="nav-link">weekly schedule</a>
+            <a href="grades.html" class="nav-link">grade dashboard</a>
+            <a href="calendar.html" class="nav-link active">calendar</a>
+        </nav>
+    </div>
+
+    <main class="container">
+        <header>
+            <a href="index.html" class="back-link" style="margin-bottom: 2rem; display: inline-block;">← Back to
+                Home</a>
+            <div class="header-titling">
+                <h1>calendar.</h1>
+            </div>
+        </header>
+
+
+        <!-- Calendar View (Always Visible) -->
+        <div id="calendar-view" class="calendar-container">
+            <div class="calendar-header">
+                <button id="prev-month" class="nav-btn">&lt;</button>
+                <h3 id="current-month-year">January 2026</h3>
+                <button id="next-month" class="nav-btn">&gt;</button>
+            </div>
+            <div class="calendar-grid-header">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+            </div>
+            <div id="calendar-days" class="calendar-grid">
+                <!-- Days injected via JS -->
+            </div>
+            <div id="selected-day-details">
+                <!-- Clicked day details appear here -->
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 Patrick. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script src="student-config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Force calendar initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // script.js will query for #calendar-days and fill it.
+            // We just need to make sure renderCalendar() is called. 
+            // script.js calls it on load if elements exist, which they do.
+            // We might need to ensure 'currentDate' is set globally, which it is in script.js.
+            if (typeof renderCalendar === 'function') {
+                renderCalendar();
+            }
+        });
+    </script>
+</body>
+
+</html>

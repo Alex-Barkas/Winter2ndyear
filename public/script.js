@@ -310,6 +310,10 @@ function createAssignmentCard(item) {
     // Category Color Logic
     const categoryClass = `category-${item.category.toLowerCase()}`;
 
+    // Only show status if it's NOT Pending/Upcoming (e.g. show DONE)
+    const showStatus = status !== 'PENDING' && status !== 'UPCOMING';
+    const statusHtml = showStatus ? `<span class="assign-status ${statusClass}">${status}</span>` : '';
+
     return `
         <a href="details.html?id=${item.id}" class="assignment-item">
             <div class="assign-left">
@@ -327,7 +331,7 @@ function createAssignmentCard(item) {
             </div>
             <div class="assign-right">
                 <span class="assign-time">${item.time}</span>
-                <span class="assign-status ${statusClass}">${status}</span>
+                ${statusHtml}
             </div>
         </a>
     `;

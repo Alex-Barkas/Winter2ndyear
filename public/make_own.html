@@ -134,20 +134,29 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
+        }
+
+        .toc-sublist {
+            list-style: none;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
 
         .toc-link {
             text-decoration: none;
-            color: var(--text-primary);
+            color: var(--accent-color);
             font-size: 1rem;
-            opacity: 0.8;
+            opacity: 1;
             transition: all 0.2s;
         }
 
         .toc-link:hover {
-            color: var(--accent-color);
-            padding-left: 0.5rem;
+            color: #b94a11;
+            text-decoration: underline;
         }
 
         .intro-gif-container {
@@ -193,7 +202,7 @@
         <article class="article-content">
 
             <div class="intro-gif-container">
-                <img src="clonegif.gif" alt="Clone Guide" class="intro-gif">
+                <img src="guide.gif" alt="Clone Guide" class="intro-gif">
             </div>
 
             <p>This repository works as a complete operating system for your semester. It handles course links,
@@ -204,10 +213,30 @@
             <div class="toc-container">
                 <div class="toc-title">Table of Contents</div>
                 <ul class="toc-list">
-                    <li><a href="#phase-1" class="toc-link">Phase 1: Setup & Prerequisites</a></li>
-                    <li><a href="#phase-2" class="toc-link">Phase 2: Configuration</a></li>
-                    <li><a href="#phase-3" class="toc-link">Phase 3: Assets & Features</a></li>
-                    <li><a href="#phase-4" class="toc-link">Phase 4: Personalization</a></li>
+                    <li>
+                        <a href="#phase-1" class="toc-link">1. Phase 1: Setup & Prerequisites</a>
+                    </li>
+                    <li>
+                        <a href="#phase-2" class="toc-link">2. Phase 2: Configuration</a>
+                        <ul class="toc-sublist">
+                            <li><a href="#phase-2-1" class="toc-link">2.1 Understanding the Data</a></li>
+                            <li><a href="#phase-2-2" class="toc-link">2.2 Prompting Your AI</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#phase-3" class="toc-link">3. Phase 3: Assets & Features</a>
+                        <ul class="toc-sublist">
+                            <li><a href="#phase-3-1" class="toc-link">3.1 The Weekly Schedule</a></li>
+                            <li><a href="#phase-3-2" class="toc-link">3.2 Grade Dashboard</a></li>
+                            <li><a href="#phase-3-3" class="toc-link">3.3 Planner</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#phase-4" class="toc-link">4. Phase 4: Personalization</a>
+                        <ul class="toc-sublist">
+                            <li><a href="#phase-4-1" class="toc-link">4.1 Visuals</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
 
@@ -225,12 +254,13 @@
             <p>The entire site is powered by a single file: <code>public/student-config.js</code>. This file contains
                 the list of courses, assignments, and grading schemes.</p>
 
-            <h3>Understanding the Data</h3>
+            <h3 id="phase-2-1">2.1 Understanding the Data</h3>
             <p>Currently, the file is populated with my Winter 2026 courses, including <code>MTHE 281</code> and
                 <code>MTHE 212</code>. <strong>If you are taking these courses, you can keep them.</strong> Otherwise,
-                you will need to swap them out for your own.</p>
+                you will need to swap them out for your own.
+            </p>
 
-            <h3>Prompting Your AI</h3>
+            <h3 id="phase-2-2">2.2 Prompting Your AI</h3>
             <p>Instead of editing the code manually, copy-paste the following prompt to your AI assistant to update the
                 course list. Fill in the brackets with your details.</p>
 
@@ -249,27 +279,30 @@
             <p>To get the most out of the system, make sure you are using all the built-in tools. Here is what you need
                 to provide to make them work.</p>
 
-            <h3>The Weekly Schedule</h3>
+            <h3 id="phase-3-1">3.1 The Weekly Schedule</h3>
             <p>The "weekly schedule" link in the navigation bar points to a file at
                 <code>public/schedule/schedule.pdf</code>. This is intended to be your visual timetable (exported from
-                SOLUS or a calendar app).</p>
+                SOLUS or a calendar app).
+            </p>
             <ul>
                 <li><strong>Action:</strong> Save your own schedule as a PDF and verify it is named
-                    <code>schedule.pdf</code>, then place it in the `public/schedule/` folder.</li>
+                    <code>schedule.pdf</code>, then place it in the `public/schedule/` folder.
+                </li>
                 <li><strong>AI Prompt:</strong> "I have uploaded my new schedule.pdf. Please confirm it is in the
                     correct directory so the link works."</li>
             </ul>
 
-            <h3>Grade Dashboard</h3>
+            <h3 id="phase-3-2">3.2 Grade Dashboard</h3>
             <p>The <code>grades.html</code> page calculates your current standing based on weights defined in
                 <code>student-config.js</code>. Only the courses defined in the <code>gradingSchemes</code> object will
-                appear here.</p>
+                appear here.
+            </p>
             <ul>
                 <li><strong>Action:</strong> Ask your AI to update the `gradingSchemes` object with the weight
                     distribution from your course syllabus (e.g., "Midterm 20%, Final 50%").</li>
             </ul>
 
-            <h3>Planner</h3>
+            <h3 id="phase-3-3">3.3 Planner</h3>
             <p>The <code>planner.html</code> page is a session-based focus tool. It uses the courses defined in your
                 config file to let you tag study sessions. No setup required other than setting up your courses in Phase
                 2.</p>
@@ -277,11 +310,12 @@
             <h2 id="phase-4">Phase 4: Personalization</h2>
             <p>Make the site feel like yours.</p>
 
-            <h3>Visuals</h3>
+            <h3 id="phase-4-1">4.1 Visuals</h3>
             <ul>
                 <li><strong>Accent Color:</strong> The site uses a specific orange (<code>#dc5815</code>). You can
                     change this globally by editing the <code>--accent-color</code> variable in
-                    <code>public/style.css</code>.</li>
+                    <code>public/style.css</code>.
+                </li>
                 <li><strong>Signature:</strong> The name "patrick taylor 2026" appears in the top right. Ask your AI to
                     find and replace this string across all HTML files with your own name and year.</li>
             </ul>

@@ -9,33 +9,16 @@
     --card-hover-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.05);
 
-    --font-sans: 'Latin Modern Roman', serif;
+    --font-sans: 'Charter', 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+    /* Switched to Charter stack */
     --font-mono: 'JetBrains Mono', monospace;
 
     --accent-color: #dc5815;
     /* User preferred orange accent */
 }
 
-@font-face {
-    font-family: 'Latin Modern Roman';
-    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Latin Modern Roman';
-    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-bold.otf') format('opentype');
-    font-weight: 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Latin Modern Roman';
-    src: url('fonts/latin-modern/fonts/opentype/public/lm/lmroman10-italic.otf') format('opentype');
-    font-weight: 400;
-    font-style: italic;
-}
+/* Removed local Latin Modern @font-face rules since we are switching to Charter (system/web stack) */
+/* If the user provides local Charter files later, we can re-add @font-face */
 
 * {
     box-sizing: border-box;

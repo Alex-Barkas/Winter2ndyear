@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner - archive.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Charter:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific Styles for Planner */
+        .planner-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .planner-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .planner-section-title {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Block Cards */
+        .block-card {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .block-card:hover {
+            background: var(--card-hover-bg);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .block-course {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .block-duration {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .block-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .block-notes {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .block-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Ideas / Scratchpad Area */
+        .scratchpad-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .idea-item {
+            font-family: var(--font-sans);
+            /* Use Charter/Serif for notes */
+            font-size: 0.95rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .idea-item:last-child {
+            border-bottom: none;
+        }
+
+        .new-idea-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            margin-top: 1rem;
+        }
+
+        .new-idea-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Focus Mode Overlay */
+        .focus-overlay {
+            display: none;
+            /* Hidden by default */
+            border: 1px solid var(--accent-color);
+            background: rgba(220, 88, 21, 0.05);
+        }
+
+        .focus-active .focus-overlay {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signature-badge">
+        <div class="signature-row">
+            <span class="signature-text">patrick taylor 2026</span>
+            <img src="cooffe.gif" alt="Coffee" class="signature-gif">
+        </div>
+        <div class="nav-divider"></div>
+        <nav class="side-nav">
+            <a href="schedule/schedule.pdf" target="_blank" class="nav-link">weekly schedule</a>
+            <a href="grades.html" class="nav-link">grade dashboard</a>
+            <a href="calendar.html" class="nav-link">calendar</a>
+            <a href="planner.html" class="nav-link active">planner</a>
+        </nav>
+    </div>
+
+    <main class="container">
+        <header>
+            <a href="index.html" class="back-link" style="margin-bottom: 2rem; display: inline-block;">← Back to
+                Home</a>
+            <div class="header-titling">
+                <h1>planner.</h1>
+            </div>
+            <p class="subtitle">Context-switching is the mind-killer. Focus on one block at a time.</p>
+        </header>
+
+        <div class="planner-layout">
+
+            <!-- Main Column: Session Blocks -->
+            <section>
+                <h2 class="planner-section-title">Session Blocks</h2>
+                <div id="blocks-container">
+                    <!-- Injected via JS -->
+                </div>
+            </section>
+
+            <!-- Side Column: Scratchpad / Ideas -->
+            <aside>
+                <div class="scratchpad-container">
+                    <h2 class="planner-section-title">Idea Log</h2>
+                    <div id="ideas-list">
+                        <!-- Injected via JS -->
+                    </div>
+                    <input type="text" id="quick-idea" class="new-idea-input" placeholder="+  Jot down a thought..."
+                        onkeypress="handleIdeaInput(event)">
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; opacity: 0.5;">* Press
+                        Enter to save to LocalStorage (Temporary)</p>
+                </div>
+            </aside>
+
+        </div>
+
+        <footer>
+            <p>© 2026 Patrick. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <script src="student-config.js"></script>
+    <script src="tracker.js"></script>
+    <script src="planner.js"></script>
+</body>
+
+</html>

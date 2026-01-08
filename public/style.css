@@ -53,10 +53,10 @@ header {
     gap: 1.5rem;
 }
 
-/* Signature Badge (Fixed Top Right) */
-/* Signature Badge & Sidebar Nav (Fixed Top Right) */
+/* Signature Badge (Absolute Top Right) */
+/* Signature Badge & Sidebar Nav (Absolute Top Right) */
 .signature-badge {
-    position: fixed;
+    position: absolute;
     top: 2rem;
     right: 2rem;
     display: flex;

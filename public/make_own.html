@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>how to make your own - archive.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Charter:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .article-content {
+            max-width: 680px;
+            margin: 0 auto;
+            font-family: var(--font-sans);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .article-content h2 {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .article-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            list-style-type: none;
+        }
+
+        .article-content li {
+            position: relative;
+            margin-bottom: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .article-content li::before {
+            content: "→";
+            position: absolute;
+            left: -1.5rem;
+            color: var(--accent-color);
+        }
+
+        .article-content code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2em 0.4em;
+            border-radius: 0.25rem;
+            color: var(--accent-color);
+        }
+
+        .article-content .highlight {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .article-content blockquote {
+            border-left: 3px solid var(--accent-color);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signature-badge">
+        <div class="signature-row">
+            <span class="signature-text">patrick taylor 2026</span>
+            <img src="cooffe.gif" alt="Coffee" class="signature-gif">
+        </div>
+        <div class="nav-divider"></div>
+        <nav class="side-nav">
+            <a href="schedule/schedule.pdf" target="_blank" class="nav-link">weekly schedule</a>
+            <a href="grades.html" class="nav-link">grade dashboard</a>
+            <a href="calendar.html" class="nav-link">calendar</a>
+            <a href="planner.html" class="nav-link">planner</a>
+            <a href="make_own.html" class="nav-link active">how to make your own</a>
+        </nav>
+    </div>
+
+    <main class="container">
+        <header>
+            <a href="index.html" class="back-link" style="margin-bottom: 2rem; display: inline-block;">← Back to
+                Home</a>
+            <div class="header-titling">
+                <h1>how to make your own.</h1>
+            </div>
+            <p class="subtitle">A guide to forking this system for your own studies.</p>
+        </header>
+
+        <article class="article-content">
+            <p>So, you want to steal my notes site. Excellent choice. This system is built to be a <span
+                    class="highlight">minimalist, high-performance command center</span> for your academic life,
+                stripping away the bloat of modern learning management systems.</p>
+
+            <p>The architecture is simple: a static HTML/JS frontend powered by a single configuration file. No
+                database, no backend server, no login. Just you and the code.</p>
+
+            <h2>Prerequisites</h2>
+            <ul>
+                <li>A GitHub account to fork the source code.</li>
+                <li><strong>Antigravity</strong> (or a similar AI coding assistant) to handle the heavy lifting.</li>
+                <li>Your own course syllabi and schedule.</li>
+            </ul>
+
+            <h2>Step 1: Clean House</h2>
+            <p>Right now, this codebase is tailored to my Winter 2026 term. It has my courses (like
+                <code>MTHE 281</code> and <code>MTHE 212</code>) and my schedule. The first thing you need to do is
+                clear out my data.</p>
+            <p>Navigate to <code>public/student-config.js</code>. This is the brain of the operation. In it, you will
+                find a <code>courses</code> array and an <code>assignments</code> array. Delete my entries.</p>
+
+            <h2>Step 2: Input Your Data</h2>
+            <p>You don't need to write manual HTML to add your courses. Just update the configuration objects in
+                <code>public/student-config.js</code>.</p>
+            <ul>
+                <li><strong>Courses:</strong> Add objects with properties for <code>code</code>, <code>name</code>, and
+                    links to your <code>notes</code>, <code>textbook</code>, and <code>onq</code> pages.</li>
+                <li><strong>Assignments:</strong> Add your deadlines to the <code>assignments</code> array. The system
+                    will automatically populate the Global Schedule, Calendar, and Grade Dashboard.</li>
+            </ul>
+            <blockquote>
+                "Antigravity, update my student-config.js to add a new course called 'PHYS 101' with a midterm on Feb
+                14th."
+            </blockquote>
+            <p>Use your AI assistant to make these data entry tasks trivial. It knows the structure of the file and can
+                append or modify entries instantly.</p>
+
+            <h2>Step 3: The Assets</h2>
+            <p>There are a few key files you need to replace to truly make this yours:</p>
+            <ul>
+                <li><strong>Schedule:</strong> Replace <code>public/schedule/schedule.pdf</code> with your own weekly
+                    timetable. This file is linked directly from the "weekly schedule" navigation item.</li>
+                <li><strong>Signature:</strong> You might want to change the "patrick taylor 2026" text in the top
+                    right. This is hardcoded in the HTML files (grep for it!) or you can ask Antigravity to variable-ize
+                    it for you.</li>
+            </ul>
+
+            <h2>Step 4: Customization</h2>
+            <p>The site uses a <span class="highlight">defined orange accent color</span> throughout the UI. If orange
+                isn't your vibe, open <code>public/style.css</code> and find the <code>--accent-color</code> variable at
+                the top. Change the hex code, and the entire site will update to match your aesthetic.</p>
+
+            <p>That's it. You now have a personalized, distraction-free academic dashboard. Now go study.</p>
+        </article>
+
+        <footer>
+            <p>© 2026 Patrick. All rights reserved.</p>
+        </footer>
+    </main>
+</body>
+
+</html>

@@ -218,32 +218,38 @@
                         <a href="#phase-1" class="toc-link">2. Phase 1: Setup & Prerequisites</a>
                     </li>
                     <li>
-                        <a href="#phase-2" class="toc-link">3. Phase 2: Configuration</a>
+                        <a href="#phase-2" class="toc-link">3. Phase 2: File Structure</a>
                         <ul class="toc-sublist">
-                            <li><a href="#phase-2-1" class="toc-link">3.1 Understanding the Data</a></li>
-                            <li><a href="#phase-2-2" class="toc-link">3.2 Prompting Your AI</a></li>
+                            <li><a href="#phase-2-1" class="toc-link">3.1 public/</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#phase-3" class="toc-link">4. Phase 3: Assets & Features</a>
+                        <a href="#phase-3" class="toc-link">4. Phase 3: Configuration</a>
                         <ul class="toc-sublist">
-                            <li><a href="#phase-3-1" class="toc-link">4.1 The Weekly Schedule</a></li>
-                            <li><a href="#phase-3-2" class="toc-link">4.2 Grade Dashboard</a></li>
-                            <li><a href="#phase-3-3" class="toc-link">4.3 Planner</a></li>
+                            <li><a href="#phase-3-1" class="toc-link">4.1 Understanding the Data</a></li>
+                            <li><a href="#phase-3-2" class="toc-link">4.2 Prompting Your AI</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#phase-4" class="toc-link">5. Phase 4: Personalization</a>
+                        <a href="#phase-4" class="toc-link">5. Phase 4: Assets & Features</a>
                         <ul class="toc-sublist">
-                            <li><a href="#phase-4-1" class="toc-link">5.1 Visuals</a></li>
+                            <li><a href="#phase-4-1" class="toc-link">5.1 The Weekly Schedule</a></li>
+                            <li><a href="#phase-4-2" class="toc-link">5.2 Grade Dashboard</a></li>
+                            <li><a href="#phase-4-3" class="toc-link">5.3 Planner</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#phase-5" class="toc-link">6. Phase 5: Workflow & Persistence</a>
+                        <a href="#phase-5" class="toc-link">6. Phase 5: Personalization</a>
                         <ul class="toc-sublist">
-                            <li><a href="#phase-5-1" class="toc-link">6.1 Efficiency & Batching</a></li>
-                            <li><a href="#phase-5-2" class="toc-link">6.2 Google Drive Strategy</a></li>
-                            <li><a href="#phase-5-3" class="toc-link">6.3 Why This Matters</a></li>
+                            <li><a href="#phase-5-1" class="toc-link">6.1 Visuals</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#phase-6" class="toc-link">7. Phase 6: Workflow & Persistence</a>
+                        <ul class="toc-sublist">
+                            <li><a href="#phase-6-1" class="toc-link">7.1 Efficiency & Batching</a></li>
+                            <li><a href="#phase-6-2" class="toc-link">7.2 Google Drive Strategy</a></li>
+                            <li><a href="#phase-6-3" class="toc-link">7.3 Why This Matters</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -273,17 +279,41 @@
                 <li><strong>Course Info:</strong> Have your syllabus PDFs and OnQ/portal links ready.</li>
             </ul>
 
-            <h2 id="phase-2">3. Phase 2: Configuration</h2>
+            <h2 id="phase-2">3. Phase 2: File Structure</h2>
+            <p>Before you start editing, it helps to understand where things live. Use this map to navigate the
+                repository.</p>
+
+            <pre
+                style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); overflow-x: auto;">
+public/
+├── student-config.js      <span style="color: var(--accent-color); font-weight: bold;">[The Brain]</span> All courses, assignments, and grades live here.
+├── make_own.html          <span style="color: var(--accent-color); font-weight: bold;">[The Guide]</span> This file! Setup instructions.
+├── course-links/          <span style="color: var(--accent-color); font-weight: bold;">[Resource Hub]</span>
+│   ├── onq-links.md       (Links to your university portals)
+│   ├── googledrive.md     (Links to your personal cloud folders)
+│   └── textbooks.md       (Links to your digital textbooks)
+├── pdfs/                  <span style="color: var(--accent-color); font-weight: bold;">[Storage]</span> Local copies of assignment briefs or syllabus files.
+└── syllabus/              <span style="color: var(--accent-color); font-weight: bold;">[Knowledge Base]</span>
+    ├── mthe281.md         (Extracted text from your syllabus PDFs)
+    └── course_name.md     (Create these to give your AI context)</pre>
+
+            <blockquote style="margin-top: 1.5rem;">
+                <strong>Pro Tip:</strong> Keeping your syllabus text in the <code>syllabus/</code> folder allows your AI
+                to "read" your course policies when you ask questions like <em>"What is the late policy for MTHE
+                    281?"</em>
+            </blockquote>
+
+            <h2 id="phase-3">4. Phase 3: Configuration</h2>
             <p>The entire site is powered by a single file: <code>public/student-config.js</code>. This file contains
                 the list of courses, assignments, and grading schemes.</p>
 
-            <h3 id="phase-2-1">3.1 Understanding the Data</h3>
+            <h3 id="phase-3-1">4.1 Understanding the Data</h3>
             <p>Currently, the file is populated with my Winter 2026 courses, including <code>MTHE 281</code> and
                 <code>MTHE 212</code>. <strong>If you are taking these courses, you can keep them.</strong> Otherwise,
                 you will need to swap them out for your own.
             </p>
 
-            <h3 id="phase-2-2">3.2 Prompting Your AI</h3>
+            <h3 id="phase-3-2">4.2 Prompting Your AI</h3>
             <p>Instead of editing the code manually, copy-paste the following prompt to your AI assistant to update the
                 course list. Fill in the brackets with your details.</p>
 
@@ -291,18 +321,22 @@
                 "I am configuring my student-config.js file. <br><br>
                 1. Please keep the entries for MTHE 281 and MTHE 212 as I am taking those courses.<br>
                 2. Remove the other courses (ENPH 239, CMPE 212, ELEC 274).<br>
-                3. Add a new course: [COURSE CODE] - [COURSE NAME]. Here is the link to the OnQ page: [LINK].<br>
-                4. Add a midterm for this new course on [DATE] at [TIME]."<br>
+                3. Add a new course: [COURSE CODE] - [COURSE NAME]. Link: [LINK].<br>
+                4. Add the schedule:<br>
+                - Lectures: Mon 9:30, Wed 12:30<br>
+                - Labs: Friday 2:30 (Week A)<br>
+                - Weekly Quizzes: Due Sunday night<br>
+                - Midterm: Feb 14 at 2pm"<br>
             </blockquote>
 
             <p>The AI will automatically structure the data correctly, ensuring the new courses appear on the homepage
                 and the deadlines appear in the calendar.</p>
 
-            <h2 id="phase-3">4. Phase 3: Assets & Features</h2>
+            <h2 id="phase-4">5. Phase 4: Assets & Features</h2>
             <p>To get the most out of the system, make sure you are using all the built-in tools. Here is what you need
                 to provide to make them work.</p>
 
-            <h3 id="phase-3-1">4.1 The Weekly Schedule</h3>
+            <h3 id="phase-4-1">5.1 The Weekly Schedule</h3>
             <p>The "weekly schedule" link in the navigation bar points to a file at
                 <code>public/schedule/schedule.pdf</code>. This is intended to be your visual timetable (exported from
                 SOLUS or a calendar app).
@@ -315,7 +349,7 @@
                     correct directory so the link works."</li>
             </ul>
 
-            <h3 id="phase-3-2">4.2 Grade Dashboard</h3>
+            <h3 id="phase-4-2">5.2 Grade Dashboard</h3>
             <p>The <code>grades.html</code> page calculates your current standing based on weights defined in
                 <code>student-config.js</code>. Only the courses defined in the <code>gradingSchemes</code> object will
                 appear here.
@@ -325,15 +359,15 @@
                     distribution from your course syllabus (e.g., "Midterm 20%, Final 50%").</li>
             </ul>
 
-            <h3 id="phase-3-3">4.3 Planner</h3>
+            <h3 id="phase-4-3">5.3 Planner</h3>
             <p>The <code>planner.html</code> page is a session-based focus tool. It uses the courses defined in your
                 config file to let you tag study sessions. No setup required other than setting up your courses in Phase
                 2.</p>
 
-            <h2 id="phase-4">5. Phase 4: Personalization</h2>
+            <h2 id="phase-5">6. Phase 5: Personalization</h2>
             <p>Make the site feel like yours.</p>
 
-            <h3 id="phase-4-1">5.1 Visuals</h3>
+            <h3 id="phase-5-1">6.1 Visuals</h3>
             <ul>
                 <li><strong>Accent Color:</strong> The site uses a specific orange (<code>#dc5815</code>). You can
                     change this globally by editing the <code>--accent-color</code> variable in
@@ -348,7 +382,7 @@
                 accent color in style.css to a [COLOR NAME/HEX]."
             </blockquote>
 
-            <h2 id="phase-5">6. Phase 5: Workflow & Persistence</h2>
+            <h2 id="phase-6">7. Phase 6: Workflow & Persistence</h2>
             <p>This system uses a "Code as Database" philosophy. This means there are two ways to interact with it:</p>
             <ul>
                 <li><strong>Local (Temporary):</strong> Clicking "Mark as Complete" or entering a grade in the UI. This
@@ -357,7 +391,7 @@
                     a permanent record that syncs across devices.</li>
             </ul>
 
-            <h3 id="phase-5-1">6.1 Efficiency & Batching</h3>
+            <h3 id="phase-6-1">7.1 Efficiency & Batching</h3>
             <p>One-off requests are slow. Don't ask your AI to update one assignment at a time. <strong>Batch your
                     requests.</strong></p>
             <ul>
@@ -368,7 +402,7 @@
             <p>Treat your AI like a secretary you meet with once a day. Dump all your updates in one prompt, and let it
                 handle the code.</p>
 
-            <h3 id="phase-5-2">6.2 Google Drive Strategy</h3>
+            <h3 id="phase-6-2">7.2 Google Drive Strategy</h3>
             <p>Since we don't have a database to store files, use <strong>Google Drive</strong> as your file server.</p>
             <ol>
                 <li>Create a folder for each course in your Drive.</li>
@@ -379,10 +413,11 @@
             </ol>
             <p>This keeps your repo light and fast while giving you unlimited storage for your actual documents.</p>
 
-            <h3 id="phase-5-3">6.3 Why This Matters</h3>
+            <h3 id="phase-6-3">7.3 Why This Matters</h3>
             <p><strong>Disclaimer:</strong> Any changes you make in the browser UI (checking off a box, entering a
                 grade) are <strong>temporary</strong> and live only on that device. To make it permanent, you
-                <strong>must</strong> instruct your AI to update the config file.</p>
+                <strong>must</strong> instruct your AI to update the config file.
+            </p>
             <p>This workflow separates "scratchpad" work (UI) from "official record" work (Code). It forces you to be
                 intentional about your data, preventing the digital clutter that accumulates in apps like Notion.</p>
 

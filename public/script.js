@@ -68,7 +68,7 @@ const data = {
         },
         "ELEC 274": {
             components: [
-                { name: "Laboratories", weight: 20, count: 5 }, // Assume 5 labs?
+                { name: "Laboratories", weight: 20, count: 4 },
                 { name: "Midterm Quiz", weight: 20, count: 1 },
                 { name: "Final Exam", weight: 60, count: 1 }
             ]
@@ -128,6 +128,14 @@ const data = {
         { id: "cmpe-l7", course: "CMPE 212", category: "LAB", title: "Lab 7", date: "2026-03-17", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 7" } },
         { id: "cmpe-l8", course: "CMPE 212", category: "LAB", title: "Lab 8", date: "2026-03-31", time: "14:30", status: "PENDING", details: { type: "text", content: "Comp Sci Lab 8" } },
         { id: "cmpe-fin", course: "CMPE 212", category: "FINAL", title: "Final Exam", date: "2026-04-30", time: "00:00", status: "UPCOMING", details: { type: "text", content: "Date TBD" } },
+
+        // --- ELEC 274 ---
+        { id: "elec-l1", course: "ELEC 274", category: "LAB", title: "Lab 1", date: "2026-01-12", time: "18:30", status: "PENDING", details: { type: "text", content: "Week 2 Lab" } },
+        { id: "elec-l2", course: "ELEC 274", category: "LAB", title: "Lab 2", date: "2026-01-26", time: "18:30", status: "PENDING", details: { type: "text", content: "Week 4 Lab" } },
+        { id: "elec-t1", course: "ELEC 274", category: "MIDTERM", title: "Midterm Quiz", date: "2026-02-06", time: "13:30", status: "UPCOMING", details: { type: "text", content: "Friday, Feb 6 @ 1:30PM" } },
+        { id: "elec-l3", course: "ELEC 274", category: "LAB", title: "Lab 3", date: "2026-03-09", time: "18:30", status: "PENDING", details: { type: "text", content: "Week 9 Lab" } },
+        { id: "elec-l4", course: "ELEC 274", category: "LAB", title: "Lab 4", date: "2026-03-23", time: "18:30", status: "PENDING", details: { type: "text", content: "Week 11 Lab" } },
+        { id: "elec-fin", course: "ELEC 274", category: "FINAL", title: "Final Exam", date: "2026-04-30", time: "00:00", status: "UPCOMING", details: { type: "text", content: "Date TBD" } },
 
         // --- OTHER COURSES (Retained) ---
         {
@@ -271,7 +279,7 @@ function renderCalendar() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const prevMonthDays = new Date(year, month, 0).getDate();
 
-    // Reading Week Setup (Feb 13 - Feb 22, 2026)
+    // Reading Week Setup (Feb 13 - Feb 22, 2026) -- Highlighting range
     const rwStart = new Date('2026-02-13T00:00:00');
     const rwEnd = new Date('2026-02-22T23:59:59');
 
@@ -423,9 +431,56 @@ function filterAssignments(courseCode) {
     renderAssignments(items);
 }
 
+// Helper to determine Semester Week
+function getSemesterWeek(dateString) {
+    const d = new Date(dateString);
+    // Week 1 starts Jan 5, 2026
+    const startOfSem = new Date('2026-01-05');
+
+    // Reading Week: Feb 16 - Feb 22
+    const rwStart = new Date('2026-02-16');
+    const rwEnd = new Date('2026-02-22');
+
+    if (d >= rwStart && d <= rwEnd) return "Reading Week";
+
+    const diffTime = d - startOfSem;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // If before semester
+    if (diffDays < 0) return "Pre-Term";
+
+    let weekNum = Math.floor(diffDays / 7) + 1;
+
+    // Adjust for Reading Week gap (which is essentially a skipped week number in terms of "Instructional Weeks" usually,
+    // but user said "Feb 23 would start week 7".
+    // Week 1: Jan 5
+    // Week 2: Jan 12
+    // Week 3: Jan 19
+    // Week 4: Jan 26
+    // Week 5: Feb 2
+    // Week 6: Feb 9
+    // RW: Feb 16 (Week 7 calendar-wise, but is RW)
+    // Week 7 Instruction: Feb 23 (Week 8 calendar-wise)
+    // So if date is after RW, we subtract 1 from the raw week count effectively?
+    // Wait, Jan 5 (W1), Jan 12 (W2)... Feb 9 (W6).
+    // Feb 16 is starts RW.
+    // Feb 23 starts W7.
+    // My calculation:
+    // Feb 23 is 49 days after Jan 5. 49/7 = 7. floor(7)+1 = 8.
+    // So raw calculation gives Week 8. User wants Week 7.
+    // So yes, subtract 1 if > Feb 22.
+
+    if (d > rwEnd) {
+        weekNum -= 1;
+    }
+
+    return `Week ${weekNum}`;
+}
+
 function createAssignmentCard(item) {
     const dateObj = new Date(item.date + 'T' + item.time);
     const day = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+    const weekLabel = getSemesterWeek(item.date);
 
     // Status Color Logic
     let status = item.status;
@@ -442,7 +497,10 @@ function createAssignmentCard(item) {
     return `
         <a href="details.html?id=${item.id}" class="assignment-item">
             <div class="assign-left">
-                <span class="assign-date">${day}</span>
+                <span class="assign-date">
+                    ${day}
+                    <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 2px;">${weekLabel}</div>
+                </span>
                 <div class="assign-details">
                     <div class="assign-meta">
                         <span class="assign-course">${item.course}</span>

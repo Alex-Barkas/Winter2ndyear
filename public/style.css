@@ -733,3 +733,12 @@ footer p {
     opacity: 0.5;
 }
 
+
+/* Week Badge Style */
+.week-badge {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+}
+

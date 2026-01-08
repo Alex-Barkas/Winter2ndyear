@@ -16,5 +16,4 @@ build/
 *.txt
 *.log
 
-# Fonts (Ignored to speed up git on Drive)
-public/fonts/
+

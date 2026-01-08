@@ -30,24 +30,41 @@
             color: var(--text-primary);
         }
 
+        .article-content h3 {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            opacity: 0.9;
+        }
+
         .article-content p {
             margin-bottom: 1.5rem;
             opacity: 0.9;
         }
 
-        .article-content ul {
+        .article-content ul,
+        .article-content ol {
             margin-bottom: 1.5rem;
             padding-left: 1.5rem;
+        }
+
+        .article-content ol {
+            list-style-type: decimal;
+        }
+
+        .article-content ul {
             list-style-type: none;
         }
 
-        .article-content li {
+        .article-content ul li {
             position: relative;
             margin-bottom: 0.75rem;
             opacity: 0.9;
         }
 
-        .article-content li::before {
+        .article-content ul li::before {
             content: "→";
             position: absolute;
             left: -1.5rem;
@@ -72,8 +89,12 @@
             border-left: 3px solid var(--accent-color);
             padding-left: 1.5rem;
             margin: 2rem 0;
-            font-style: italic;
-            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
 
         .back-link {
@@ -88,6 +109,57 @@
         .back-link:hover {
             opacity: 1;
             color: var(--accent-color);
+        }
+
+        .toc-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .toc-title {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toc-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            opacity: 0.8;
+            transition: all 0.2s;
+        }
+
+        .toc-link:hover {
+            color: var(--accent-color);
+            padding-left: 0.5rem;
+        }
+
+        .intro-gif-container {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .intro-gif {
+            max-width: 200px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -115,63 +187,112 @@
             <div class="header-titling">
                 <h1>how to make your own.</h1>
             </div>
-            <p class="subtitle">A guide to forking this system for your own studies.</p>
+            <p class="subtitle">A guide to configuring this academic dashboard for your own use.</p>
         </header>
 
         <article class="article-content">
-            <p>So, you want to steal my notes site. Excellent choice. This system is built to be a <span
-                    class="highlight">minimalist, high-performance command center</span> for your academic life,
-                stripping away the bloat of modern learning management systems.</p>
 
-            <p>The architecture is simple: a static HTML/JS frontend powered by a single configuration file. No
-                database, no backend server, no login. Just you and the code.</p>
+            <div class="intro-gif-container">
+                <img src="clonegif.gif" alt="Clone Guide" class="intro-gif">
+            </div>
 
-            <h2>Prerequisites</h2>
+            <p>This repository works as a complete operating system for your semester. It handles course links,
+                assignment tracking, grade calculation, and daily planning without the bloat of traditional LMS
+                platforms. Since you're likely using an AI assistant (like Google Gemini) to manage your code, this
+                guide is written to help you direct that AI effectively.</p>
+
+            <div class="toc-container">
+                <div class="toc-title">Table of Contents</div>
+                <ul class="toc-list">
+                    <li><a href="#phase-1" class="toc-link">Phase 1: Setup & Prerequisites</a></li>
+                    <li><a href="#phase-2" class="toc-link">Phase 2: Configuration</a></li>
+                    <li><a href="#phase-3" class="toc-link">Phase 3: Assets & Features</a></li>
+                    <li><a href="#phase-4" class="toc-link">Phase 4: Personalization</a></li>
+                </ul>
+            </div>
+
+            <h2 id="phase-1">Phase 1: Setup & Prerequisites</h2>
+            <p>You don't need to be a developer to use this. You just need access to the source code and an LLM to do
+                the heavy lifting.</p>
             <ul>
-                <li>A GitHub account to fork the source code.</li>
-                <li><strong>Antigravity</strong> (or a similar AI coding assistant) to handle the heavy lifting.</li>
-                <li>Your own course syllabi and schedule.</li>
+                <li><strong>Source Code:</strong> Fork the GitHub repository to your own account.</li>
+                <li><strong>AI Assistant:</strong> Use "Antigravity" (Google Gemini) or a similar agentic coding tool.
+                </li>
+                <li><strong>Course Info:</strong> Have your syllabus PDFs and OnQ/portal links ready.</li>
             </ul>
 
-            <h2>Step 1: Clean House</h2>
-            <p>Right now, this codebase is tailored to my Winter 2026 term. It has my courses (like
-                <code>MTHE 281</code> and <code>MTHE 212</code>) and my schedule. The first thing you need to do is
-                clear out my data.</p>
-            <p>Navigate to <code>public/student-config.js</code>. This is the brain of the operation. In it, you will
-                find a <code>courses</code> array and an <code>assignments</code> array. Delete my entries.</p>
+            <h2 id="phase-2">Phase 2: Configuration</h2>
+            <p>The entire site is powered by a single file: <code>public/student-config.js</code>. This file contains
+                the list of courses, assignments, and grading schemes.</p>
 
-            <h2>Step 2: Input Your Data</h2>
-            <p>You don't need to write manual HTML to add your courses. Just update the configuration objects in
-                <code>public/student-config.js</code>.</p>
-            <ul>
-                <li><strong>Courses:</strong> Add objects with properties for <code>code</code>, <code>name</code>, and
-                    links to your <code>notes</code>, <code>textbook</code>, and <code>onq</code> pages.</li>
-                <li><strong>Assignments:</strong> Add your deadlines to the <code>assignments</code> array. The system
-                    will automatically populate the Global Schedule, Calendar, and Grade Dashboard.</li>
-            </ul>
+            <h3>Understanding the Data</h3>
+            <p>Currently, the file is populated with my Winter 2026 courses, including <code>MTHE 281</code> and
+                <code>MTHE 212</code>. <strong>If you are taking these courses, you can keep them.</strong> Otherwise,
+                you will need to swap them out for your own.</p>
+
+            <h3>Prompting Your AI</h3>
+            <p>Instead of editing the code manually, copy-paste the following prompt to your AI assistant to update the
+                course list. Fill in the brackets with your details.</p>
+
             <blockquote>
-                "Antigravity, update my student-config.js to add a new course called 'PHYS 101' with a midterm on Feb
-                14th."
+                "I am configuring my student-config.js file. <br><br>
+                1. Please keep the entries for MTHE 281 and MTHE 212 as I am taking those courses.<br>
+                2. Remove the other courses (ENPH 239, CMPE 212, ELEC 274).<br>
+                3. Add a new course: [COURSE CODE] - [COURSE NAME]. Here is the link to the OnQ page: [LINK].<br>
+                4. Add a midterm for this new course on [DATE] at [TIME]."<br>
             </blockquote>
-            <p>Use your AI assistant to make these data entry tasks trivial. It knows the structure of the file and can
-                append or modify entries instantly.</p>
 
-            <h2>Step 3: The Assets</h2>
-            <p>There are a few key files you need to replace to truly make this yours:</p>
+            <p>The AI will automatically structure the data correctly, ensuring the new courses appear on the homepage
+                and the deadlines appear in the calendar.</p>
+
+            <h2 id="phase-3">Phase 3: Assets & Features</h2>
+            <p>To get the most out of the system, make sure you are using all the built-in tools. Here is what you need
+                to provide to make them work.</p>
+
+            <h3>The Weekly Schedule</h3>
+            <p>The "weekly schedule" link in the navigation bar points to a file at
+                <code>public/schedule/schedule.pdf</code>. This is intended to be your visual timetable (exported from
+                SOLUS or a calendar app).</p>
             <ul>
-                <li><strong>Schedule:</strong> Replace <code>public/schedule/schedule.pdf</code> with your own weekly
-                    timetable. This file is linked directly from the "weekly schedule" navigation item.</li>
-                <li><strong>Signature:</strong> You might want to change the "patrick taylor 2026" text in the top
-                    right. This is hardcoded in the HTML files (grep for it!) or you can ask Antigravity to variable-ize
-                    it for you.</li>
+                <li><strong>Action:</strong> Save your own schedule as a PDF and verify it is named
+                    <code>schedule.pdf</code>, then place it in the `public/schedule/` folder.</li>
+                <li><strong>AI Prompt:</strong> "I have uploaded my new schedule.pdf. Please confirm it is in the
+                    correct directory so the link works."</li>
             </ul>
 
-            <h2>Step 4: Customization</h2>
-            <p>The site uses a <span class="highlight">defined orange accent color</span> throughout the UI. If orange
-                isn't your vibe, open <code>public/style.css</code> and find the <code>--accent-color</code> variable at
-                the top. Change the hex code, and the entire site will update to match your aesthetic.</p>
+            <h3>Grade Dashboard</h3>
+            <p>The <code>grades.html</code> page calculates your current standing based on weights defined in
+                <code>student-config.js</code>. Only the courses defined in the <code>gradingSchemes</code> object will
+                appear here.</p>
+            <ul>
+                <li><strong>Action:</strong> Ask your AI to update the `gradingSchemes` object with the weight
+                    distribution from your course syllabus (e.g., "Midterm 20%, Final 50%").</li>
+            </ul>
 
-            <p>That's it. You now have a personalized, distraction-free academic dashboard. Now go study.</p>
+            <h3>Planner</h3>
+            <p>The <code>planner.html</code> page is a session-based focus tool. It uses the courses defined in your
+                config file to let you tag study sessions. No setup required other than setting up your courses in Phase
+                2.</p>
+
+            <h2 id="phase-4">Phase 4: Personalization</h2>
+            <p>Make the site feel like yours.</p>
+
+            <h3>Visuals</h3>
+            <ul>
+                <li><strong>Accent Color:</strong> The site uses a specific orange (<code>#dc5815</code>). You can
+                    change this globally by editing the <code>--accent-color</code> variable in
+                    <code>public/style.css</code>.</li>
+                <li><strong>Signature:</strong> The name "patrick taylor 2026" appears in the top right. Ask your AI to
+                    find and replace this string across all HTML files with your own name and year.</li>
+            </ul>
+
+            <blockquote>
+                "Please replace 'patrick taylor 2026' with '[YOUR NAME] [YEAR]' in all HTML files. Also, change the
+                accent color in style.css to a [COLOR NAME/HEX]."
+            </blockquote>
+
+            <p>Once you've completed these steps, you'll have a fully functional, personalized academic operating
+                system.</p>
         </article>
 
         <footer>

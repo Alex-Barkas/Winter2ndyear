@@ -33,7 +33,9 @@ body {
 
 .container {
     width: 100%;
-    max-width: 700px;
+    max-width: 1200px;
+    /* Widened from 700px */
+    margin: 0 auto;
 }
 
 /* Header */
@@ -45,7 +47,17 @@ header {
 }
 
 .header-icon {
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.header-icon img {
+    width: 120px !important;
+    /* Increased from 48px inline */
+    height: 120px !important;
+    border-radius: 12px !important;
+    /* Slight rounded square looks more iconic */
+    object-fit: cover;
+    border: 1px solid var(--border-color);
 }
 
 .header-image-container {
@@ -101,9 +113,17 @@ section {
 }
 
 /* List Grid */
+/* Default to single column stack */
 .list-grid {
     display: flex;
     flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Specific Grid for Course List to use space */
+#course-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
     gap: 1.5rem;
 }
 
@@ -294,45 +314,63 @@ section {
 }
 
 .course-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 0.75rem;
-    flex-wrap: wrap;
+    margin-top: 0.5rem;
 }
 
 .action-btn {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
+    /* Icon (if any) top, Text bottom if needed, or just centered */
     align-items: center;
     justify-content: center;
-    height: 2.25rem;
-    padding: 0 1rem;
-    border-radius: 0.375rem;
-    font-size: 0.8rem;
+    height: 3.5rem;
+    /* Taller, easier to click */
+    padding: 0 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    /* Larger text */
     font-weight: 500;
     text-decoration: none;
     font-family: var(--font-sans);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.action-btn span {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .action-btn.primary {
     background-color: var(--text-primary);
     color: #000;
     border: 1px solid var(--text-primary);
+    font-weight: 600;
 }
 
 .action-btn.primary:hover {
-    background-color: #e4e4e7;
-    border-color: #e4e4e7;
+    background-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .action-btn.secondary {
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.03);
     color: var(--text-muted);
     border: 1px solid var(--border-color);
 }
 
 .action-btn.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
-    border-color: var(--text-muted);
-    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
 }
 
 

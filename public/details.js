@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentAssignmentId) {
         loadChecklist();
         loadGrade();
+        loadStatus();
     }
 });
 
@@ -109,17 +110,27 @@ function saveAssignmentGrade() {
     localStorage.setItem(`grade_val_${currentAssignmentId}`, val);
 }
 
-function markAsDone() {
-    // Update the main assignment status in script.js (persisted via local storage overlay)
-    // Note: Since script.js data is hardcoded, we need a "status overlay" system.
-    // simpler approach: Save to localStorage `status_${id}` = 'DONE'
+function loadStatus() {
+    const item = data.assignments.find(a => a.id === currentAssignmentId);
+    if (!item) return;
 
-    localStorage.setItem(`status_${currentAssignmentId}`, 'DONE');
+    // Check localStorage first, then default to item.status
+    const localStatus = localStorage.getItem(`status_${currentAssignmentId}`);
+    const currentStatus = localStatus || item.status;
 
-    const btn = document.querySelector('.submit-btn');
-    btn.innerText = "Completed! 🎉";
-    btn.disabled = true;
-    btn.style.opacity = "0.7";
+    const selector = document.getElementById('status-selector');
+    if (selector) {
+        selector.value = currentStatus;
+    }
+}
 
-    // Confetti effect could go here
+function updateStatus() {
+    const selector = document.getElementById('status-selector');
+    const newStatus = selector.value;
+
+    // Save to localStorage
+    localStorage.setItem(`status_${currentAssignmentId}`, newStatus);
+
+    // Visual feedback (optional)
+    // You could flash a border or show a toast here
 }

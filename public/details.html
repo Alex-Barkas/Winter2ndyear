@@ -142,9 +142,17 @@
                         <label>Grade Achieved (%)</label>
                         <input type="number" id="assignment-grade" placeholder="-" onchange="saveAssignmentGrade()">
                     </div>
-                    <button class="submit-btn" onclick="markAsDone()">
-                        Mark as Complete
-                    </button>
+                    <div style="margin-top: 1rem;">
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Current
+                            Status</label>
+                        <select id="status-selector" onchange="updateStatus()"
+                            style="width: 100%; padding: 0.75rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; font-family: var(--font-sans);">
+                            <option value="PENDING">Pending</option>
+                            <option value="UPCOMING">Upcoming</option>
+                            <option value="DONE">Done</option>
+                        </select>
+                    </div>
                 </div>
 
             </div>

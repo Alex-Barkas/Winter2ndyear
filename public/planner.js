@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- HELPER: GET DATA POOLS ---
 function getBlocks() {
-    // 1. Permanent File Data
-    const fileBlocks = TRACKER_DATA.blocks || [];
+    // 1. Permanent File Data (Filtered by deletions)
+    const deletedFileIds = JSON.parse(localStorage.getItem('deleted_file_blocks')) || [];
+    const fileBlocks = (TRACKER_DATA.blocks || []).filter(b => !deletedFileIds.includes(b.id));
 
     // 2. Local Storage Data
     const localBlocks = JSON.parse(localStorage.getItem('planner_blocks')) || [];
@@ -17,7 +18,8 @@ function getBlocks() {
 }
 
 function getIdeas() {
-    const fileIdeas = TRACKER_DATA.ideas || [];
+    const deletedIdeas = JSON.parse(localStorage.getItem('deleted_file_ideas')) || [];
+    const fileIdeas = (TRACKER_DATA.ideas || []).filter(i => !deletedIdeas.includes(i));
     const local = JSON.parse(localStorage.getItem('planner_ideas')) || [];
     return [...fileIdeas, ...local];
 }
@@ -30,7 +32,7 @@ function populateCourseDropdown() {
     STUDENT_DATA.courses.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.code;
-        opt.innerText = c.name; // e.g. "Linear Algebra"
+        opt.innerText = c.name;
         select.appendChild(opt);
     });
 }
@@ -52,7 +54,6 @@ function renderBlocks() {
 }
 
 function createBlockCard(block) {
-    // Attempt to find linked resources from student-config.js
     const courseConfig = STUDENT_DATA.courses.find(c => c.code === block.course);
     let resourceButtons = '';
 
@@ -62,24 +63,18 @@ function createBlockCard(block) {
         `;
     }
 
-    // Explicit Drive/External Link from User
     if (block.link) {
         resourceButtons += `<a href="${block.link}" target="_blank" class="action-btn secondary" style="font-size:0.75rem; height: 2.25rem;">Drive ↗</a>`;
     }
 
-    // "View Item" Link -> Goes to details.html?id=...
-    // details.html now knows how to look up local blocks.
     const viewItemBtn = `
         <a href="details.html?id=${block.id}" class="action-btn secondary" style="font-size:0.75rem; height: 2.25rem;">View Item</a>
     `;
 
-    // Delete Button (Only for LocalStorage items typically, but we'll try to support all)
-    // Note: We can't actually delete from tracker.js via JS. So we'll only show delete for local ones or fake it.
-    // Logic: If ID starts with 'local-', it's deletable. 
-    const isLocal = block.id.startsWith('local-');
-    const deleteBtn = isLocal ? `
+    // Delete is always visible now
+    const deleteBtn = `
         <button onclick="deleteBlock('${block.id}')" class="delete-btn">Delete</button>
-    ` : '';
+    `;
 
     return `
         <div class="block-card" id="block-${block.id}">
@@ -118,15 +113,15 @@ function addNewBlock() {
     }
 
     const newBlock = {
-        id: `local-${Date.now()}`, // Unique ID for local items
+        id: `local-${Date.now()}`,
         title: title,
         course: course,
         duration: duration,
         link: link,
-        category: "SESSION", // for details page defaults
-        date: new Date().toISOString().split('T')[0], // Today
+        category: "SESSION",
+        date: new Date().toISOString().split('T')[0],
         time: "09:00",
-        details: { type: "text", content: "Active Planning Session" }, // Standard details structure
+        details: { type: "text", content: "Active Planning Session" },
         status: "TODO"
     };
 
@@ -134,7 +129,6 @@ function addNewBlock() {
     localBlocks.push(newBlock);
     localStorage.setItem('planner_blocks', JSON.stringify(localBlocks));
 
-    // Clear and Reload
     document.getElementById('new-block-title').value = '';
     renderBlocks();
 }
@@ -142,9 +136,16 @@ function addNewBlock() {
 function deleteBlock(id) {
     if (!confirm("Delete this block?")) return;
 
-    let localBlocks = JSON.parse(localStorage.getItem('planner_blocks')) || [];
-    localBlocks = localBlocks.filter(b => b.id !== id);
-    localStorage.setItem('planner_blocks', JSON.stringify(localBlocks));
+    if (id.startsWith('local-')) {
+        let localBlocks = JSON.parse(localStorage.getItem('planner_blocks')) || [];
+        localBlocks = localBlocks.filter(b => b.id !== id);
+        localStorage.setItem('planner_blocks', JSON.stringify(localBlocks));
+    } else {
+        // Soft delete file item
+        const deletedIds = JSON.parse(localStorage.getItem('deleted_file_blocks')) || [];
+        deletedIds.push(id);
+        localStorage.setItem('deleted_file_blocks', JSON.stringify(deletedIds));
+    }
     renderBlocks();
 }
 
@@ -174,8 +175,6 @@ function renderIdeas() {
         return;
     }
 
-    // We distinguish local vs file by... index? Or string content? 
-    // For now, simple string matching.
     list.innerHTML = ideas.map((idea, index) => `
         <div class="idea-item" style="display:flex; justify-content:space-between;">
             <span>• ${idea}</span>
@@ -200,23 +199,22 @@ function handleIdeaInput(e) {
 }
 
 function deleteIdea(index) {
-    // This is tricky because indices mix file/local. 
-    // We will only allow deleting LOCAL ideas for now to be safe, or we need a better ID system.
-    // Simplification: We only support deleting from the LocalStorage array.
+    const ideas = getIdeas();
+    const targetIdea = ideas[index];
 
-    // 1. Get stats
-    const fileCount = (TRACKER_DATA.ideas || []).length;
-
-    if (index < fileCount) {
-        alert("Cannot delete permanent file ideas from UI. Edit tracker.js.");
-        return;
-    }
-
-    // Adjust index for local array
-    const localIndex = index - fileCount;
+    // Check if local
     let local = JSON.parse(localStorage.getItem('planner_ideas')) || [];
-    local.splice(localIndex, 1);
-    localStorage.setItem('planner_ideas', JSON.stringify(local));
+    const localIndex = local.indexOf(targetIdea);
+
+    if (localIndex !== -1) {
+        local.splice(localIndex, 1);
+        localStorage.setItem('planner_ideas', JSON.stringify(local));
+    } else {
+        // Soft delete file idea
+        const deletedFileIdeas = JSON.parse(localStorage.getItem('deleted_file_ideas')) || [];
+        deletedFileIdeas.push(targetIdea);
+        localStorage.setItem('deleted_file_ideas', JSON.stringify(deletedFileIdeas));
+    }
 
     renderIdeas();
 }

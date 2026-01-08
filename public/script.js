@@ -350,6 +350,43 @@ function createCourseCard(course) {
         </a>
     ` : '';
 
+    // Construct Syllabus URL (assuming pattern matches file existence: syllabus/code-grading.md)
+    const cleanCode = course.code.toLowerCase().replace(/\s+/g, '');
+    const syllabusUrl = `syllabus/${cleanCode}-grading.md`;
+
+    // New Buttons
+    // Drive SVG Icon (Simplified)
+    const driveIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.01 1.5c-0.615 0-1.192 0.32-1.503 0.844L2.348 16.32c-0.315 0.53-0.318 1.173-0.007 1.706C2.65 18.56 3.23 18.88 3.845 18.88h16.307c0.615 0 1.193-0.32 1.505-0.846l-0.007-0.012 0.006 0.012c0.31-0.533 0.307-1.176-0.007-1.708L13.513 2.344C13.202 1.82 12.625 1.5 12.01 1.5zm0 2.25L19.14 16.63H4.88L12.01 3.75z" fill="gray"/><path d="M7.76 17.5h8.48l2.91 5H4.85l2.91-5z" fill="currentColor" opacity="0.6"/><path d="M16.24 17.5l-4.24-7.35-4.24 7.35H4.85l7.15-12.39 7.15 12.39h-2.91z" opacity="0.4"/></svg>`;
+    // Actually, let's use a simpler text/icon combo for Drive or just the Google Drive Official triangle if possible.
+    // Using a simple unicode or text fallback if SVG is too messy, but let's try a clean triangular SVG path.
+    const driveSvg = `<svg width="15" height="13" viewBox="0 0 87 78" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#3D8AFF"/>
+        <path d="M43.65 25l-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00AC47"/>
+        <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#EA4335"/>
+        <path d="M43.65 25l13.75 23.8-13.75 23.8-13.75-23.8z" fill="#185ABC"/>
+        <path d="M59.8 53.2l-16.15 27.95c1.4.05 2.8-.25 4.15-.95l24.6-14.2c1.35-.8 2.5-1.9 3.3-3.3l-13.75-23.8z" fill="#8DA6FA"/>
+        <path d="M73.4 26.5l-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27.95c1.55.05 3.1-.35 4.5-1.2l12.3-7.1c1.35-.8 2.5-1.9 3.3-3.3.4-.65.7-1.35.95-2.05.05-.3.05-.55.05-.85z" fill="#FFBA00"/>
+    </svg>`;
+
+    const driveBtn = course.drive ? `
+        <a href="${course.drive}" target="_blank" class="action-btn secondary" title="Google Drive">
+            <span style="display: flex; align-items: center; justify-content: center;">${driveSvg}</span>
+        </a>
+    ` : '';
+
+    // OnQ and NotebookLM
+    const onqBtn = course.onq ? `
+        <a href="${course.onq}" target="_blank" class="action-btn secondary">
+            <span>OnQ</span>
+        </a>
+    ` : '';
+
+    const notebookBtn = course.notebooklm ? `
+        <a href="${course.notebooklm}" target="_blank" class="action-btn secondary">
+            <span>NotebookLM</span>
+        </a>
+    ` : '';
+
     return `
         <div class="course-card">
             <div class="course-header">
@@ -360,13 +397,26 @@ function createCourseCard(course) {
                 <a href="${course.notes}" target="_blank" class="action-btn primary">
                     <span>Notes</span>
                 </a>
+                <a href="${syllabusUrl}" target="_blank" class="action-btn secondary">
+                    <span>Syllabus</span>
+                </a>
+                
                 <a href="${course.textbook}" target="_blank" class="action-btn secondary">
                     <span>Textbook</span>
                 </a>
                 ${solutionsButton}
+                
                 <a href="${course.assignments}" class="action-btn secondary">
                     <span>Assignments</span>
                 </a>
+                <a href="${course.assignments}&type=homework" class="action-btn secondary">
+                    <span>Homework</span>
+                </a>
+
+                <!-- New Buttons -->
+                ${onqBtn}
+                ${notebookBtn}
+                ${driveBtn}
             </div>
         </div>
     `;

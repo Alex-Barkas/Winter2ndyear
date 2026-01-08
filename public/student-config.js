@@ -71,7 +71,10 @@ const STUDENT_DATA = {
             notes: "pdfs/MTHE281.pdf",
             textbook: "textbooks/MTHE281 Abbott - Understanding Analysis.pdf",
             solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
-            assignments: "assignments.html?course=MTHE 281"
+            assignments: "assignments.html?course=MTHE 281",
+            onq: "https://onq.queensu.ca/d2l/home",
+            notebooklm: "https://notebooklm.google.com/",
+            drive: "#"
         },
         {
             code: "ENPH 239",
@@ -79,7 +82,10 @@ const STUDENT_DATA = {
             notes: "pdfs/ENPH239.pdf",
             textbook: "textbooks/ENPH 239 David J. Griffiths-Introduction to Electrodynamics-Addison-Wesley (2012).pdf",
             solutions: "textbooks/ENPH 239 solutions_manual.pdf",
-            assignments: "assignments.html?course=ENPH 239"
+            assignments: "assignments.html?course=ENPH 239",
+            onq: "https://onq.queensu.ca/d2l/home",
+            notebooklm: "https://notebooklm.google.com/",
+            drive: "#"
         },
         {
             code: "MTHE 212",
@@ -87,21 +93,30 @@ const STUDENT_DATA = {
             notes: "pdfs/MTHE212.pdf",
             textbook: "textbooks/MTHE 212 Textbook - [3rd ed.] LADR by Sheldon A.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
-            assignments: "assignments.html?course=MTHE 212"
+            assignments: "assignments.html?course=MTHE 212",
+            onq: "https://onq.queensu.ca/d2l/home",
+            notebooklm: "https://notebooklm.google.com/",
+            drive: "#"
         },
         {
             code: "CMPE 212",
             name: "Intro Computing Science II",
             notes: "pdfs/CMPE212.pdf",
             textbook: "textbooks/CMPE 212 Textbook - [5th ed.] Addison Wesley - Absolute Java.pdf",
-            assignments: "assignments.html?course=CMPE 212"
+            assignments: "assignments.html?course=CMPE 212",
+            onq: "https://onq.queensu.ca/d2l/home",
+            notebooklm: "https://notebooklm.google.com/",
+            drive: "#"
         },
         {
             code: "ELEC 274",
             name: "Computer Architecture",
             notes: "pdfs/ELEC274.pdf",
             textbook: "textbooks/ELEC 274 Textbook - [6th ed.] Computer Organization and Embedded Systems by ya boi Manjikian himself.pdf",
-            assignments: "assignments.html?course=ELEC 274"
+            assignments: "assignments.html?course=ELEC 274",
+            onq: "https://onq.queensu.ca/d2l/home",
+            notebooklm: "https://notebooklm.google.com/",
+            drive: "#"
         }
     ],
     assignments: [

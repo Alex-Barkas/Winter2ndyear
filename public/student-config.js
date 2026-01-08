@@ -160,26 +160,24 @@ const STUDENT_DATA = {
             status: "PENDING",
             details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
         },
+        // --- MTHE 212 ---
+        { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-24", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-07", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q3", course: "MTHE 212", category: "QUIZ", title: "Quiz 3", date: "2026-02-28", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q4", course: "MTHE 212", category: "QUIZ", title: "Quiz 4", date: "2026-03-14", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q5", course: "MTHE 212", category: "QUIZ", title: "Quiz 5", date: "2026-03-28", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+
         {
-            id: "4",
-            course: "MTHE 212",
-            category: "QUIZ",
-            title: "Quiz 1",
-            date: "2026-01-30",
-            time: "09:30",
-            status: "UPCOMING",
-            details: { type: "text", content: "Topics: Vector Spaces, Subspaces, Linear Independence." }
+            id: "2",
+            course: "ENPH 239",
+            category: "LAB",
+            title: "Lab 1",
+            date: "2026-01-25",
+            time: "16:00",
+            status: "PENDING",
+            details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
         },
-        {
-            id: "5",
-            course: "ELEC 274",
-            category: "MIDTERM",
-            title: "Midterm Exam",
-            date: "2026-02-05",
-            time: "14:00",
-            status: "UPCOMING",
-            details: { type: "text", content: "Location: Walter Light Hall 205. Bring ID." }
-        },
+        // Removed ELEC 274 Feb 5 Midterm as it conflicted with the Feb 6 one.
         {
             id: "6",
             course: "PERSONAL",

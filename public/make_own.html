@@ -237,6 +237,14 @@
                             <li><a href="#phase-4-1" class="toc-link">4.1 Visuals</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#phase-5" class="toc-link">5. Phase 5: Workflow & Persistence</a>
+                        <ul class="toc-sublist">
+                            <li><a href="#phase-5-1" class="toc-link">5.1 Adding Assignments</a></li>
+                            <li><a href="#phase-5-2" class="toc-link">5.2 Marking & Grading</a></li>
+                            <li><a href="#phase-5-3" class="toc-link">5.3 Attaching Resources</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
 
@@ -323,6 +331,41 @@
             <blockquote>
                 "Please replace 'patrick taylor 2026' with '[YOUR NAME] [YEAR]' in all HTML files. Also, change the
                 accent color in style.css to a [COLOR NAME/HEX]."
+            </blockquote>
+
+            <h2 id="phase-5">Phase 5: Daily Workflow & Persistence</h2>
+            <p>This system uses a "Code as Database" philosophy. This means there are two ways to interact with it:</p>
+            <ul>
+                <li><strong>Local (Temporary):</strong> Clicking "Mark as Complete" or entering a grade in the UI. This
+                    saves to your browser's local storage. Great for quick updates.</li>
+                <li><strong>Permanent (Synced):</strong> Updating the <code>student-config.js</code> file. This creates
+                    a permanent record that syncs across devices.</li>
+            </ul>
+
+            <h3 id="phase-5-1">5.1 Adding Assignments</h3>
+            <p>Don't enter assignments manually. Just paste your syllabus schedule into your AI chat.</p>
+            <blockquote>
+                "Add these assignments for [COURSE CODE] to student-config.js:<br>
+                - Assignment 1 due Feb 10<br>
+                - Midterm on Feb 14 at 2pm<br>
+                - Final Exam on Apr 20"
+            </blockquote>
+
+            <h3 id="phase-5-2">5.2 Marking as Complete & Grading</h3>
+            <p>When you finish an assignment, you can mark it as 'DONE' in the UI. But to make it official (and remove
+                it from your 'upcoming' list forever), tell your AI:</p>
+            <blockquote>
+                "Mark Assignment 1 for MTHE 281 as DONE in the config file. Also, record a score of 85%."
+            </blockquote>
+            <p>This will update the <code>status</code> and <code>score</code> fields in the code, ensuring your Grade
+                Dashboard and Schedule are permanently updated.</p>
+
+            <h3 id="phase-5-3">5.3 Attaching Resources</h3>
+            <p>Each assignment page usually links to a PDF or text description. You can have your AI enhance these pages
+                with Drive folders, solutions, or video links.</p>
+            <blockquote>
+                "Update the details for MTHE 281 Assignment 3. Change the type to 'link' and set the url to [GOOGLE
+                DRIVE LINK]. Label it 'Submission Folder'."
             </blockquote>
 
             <p>Once you've completed these steps, you'll have a fully functional, personalized academic operating

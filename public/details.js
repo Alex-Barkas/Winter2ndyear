@@ -95,13 +95,18 @@ function updateTimerDisplay() {
 
 // --- GRADE & SUBMISSION MODULE ---
 function loadGrade() {
-    // Attempt to match this assignment to a grade component
-    // This is tricky because assignments in the schedule map to general components
-    // For MVP, we just save a simple "status" and "grade" for this specific ID
+    const item = data.assignments.find(a => a.id === currentAssignmentId);
 
-    const savedGrade = localStorage.getItem(`grade_val_${currentAssignmentId}`);
-    if (savedGrade) {
-        document.getElementById('assignment-grade').value = savedGrade;
+    // 1. Config File (Source of Truth)
+    if (item && item.score !== null && item.score !== undefined) {
+        document.getElementById('assignment-grade').value = item.score;
+        // If config has score, we can optionally disable input or just fill it
+    } else {
+        // 2. Local Storage (Draft)
+        const savedGrade = localStorage.getItem(`grade_val_${currentAssignmentId}`);
+        if (savedGrade) {
+            document.getElementById('assignment-grade').value = savedGrade;
+        }
     }
 }
 
@@ -114,9 +119,18 @@ function loadStatus() {
     const item = data.assignments.find(a => a.id === currentAssignmentId);
     if (!item) return;
 
-    // Check localStorage first, then default to item.status
+    // Logic: 
+    // If Config says 'DONE', it means code was updated -> Force DONE.
+    // If Config says 'PENDING' or 'UPCOMING', User might have locally started it -> Allow Local Override.
+
+    let currentStatus = item.status;
     const localStatus = localStorage.getItem(`status_${currentAssignmentId}`);
-    const currentStatus = localStatus || item.status;
+
+    if (item.status === 'DONE') {
+        currentStatus = 'DONE';
+    } else if (localStatus) {
+        currentStatus = localStatus;
+    }
 
     const selector = document.getElementById('status-selector');
     if (selector) {

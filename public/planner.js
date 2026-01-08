@@ -63,8 +63,16 @@ function createBlockCard(block) {
         `;
     }
 
+    // Link Management
+    // If link exists, show Drive button + small edit icon (?) or just 'Edit Link' context
+    // User asked for "ability to add a drive link to session blocks whenever"
+
+    let linkActions = '';
     if (block.link) {
-        resourceButtons += `<a href="${block.link}" target="_blank" class="action-btn secondary" style="font-size:0.75rem; height: 2.25rem;">Drive ↗</a>`;
+        linkActions += `<a href="${block.link}" target="_blank" class="action-btn secondary" style="font-size:0.75rem; height: 2.25rem;">Drive ↗</a>`;
+        linkActions += `<button onclick="updateBlockLink('${block.id}')" class="delete-btn" style="color:var(--text-muted); margin-left:0.5rem;" title="Edit Link">✎</button>`;
+    } else {
+        linkActions += `<button onclick="updateBlockLink('${block.id}')" class="delete-btn" style="color:var(--accent-color); margin-left:0.5rem;">+ Link</button>`;
     }
 
     const viewItemBtn = `
@@ -93,12 +101,34 @@ function createBlockCard(block) {
             <div class="block-actions">
                 ${viewItemBtn}
                 ${resourceButtons}
+                ${linkActions}
                 <button onclick="toggleFocusMode('${block.id}')" class="action-btn primary" style="font-size:0.75rem; height: 2.25rem; margin-left: auto;">
                     Focus
                 </button>
             </div>
         </div>
     `;
+}
+
+function updateBlockLink(id) {
+    const newLink = prompt("Enter Drive/Resource URL:");
+    if (newLink === null) return; // Cancelled
+
+    // Update Local Storage
+    let localBlocks = JSON.parse(localStorage.getItem('planner_blocks')) || [];
+    const blockIndex = localBlocks.findIndex(b => b.id === id);
+
+    if (blockIndex !== -1) {
+        localBlocks[blockIndex].link = newLink;
+        localStorage.setItem('planner_blocks', JSON.stringify(localBlocks));
+        renderBlocks();
+        return;
+    }
+
+    // Fallback: If it's a file block, we can't edit it in place easily because getBlocks merges them.
+    // For now, assuming user mostly edits local blocks as per "make a new thing" workflow.
+    // If they try to add a link to a file block, we currently can't persist that unless we shadow it in local storage.
+    alert("Note: Use the 'New Session Block' form for full editability. Links on permanent file items cannot be updated from the UI yet.");
 }
 
 function addNewBlock() {

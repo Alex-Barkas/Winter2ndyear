@@ -848,6 +848,31 @@ footer p {
     background: rgba(0, 230, 118, 0.2);
 }
 
+/* Calendar Wrapper Layout Split View */
+.calendar-layout-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 900px) {
+    .calendar-layout-wrapper {
+        grid-template-columns: 1fr 350px;
+        /* Main Calendar + Fixed Sidebar */
+        align-items: start;
+    }
+}
+
+.calendar-side-panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    min-height: 500px;
+    position: sticky;
+    top: 2rem;
+}
+
 /* Reading Week Highlight */
 .reading-week {
     background-color: rgba(64, 196, 255, 0.05);

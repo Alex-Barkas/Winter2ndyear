@@ -81,19 +81,26 @@
 
                 <!-- Calendar View -->
                 <div id="calendar-view" class="hidden">
-                    <div class="calendar-header">
-                        <button id="prev-month" class="nav-btn">&lt;</button>
-                        <h3 id="current-month-year">January 2026</h3>
-                        <button id="next-month" class="nav-btn">&gt;</button>
-                    </div>
-                    <div class="calendar-grid-header">
-                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                    </div>
-                    <div id="calendar-days" class="calendar-grid">
-                        <!-- Days injected via JS -->
-                    </div>
-                    <div id="selected-day-details">
-                        <!-- Clicked day details appear here -->
+                    <div class="calendar-layout-wrapper">
+                        <div class="calendar-main-panel">
+                            <div class="calendar-header">
+                                <button id="prev-month" class="nav-btn">&lt;</button>
+                                <h3 id="current-month-year">January 2026</h3>
+                                <button id="next-month" class="nav-btn">&gt;</button>
+                            </div>
+                            <div class="calendar-grid-header">
+                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                            </div>
+                            <div id="calendar-days" class="calendar-grid">
+                                <!-- Days injected via JS -->
+                            </div>
+                        </div>
+                        <div class="calendar-side-panel">
+                            <div id="selected-day-details">
+                                <p class="subtitle" style="text-align: center; margin-top: 50%; opacity: 0.5;">Select a
+                                    date to view details.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

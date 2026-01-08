@@ -69,12 +69,12 @@ const STUDENT_DATA = {
             code: "MTHE 281",
             name: "Introduction To Real Analysis",
             notes: "pdfs/MTHE281.pdf",
-            textbook: "textbooks/MTHE281 Abbott - Understanding Analysis.pdf",
+            textbook: "textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
             solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
             assignments: "assignments.html?course=MTHE 281",
-            onq: "https://onq.queensu.ca/d2l/home",
-            notebooklm: "https://notebooklm.google.com/",
-            drive: "#"
+            onq: "https://onq.queensu.ca/d2l/home/1130523",
+            notebooklm: "https://notebooklm.google.com/notebook/894bb5b3-43f0-49f3-b5b8-113225096c1d",
+            drive: "https://drive.google.com/drive/folders/1sEaEGkjDQUFEEoIOZYq2CvajdVoQ__5a?usp=drive_link"
         },
         {
             code: "ENPH 239",
@@ -83,9 +83,9 @@ const STUDENT_DATA = {
             textbook: "textbooks/ENPH 239 David J. Griffiths-Introduction to Electrodynamics-Addison-Wesley (2012).pdf",
             solutions: "textbooks/ENPH 239 solutions_manual.pdf",
             assignments: "assignments.html?course=ENPH 239",
-            onq: "https://onq.queensu.ca/d2l/home",
-            notebooklm: "https://notebooklm.google.com/",
-            drive: "#"
+            onq: "https://onq.queensu.ca/d2l/home/1130508",
+            notebooklm: "https://notebooklm.google.com/notebook/856b7ce1-1f78-4a4b-bbb7-ab9230610df5",
+            drive: "https://drive.google.com/drive/folders/11-W80eQ7-Ag0u8xNmLJq-6BAf2dNW_vZ?usp=drive_link"
         },
         {
             code: "MTHE 212",
@@ -94,9 +94,9 @@ const STUDENT_DATA = {
             textbook: "textbooks/MTHE 212 Textbook - [3rd ed.] LADR by Sheldon A.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
             assignments: "assignments.html?course=MTHE 212",
-            onq: "https://onq.queensu.ca/d2l/home",
-            notebooklm: "https://notebooklm.google.com/",
-            drive: "#"
+            onq: "https://onq.queensu.ca/d2l/home/1130003",
+            notebooklm: "https://notebooklm.google.com/notebook/96203b28-07aa-43d9-ba8f-8324dacc56b5",
+            drive: "https://drive.google.com/drive/folders/1DBAs6w3QF5w-jAk0cjVa2PrlGlFVbf6q?usp=drive_link"
         },
         {
             code: "CMPE 212",
@@ -104,9 +104,9 @@ const STUDENT_DATA = {
             notes: "pdfs/CMPE212.pdf",
             textbook: "textbooks/CMPE 212 Textbook - [5th ed.] Addison Wesley - Absolute Java.pdf",
             assignments: "assignments.html?course=CMPE 212",
-            onq: "https://onq.queensu.ca/d2l/home",
-            notebooklm: "https://notebooklm.google.com/",
-            drive: "#"
+            onq: "https://onq.queensu.ca/d2l/home/1130608",
+            notebooklm: "https://notebooklm.google.com/notebook/8a81d398-0c92-45bf-b33f-d2667b198323",
+            drive: "https://drive.google.com/drive/folders/1Yj2IemjtlGUBS6YdEiGR5_TATwFrzLbP?usp=drive_link"
         },
         {
             code: "ELEC 274",
@@ -114,9 +114,9 @@ const STUDENT_DATA = {
             notes: "pdfs/ELEC274.pdf",
             textbook: "textbooks/ELEC 274 Textbook - [6th ed.] Computer Organization and Embedded Systems by ya boi Manjikian himself.pdf",
             assignments: "assignments.html?course=ELEC 274",
-            onq: "https://onq.queensu.ca/d2l/home",
-            notebooklm: "https://notebooklm.google.com/",
-            drive: "#"
+            onq: "https://onq.queensu.ca/d2l/home/1130305",
+            notebooklm: "https://notebooklm.google.com/notebook/d320a283-a332-4f3a-985c-e05a4e9adf8d",
+            drive: "https://drive.google.com/drive/folders/18hRjBCfHPG9dYJZtIe90QOIaV_9aakBz?usp=drive_link"
         }
     ],
     assignments: [

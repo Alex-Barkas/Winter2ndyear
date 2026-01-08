@@ -11,6 +11,9 @@
 
     --font-sans: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+
+    --accent-color: #dc5815;
+    /* User preferred orange accent */
 }
 
 * {
@@ -46,26 +49,53 @@ header {
     gap: 1.5rem;
 }
 
-.header-icon {
-    margin-bottom: 1rem;
+/* Signature Badge (Fixed Top Right) */
+.signature-badge {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1000;
+    /* Increased Z-index to be safe */
+    pointer-events: none;
+    background: transparent;
 }
 
-.header-icon img {
-    width: 120px !important;
-    /* Increased from 48px inline */
-    height: 120px !important;
-    border-radius: 12px !important;
-    /* Slight rounded square looks more iconic */
+.signature-text {
+    font-family: 'JetBrains Mono', monospace;
+    /* Explicit font family */
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    text-transform: lowercase;
+}
+
+.signature-gif {
+    width: 25px;
+    /* Reduced from 48px to match text better (approx 2x text height) */
+    height: 25px;
+    border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--border-color);
 }
 
+.header-titling {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
 .header-image-container {
     width: 100%;
-    margin: 0.5rem 0 1.5rem 0;
+    max-width: 400px;
+    /* Reduced from 600px */
+    margin: 0 auto 1.5rem auto;
+    /* Centered */
     overflow: hidden;
     border-radius: 0.75rem;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .header-hero-image {
@@ -80,18 +110,20 @@ header {
 h1 {
     font-family: var(--font-mono);
     /* Switched to Mono for "Notes" title for tech/academic vibe */
-    font-size: 2.5rem;
+    font-size: 3rem;
     font-weight: 700;
     letter-spacing: -0.05em;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
     color: var(--text-primary);
 }
 
 .subtitle {
     font-family: var(--font-sans);
     color: var(--text-muted);
-    font-size: 1.1rem;
-    max-width: 100%;
+    font-size: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
     line-height: 1.6;
     opacity: 0.9;
 }
@@ -322,55 +354,55 @@ section {
 
 .action-btn {
     display: flex;
-    flex-direction: column;
-    /* Icon (if any) top, Text bottom if needed, or just centered */
+    flex-direction: row;
+    /* Icon left, Text right */
+    gap: 0.5rem;
     align-items: center;
     justify-content: center;
-    height: 3.5rem;
-    /* Taller, easier to click */
-    padding: 0 0.75rem;
+    height: 3rem;
+    padding: 0 1rem;
     border-radius: 0.5rem;
-    font-size: 0.9rem;
-    /* Larger text */
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
     text-decoration: none;
     font-family: var(--font-sans);
     text-align: center;
     transition: all 0.2s ease;
+    --accent-color: #dc5815;
+    /* User preferred orange accent */
 }
 
 .action-btn span {
-    display: block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .action-btn.primary {
-    background-color: var(--text-primary);
-    color: #000;
-    border: 1px solid var(--text-primary);
-    font-weight: 600;
+    background-color: var(--accent-color);
+    color: #fff;
+    /* White text on accent */
+    border: 1px solid var(--accent-color);
 }
 
 .action-btn.primary:hover {
-    background-color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    background-color: #b94a11;
+    border-color: #b94a11;
+    box-shadow: 0 4px 12px rgba(220, 88, 21, 0.3);
+    transform: translateY(-1px);
 }
 
 .action-btn.secondary {
-    background-color: rgba(255, 255, 255, 0.03);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
+    background-color: #18181b;
+    /* Zinc 900 */
+    color: var(--text-primary);
+    /* bright text */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .action-btn.secondary:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background-color: #27272a;
+    /* Zinc 800 */
+    border-color: var(--text-primary);
+    transform: translateY(-1px);
 }
 
 

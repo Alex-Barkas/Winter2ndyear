@@ -105,19 +105,34 @@
                 let rowsHtml = '';
                 let totalWeight = 0;
 
-                scheme.components.forEach((comp, idx) => {
-                    const uniqueId = `grade-${course.replace(/\s/g, '')}-${idx}`;
-                    const savedGrade = localStorage.getItem(uniqueId) || '';
-                    totalWeight += comp.weight;
+                scheme.components.forEach((comp, compIdx) => {
+                    const count = comp.count || 1;
+                    const unitWeight = comp.weight / count;
 
-                    rowsHtml += `
-                        <div class="grade-row">
-                            <span>${comp.name}</span>
-                            <span>${comp.weight}%</span>
-                            <input type="number" class="grade-input" id="${uniqueId}" value="${savedGrade}" onchange="updateGrade('${course}', '${uniqueId}')" placeholder="-">
-                            <span id="${uniqueId}-contrib">0.00%</span>
-                        </div>
-                    `;
+                    for (let i = 0; i < count; i++) {
+                        // Create a stable unique ID
+                        // If count > 1, append index to ID
+                        const uniqueId = `grade-${course.replace(/\s/g, '')}-${compIdx}-${i}`;
+                        const savedGrade = localStorage.getItem(uniqueId) || '';
+
+                        // Display Name (e.g., "Lab 1", "Lab 2" or just "Midterm")
+                        const displayName = count > 1 ? `${comp.name} ${i + 1}` : comp.name;
+
+                        totalWeight += unitWeight;
+
+                        rowsHtml += `
+                            <div class="grade-row">
+                                <span>${displayName}</span>
+                                <span>${unitWeight.toFixed(1)}%</span>
+                                <input type="number" class="grade-input" 
+                                    id="${uniqueId}" 
+                                    value="${savedGrade}" 
+                                    onchange="updateGrade('${course}', '${uniqueId}')" 
+                                    placeholder="-">
+                                <span id="${uniqueId}-contrib">0.00%</span>
+                            </div>
+                        `;
+                    }
                 });
 
                 container.innerHTML += `
@@ -152,20 +167,25 @@
             let currentPoints = 0;
             let currentWeight = 0;
 
-            components.forEach((comp, idx) => {
-                const uniqueId = `grade-${course.replace(/\s/g, '')}-${idx}`;
-                const val = parseFloat(localStorage.getItem(uniqueId));
+            components.forEach((comp, compIdx) => {
+                const count = comp.count || 1;
+                const unitWeight = comp.weight / count;
 
-                if (!isNaN(val)) {
-                    const contribution = (val / 100) * comp.weight;
-                    document.getElementById(`${uniqueId}-contrib`).innerText = contribution.toFixed(2) + '%';
+                for (let i = 0; i < count; i++) {
+                    const uniqueId = `grade-${course.replace(/\s/g, '')}-${compIdx}-${i}`;
+                    const val = parseFloat(localStorage.getItem(uniqueId));
 
-                    // Simple weighted average for now (MVP)
-                    // If we wanted "current average" (ignoring future), we divide by currentWeight
-                    currentPoints += contribution;
-                    currentWeight += comp.weight;
-                } else {
-                    document.getElementById(`${uniqueId}-contrib`).innerText = '-';
+                    if (!isNaN(val)) {
+                        const contribution = (val / 100) * unitWeight;
+                        const contribElem = document.getElementById(`${uniqueId}-contrib`);
+                        if (contribElem) contribElem.innerText = contribution.toFixed(2) + '%';
+
+                        currentPoints += contribution;
+                        currentWeight += unitWeight;
+                    } else {
+                        const contribElem = document.getElementById(`${uniqueId}-contrib`);
+                        if (contribElem) contribElem.innerText = '-';
+                    }
                 }
             });
 

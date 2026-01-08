@@ -321,7 +321,23 @@ function renderCalendar() {
             classes += ' selected';
         }
 
-        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${i}${dot}</div>`;
+        // Week Label Logic (Show on Mondays or the 1st of the month)
+        let weekLabelHtml = '';
+        if (currentDayObj.getDay() === 1 || i === 1) { // 1 is Monday
+            const wLabel = getSemesterWeek(dateStr);
+            // Only show "Week X", ignore "Pre-Term" or "Reading Week" to not clutter, 
+            // OR show all? User want "week visual". Let's show abbreviated.
+            let shortLabel = wLabel;
+            if (wLabel.startsWith("Week ")) shortLabel = "W" + wLabel.split(' ')[1];
+            if (wLabel === "Reading Week") shortLabel = "RW";
+            if (wLabel === "Pre-Term") shortLabel = "";
+
+            if (shortLabel) {
+                weekLabelHtml = `<span class="cal-week-label">${shortLabel}</span>`;
+            }
+        }
+
+        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${i}${dot}${weekLabelHtml}</div>`;
     }
 
     // Next Month Days (to fill grid)

@@ -742,3 +742,16 @@ footer p {
     font-family: var(--font-mono);
 }
 
+
+/* Calendar Week Label */
+.cal-week-label {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 0.55rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    opacity: 0.5;
+    pointer-events: none;
+}
+

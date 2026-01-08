@@ -150,16 +150,6 @@ const STUDENT_DATA = {
         { id: "mthe281-h8", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 8", date: "2026-03-27", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } }, // Tentative date
-        {
-            id: "2",
-            course: "ENPH 239",
-            category: "LAB",
-            title: "Lab 1",
-            date: "2026-01-25",
-            time: "16:00",
-            status: "PENDING",
-            details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
-        },
         // --- MTHE 212 ---
         { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-24", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-07", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
@@ -167,16 +157,30 @@ const STUDENT_DATA = {
         { id: "mthe212-q4", course: "MTHE 212", category: "QUIZ", title: "Quiz 4", date: "2026-03-14", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q5", course: "MTHE 212", category: "QUIZ", title: "Quiz 5", date: "2026-03-28", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
 
-        {
-            id: "2",
-            course: "ENPH 239",
-            category: "LAB",
-            title: "Lab 1",
-            date: "2026-01-25",
-            time: "16:00",
-            status: "PENDING",
-            details: { type: "text", content: "Complete the pre-lab questions before entering the lab." }
-        },
+        // --- ENPH 239 ---
+        { id: "enph239-diag", course: "ENPH 239", category: "QUIZ", title: "Math Diagnostics", date: "2026-01-16", time: "23:59", status: "PENDING", details: { type: "text", content: "Post-diagnostics quiz on OnQ (5%)." } },
+
+        // Assignments (Weeks 5, 8, 11)
+        { id: "enph239-a1", course: "ENPH 239", category: "ASSIGNMENT", title: "Assignment 1", date: "2026-02-06", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/ENPH239.pdf" } },
+        { id: "enph239-a2", course: "ENPH 239", category: "ASSIGNMENT", title: "Assignment 2", date: "2026-03-06", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/ENPH239.pdf" } },
+        { id: "enph239-a3", course: "ENPH 239", category: "ASSIGNMENT", title: "Assignment 3", date: "2026-03-27", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/ENPH239.pdf" } },
+
+        // Weekly Quizzes (12)
+        { id: "enph239-q1", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 1", date: "2026-01-09", time: "23:59", status: "DONE", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q2", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 2", date: "2026-01-16", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q3", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 3", date: "2026-01-23", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q4", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 4", date: "2026-01-30", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q5", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 5", date: "2026-02-06", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q6", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 6", date: "2026-02-13", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        // Reading Week Feb 16-22
+        { id: "enph239-q7", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 7", date: "2026-02-27", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q8", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 8", date: "2026-03-06", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q9", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 9", date: "2026-03-13", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q10", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 10", date: "2026-03-20", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q11", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 11", date: "2026-03-27", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q12", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 12", date: "2026-04-03", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-fin", course: "ENPH 239", category: "FINAL", title: "Final Exam", date: "2026-04-30", time: "00:00", status: "UPCOMING", details: { type: "text", content: "Date TBD" } },
+
         // Removed ELEC 274 Feb 5 Midterm as it conflicted with the Feb 6 one.
         {
             id: "6",

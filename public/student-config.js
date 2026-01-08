@@ -18,18 +18,8 @@ const STUDENT_DATA = {
     ],
     gradingSchemes: {
         "MTHE 281": {
-            type: "max_option", // Logic for max of two options
-            options: [
-                {
-                    name: "Standard",
-                    weights: { "HOMEWORK": 10, "MIDTERM": 50, "FINAL": 40 } // Simplified for aggregation
-                },
-                {
-                    name: "Exam Bias",
-                    weights: { "HOMEWORK": 10, "MIDTERM": 40, "FINAL": 50 } // Logic needed for split midterms
-                }
-            ],
-            // For simple tracking MVP, we'll use a unified input and calculate dynamically
+            // Option 1 & 2 logic would be handled in a more advanced calculator.
+            // For now, listing the components for the Grade Dashboard.
             components: [
                 { name: "Homework", weight: 10, count: 10 },
                 { name: "Midterm 1", weight: 25, count: 1 },
@@ -138,16 +128,28 @@ const STUDENT_DATA = {
         { id: "elec-fin", course: "ELEC 274", category: "FINAL", title: "Final Exam", date: "2026-04-30", time: "00:00", status: "UPCOMING", details: { type: "text", content: "Date TBD" } },
 
         // --- OTHER COURSES (Retained) ---
-        {
-            id: "1",
-            course: "MTHE 281",
-            category: "ASSIGNMENT",
-            title: "Assignment 1",
-            date: "2026-01-23",
-            time: "23:59",
-            status: "PENDING",
-            details: { type: "pdf", url: "pdfs/MTHE281.pdf" }
-        },
+        // --- MTHE 281 ---
+        { id: "mthe281-h1", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 1", date: "2026-01-16", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h2", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 2", date: "2026-01-23", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h3", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 3", date: "2026-01-30", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h4", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 4", date: "2026-02-06", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+
+        { id: "mthe281-m1", course: "MTHE 281", category: "MIDTERM", title: "Midterm 1", date: "2026-02-11", time: "13:30", status: "UPCOMING", details: { type: "text", content: "No calculators allowed." } },
+
+        // Skip Week of Feb 9 (Midterm) -> No Fri Feb 13 HW
+        // Skip Week of Feb 16 (Reading Week) -> No Fri Feb 20 HW
+
+        { id: "mthe281-h5", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 5", date: "2026-02-27", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h6", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 6", date: "2026-03-06", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h7", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 7", date: "2026-03-13", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+
+        { id: "mthe281-m2", course: "MTHE 281", category: "MIDTERM", title: "Midterm 2", date: "2026-03-18", time: "13:30", status: "UPCOMING", details: { type: "text", content: "No calculators allowed." } },
+
+        // Skip Week of Mar 16 (Midterm) -> No Fri Mar 20 HW
+
+        { id: "mthe281-h8", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 8", date: "2026-03-27", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } }, // Tentative date
         {
             id: "2",
             course: "ENPH 239",

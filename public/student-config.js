@@ -181,7 +181,7 @@ const STUDENT_DATA = {
         { id: "enph239-a3", course: "ENPH 239", category: "ASSIGNMENT", title: "Assignment 3", date: "2026-03-27", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/ENPH239.pdf" } },
 
         // Weekly Quizzes (12)
-        { id: "enph239-q1", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 1", date: "2026-01-09", time: "23:59", status: "DONE", details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-q1", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 1", date: "2026-01-09", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q2", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 2", date: "2026-01-16", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q3", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 3", date: "2026-01-23", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q4", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 4", date: "2026-01-30", time: "23:59", status: "PENDING", details: { type: "text", content: "OnQ Quiz" } },
@@ -208,11 +208,21 @@ const STUDENT_DATA = {
             details: { type: "text", content: "Pay $850 to Landlord via E-Transfer." }
         },
         {
+            id: "tuition-w26",
+            course: "FINANCE",
+            category: "REMINDER",
+            title: "Pay Tuition",
+            date: "2026-01-10",
+            time: "10:00",
+            status: "PENDING",
+            details: { type: "text", content: "Pay Winter 2026 Tuition via Online Banking." }
+        },
+        {
             id: "7",
             course: "CAREER",
             category: "REMINDER",
             title: "RBC Internship Application",
-            date: "2026-01-31",
+            date: "2026-01-19",
             time: "23:59",
             status: "PENDING",
             details: { type: "link", url: "https://jobs.rbc.com", label: "Apply Here" }

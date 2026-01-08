@@ -166,11 +166,11 @@ const STUDENT_DATA = {
         { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", details: { type: "pdf", url: "pdfs/MTHE281.pdf" } }, // Tentative date
         // --- MTHE 212 ---
-        { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-24", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
-        { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-07", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
-        { id: "mthe212-q3", course: "MTHE 212", category: "QUIZ", title: "Quiz 3", date: "2026-02-28", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
-        { id: "mthe212-q4", course: "MTHE 212", category: "QUIZ", title: "Quiz 4", date: "2026-03-14", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
-        { id: "mthe212-q5", course: "MTHE 212", category: "QUIZ", title: "Quiz 5", date: "2026-03-28", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-23", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-06", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q3", course: "MTHE 212", category: "QUIZ", title: "Quiz 3", date: "2026-02-27", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q4", course: "MTHE 212", category: "QUIZ", title: "Quiz 4", date: "2026-03-13", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
+        { id: "mthe212-q5", course: "MTHE 212", category: "QUIZ", title: "Quiz 5", date: "2026-03-27", time: "10:30", status: "UPCOMING", details: { type: "text", content: "In-class quiz (50 mins)." } },
 
         // --- ENPH 239 ---
         { id: "enph239-diag", course: "ENPH 239", category: "QUIZ", title: "Math Diagnostics", date: "2026-01-16", time: "23:59", status: "PENDING", details: { type: "text", content: "Post-diagnostics quiz on OnQ (5%)." } },

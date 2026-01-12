@@ -91,7 +91,7 @@ const STUDENT_DATA = {
             code: "MTHE 212",
             name: "Linear Algebra II",
             notes: "pdfs/MTHE212.pdf",
-            textbook: "textbooks/MTHE 212 Textbook - [3rd ed.] LADR by Sheldon A.pdf",
+            textbook: "textbooks/LADR4e.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
             assignments: "assignments.html?course=MTHE 212",
             onq: "https://onq.queensu.ca/d2l/home/1130003",

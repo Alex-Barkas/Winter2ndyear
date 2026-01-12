@@ -136,6 +136,7 @@ const STUDENT_DATA = {
 
         // --- ELEC 274 ---
         { id: "elec-l1", course: "ELEC 274", category: "LAB", title: "Lab 1", date: "2026-01-12", time: "18:30", status: "PENDING", score: null, details: { type: "text", content: "Week 2 Lab" } },
+        { id: "elec-tut2", course: "ELEC 274", category: "TUTORIAL", title: "Tutorial Week 2", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "link", url: "assignments/ELEC274TutorialWeek2.md", label: "View Tutorial" } },
         { id: "elec-l2", course: "ELEC 274", category: "LAB", title: "Lab 2", date: "2026-01-26", time: "18:30", status: "PENDING", score: null, details: { type: "text", content: "Week 4 Lab" } },
         { id: "elec-t1", course: "ELEC 274", category: "MIDTERM", title: "Midterm Quiz", date: "2026-02-06", time: "13:30", status: "UPCOMING", score: null, details: { type: "text", content: "Friday, Feb 6 @ 1:30PM" } },
         { id: "elec-l3", course: "ELEC 274", category: "LAB", title: "Lab 3", date: "2026-03-09", time: "18:30", status: "PENDING", score: null, details: { type: "text", content: "Week 9 Lab" } },
@@ -144,7 +145,7 @@ const STUDENT_DATA = {
 
         // --- OTHER COURSES (Retained) ---
         // --- MTHE 281 ---
-        { id: "mthe281-h1", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 1", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h1", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 1", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "assignments/MTHE281Homework1.pdf" } },
         { id: "mthe281-h2", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 2", date: "2026-01-23", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h3", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 3", date: "2026-01-30", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h4", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 4", date: "2026-02-06", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
@@ -166,6 +167,7 @@ const STUDENT_DATA = {
         { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
         { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } }, // Tentative date
         // --- MTHE 212 ---
+        { id: "mthe212-hw2", course: "MTHE 212", category: "HOMEWORK", title: "Homework Week 2", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "assignments/MTHE212HomeworkWeek2.pdf" } },
         { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-23", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-06", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q3", course: "MTHE 212", category: "QUIZ", title: "Quiz 3", date: "2026-02-27", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
@@ -183,6 +185,7 @@ const STUDENT_DATA = {
         // Weekly Quizzes (12)
         { id: "enph239-q1", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 1", date: "2026-01-09", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q2", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 2", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "OnQ Quiz" } },
+        { id: "enph239-tut2", course: "ENPH 239", category: "TUTORIAL", title: "Tutorial Week 2", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "assignments/ENPH239TutorialWeek2.pdf" } },
         { id: "enph239-q3", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 3", date: "2026-01-23", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q4", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 4", date: "2026-01-30", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "OnQ Quiz" } },
         { id: "enph239-q5", course: "ENPH 239", category: "QUIZ", title: "Weekly Quiz 5", date: "2026-02-06", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "OnQ Quiz" } },

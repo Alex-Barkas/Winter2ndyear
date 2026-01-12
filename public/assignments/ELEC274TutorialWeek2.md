@@ -1,23 +1,66 @@
-Tutorial 2
+# ELEC 274: Tutorial 2
 
-As background for the questions in this tutorial, consider Chapter 2 slide 22 for Question 1. For Question 2, examine the first three columns of the table on slide 2 of the additional material on signed number representation and arithmetic. Finally, for Question 3, consider the pseudocode vs. assembly-language code for the loop example from Tutorial 1, and also the pseudocode vs. assembly-language code for the loop in the CalcAvg() subroutine in the document on Design, Implementation, and Testing of a Simple Program in Nios II Assembly Languages.
+**Background/Preparation**:
+*   **Q1**: Review *Chapter 2, Slide 22*.
+*   **Q2**: Examine the first three columns of the table on *Slide 2* of the additional material on signed number representation.
+*   **Q3**: Review the loop examples in *Tutorial 1* and the `CalcAvg()` subroutine in the *Design, Implementation, and Testing* document.
 
-Assume that for a software program, there are four global variables W, X, Y, and Z. Consider the high-level pseudocode assignment statement
-     W = X + Y + Z
-that specifies arithmetic involving the variables described above. This statement corresponds to code in some portion of the program under consideration. To gain more appreciation of how compiler software automates the generation of low-level code for hardware from high-level code, pursue the steps that are outlined below.
-Generate an expression tree for this assignment statement.
-Use an appropriate traversal of the expression tree to guide the generation of assembly-language code containing generic RISC instructions as shown in Chapters 1 and 2.
-But before writing the sequence of instructions through such a tree traversal, plan ahead with decisions on the allocation/usage of general-purpose registers in the processor. Annotate the nodes in the expression tree with register identifiers to reflect register allocation decisions.
-For register allocation, avoid using R0 and R1 (reasons will be detailed later). Start with R2.
-Write the sequence of instructions by traversing the nodes of the annotated tree in an appropriate manner that corresponds with the desired order of operations. Use the annotations to dictate the register operands for each instruction that you write.
-The register allocation decisions and the tree traversal for emitting instructions are reflections of an approach that could be automated in compiler software.
-Assume that the four variables are assigned to particular locations in memory to hold word-sized numbers. The initial contents of the four variables, and hence the corresponding memory locations, are 9, 3, 2, and 1, respectively, for W, X, Y, and Z. Trace an execution of the resulting instruction sequence based on aforementioned initial values. Use a simple diagram with boxes that reflect the current contents of relevant processor registers and the current contents of relevant locations in memory.
-[Extension for individual learning] Using the documentation provided by the instructor as a guide, prepare a complete Nios II assembly-language program in a source file for the example considered in this question. Use appropriate data directives to set initial values in memory for variables X,Y,Z and to reserve space for variable W. The computation of interest for the assignment statement could be included directly in the main routine, or it could be in a separate subroutine that is called from the main routine. Test the program using the Web-based simulator, inspecting the contents of W after execution to confirm that it has the expected result based on the values of X,Y,Z.
+---
 
-Consider the decimal value 106. Without a calculator, use subtraction of powers of the relevant target base to convert this decimal value into binary and hexadecimal representation.
+### Question 1: Compiler Automation & Assembly Generation
+Assume a software program has four global variables $W, X, Y, Z$. Consider the high-level pseudocode assignment:
 
-Consider pseudocode containing a for loop with an integer index variable i and specified integer lower/upper bounds that describes computation on an array or list of numbers, such as summing the values in the array or list. Provide a progression of transformations of the pseudocode loop as indicated below.
-First, transform the original for loop with an index variable i and indexed array accesses with [..] syntax into a while loop that still uses an index variable i and [..] syntax for array accesses.
-Next, transform the preceding while loop into another while that no longer uses an index variable i, and instead increments a current-list-element pointer, which is initialized to identify the start of the array, and decrements a count of elements remaining to be processed, which is initialized to the number of iterations determined from the lower/upper bounds under the assumption that the array consists of at least one element.
-Finally, transform the preceding while loop into a do..while loop with the stated assumption still applying.
-The final high-level form is most closely aligned with the low-level assembly-language form that is seen in slide 40 of the Chapter 2 material, page 4 of the assembly-language programming guidelines, and the two subroutines in the document on the development of a complete modular program.
+$$ W = X + Y + Z $$
+
+To understand how compilers generate low-level hardware code from high-level code, follow these steps:
+
+1.  **Expression Tree**: Generate an expression tree for the assignment statement.
+2.  **Register Allocation Plan**:
+    *   Annotate nodes with register identifiers ($R_x$) to plan usage.
+    *   **Constraint**: Avoid using $R0$ and $R1$. Start allocation with $R2$.
+3.  **Code Generation**:
+    *   Traverse the annotated tree to write the sequence of generic RISC instructions.
+    *   Reflect the desired order of operations and planned register usage.
+4.  **Execution Trace**:
+    *   **Memory Context**: Assume variables are word-sized and located in memory with initial values:
+        *   $W = 9$ (Initially)
+        *   $X = 3$
+        *   $Y = 2$
+        *   $Z = 1$
+    *   **Trace**: Draw a simple diagram showing the contents of relevant processor registers and memory locations after execution.
+
+> **Extension**: Using the instructor's documentation, write a complete Nios II assembly program for this example. Use data directives for integers and reserve space for $W$. Test using the Web-based simulator.
+
+---
+
+### Question 2: Number Representation
+Consider the decimal value **106**.
+
+Without a calculator, convert this value into:
+1.  **Binary** representation.
+2.  **Hexadecimal** representation.
+
+*Hint: Use subtraction of powers of the relevant target base.*
+
+---
+
+### Question 3: Loop Transformations
+Consider pseudocode for a `for` loop summing an array, using an integer index $i$ and loops from a lower to upper bound.
+
+Perform the following progression of transformations:
+
+1.  **For $\to$ While (Index-based)**:
+    *   Transform the `for` loop into a `while` loop.
+    *   Retain the index variable $i$ and array access syntax `[...]`.
+
+2.  **While (Index) $\to$ While (Pointer)**:
+    *   Remove the index variable $i$.
+    *   **Initialize**:
+        *   A *pointer* to the start of the array.
+        *   A *counter* for the number of elements (derived from bounds).
+    *   **Loop Logic**: Increment the pointer and decrement the counter.
+
+3.  **While (Pointer) $\to$ Do..While (Pointer)**:
+    *   Transform into a `do..while` loop (assuming the array has at least one element).
+
+> The final form aligns with low-level assembly patterns seen in *Chapter 2, Slide 40* and the course programming guidelines.

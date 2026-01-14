@@ -8,23 +8,19 @@ window.seedDB = () => DataService.seedDatabase(STUDENT_DATA);
 let appData = {
     assignments: [],
     courses: [],
-    planning: []
 };
 
 async function loadData() {
     // Show loading state if needed
     try {
-        const [assignments, courses, planning] = await Promise.all([
+        const [assignments, courses] = await Promise.all([
             DataService.getAllAssignments(),
-            DataService.getCourses(),
-            DataService.getPlanning()
+            DataService.getCourses()
         ]);
 
         appData.assignments = assignments;
         appData.courses = courses;
-        appData.planning = planning;
 
-        renderPlanning();
         renderGlobalSchedule();
         renderCourses();
     } catch (e) {
@@ -32,16 +28,6 @@ async function loadData() {
     }
 }
 
-function renderPlanning() {
-    const container = document.getElementById('planning-list');
-    if (!container) return;
-    container.innerHTML = appData.planning.map(item => `
-        <a href="${item.link}" target="${item.action === 'PDF' ? '_blank' : '_self'}" class="link-item planning-item">
-            <span class="item-name">${item.name}</span>
-            <span class="item-action">${item.action}</span>
-        </a>
-    `).join('');
-}
 
 // Calendar State
 let currentDate = new Date();
@@ -395,6 +381,12 @@ function createCourseCard(course) {
         </a>
     ` : '';
 
+    const textbookBtn = course.textbook ? `
+        <a href="${course.textbook}" target="_blank" class="action-btn secondary">
+            <span>Textbook</span>
+        </a>
+    ` : '';
+
     return `
         <div class="course-card">
             <div class="course-header">
@@ -408,19 +400,16 @@ function createCourseCard(course) {
                 <a href="${course.assignments}" class="action-btn secondary">
                     <span>Assignments</span>
                 </a>
+                <a href="grades.html?course=${course.code}" class="action-btn secondary">
+                    <span>Grades</span>
+                </a>
                 <a href="${syllabusUrl}" target="_blank" class="action-btn secondary">
                     <span>Syllabus</span>
                 </a>
                 
-                <a href="${course.textbook}" target="_blank" class="action-btn secondary">
-                    <span>Textbook</span>
-                </a>
+                ${textbookBtn}
                 
                 ${solutionsButton}
-
-                <a href="${course.assignments}&type=homework" class="action-btn secondary">
-                    <span>Homework</span>
-                </a>
 
                 ${onqBtn}
                 ${notebookBtn}
@@ -431,7 +420,6 @@ function createCourseCard(course) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderPlanning();
     renderGlobalSchedule();
     renderCourses();
 });

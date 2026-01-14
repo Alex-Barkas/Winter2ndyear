@@ -1,27 +1,9 @@
 const STUDENT_DATA = {
-    planning: [
-        {
-            name: "Weekly Schedule",
-            link: "schedule/schedule.pdf",
-            action: "PDF"
-        },
-        {
-            name: "Upcoming Dates",
-            link: "#",
-            action: "VIEW"
-        },
-        {
-            name: "Grade Dashboard",
-            link: "grades.html",
-            action: "VIEW"
-        }
-    ],
     gradingSchemes: {
         "MTHE 281": {
             components: [
                 { name: "Homework", weight: 10, count: 10, score: null },
-                { name: "Midterm 1", weight: 25, count: 1, score: null },
-                { name: "Midterm 2", weight: 25, count: 1, score: null },
+                { name: "Midterm", weight: 50, count: 2, score: null },
                 { name: "Final Exam", weight: 40, count: 1, score: null }
             ]
         },
@@ -79,14 +61,12 @@ const STUDENT_DATA = {
             code: "MREN 230",
             name: "Thermodynamics",
             notes: "pdfs/MREN230.pdf",
-            textbook: "textbooks/MREN230.pdf",
             assignments: "assignments.html?course=MREN 230"
         },
         {
             code: "MECH 210",
             name: "Circuits",
             notes: "pdfs/MECH210.pdf",
-            textbook: "textbooks/MECH210.pdf",
             assignments: "assignments.html?course=MECH 210"
         },
         {
@@ -113,7 +93,6 @@ const STUDENT_DATA = {
         { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
 
         // --- MTHE 212 ---
-        { id: "mthe212-hw2", course: "MTHE 212", category: "HOMEWORK", title: "Homework Week 2", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "assignments/MTHE212HomeworkWeek2.pdf" } },
         { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-23", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q2", course: "MTHE 212", category: "QUIZ", title: "Quiz 2", date: "2026-02-06", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
         { id: "mthe212-q3", course: "MTHE 212", category: "QUIZ", title: "Quiz 3", date: "2026-02-27", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
@@ -183,6 +162,9 @@ const STUDENT_DATA = {
         { id: "mren230-m2", course: "MREN 230", category: "MIDTERM", title: "Midterm 2", date: "2026-03-26", time: "18:00", status: "UPCOMING", score: null, details: { type: "text", content: "Details on Rooms and Formula sheets TBA" } },
 
         // Labs: Lab I (W5-8), Lab II (W9-12)
+        { id: "mren230-lab1", course: "MREN 230", category: "LAB", title: "Lab 1", date: "2026-02-13", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Lab Report I" } },
+        { id: "mren230-lab2", course: "MREN 230", category: "LAB", title: "Lab 2", date: "2026-03-27", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Lab Report II" } },
+
 
         // --- PERSONAL & OTHER ---
         {
@@ -198,3 +180,7 @@ const STUDENT_DATA = {
         }
     ]
 };
+
+// Expose globally for modules
+window.STUDENT_DATA = STUDENT_DATA;
+window.data = STUDENT_DATA; // Backwards compatibility if needed

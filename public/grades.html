@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .grade-card {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 0.75rem;
             padding: 1.5rem;
@@ -76,6 +76,23 @@
             padding: 0.2rem 0.4rem;
             border-radius: 0.25rem;
         }
+
+        .grade-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .grade-input.synced {
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -88,128 +105,48 @@
         </header>
 
         <div id="grade-list">
-            <!-- Grade cards injected here -->
+            <p class="loading-text">Loading grades...</p>
         </div>
 
-        <footer>
-            <p>© 2026 Patrick. All rights reserved.</p>
-        </footer>
     </main>
 
+    <!-- Load config for the schemes -->
     <script src="student-config.js"></script>
-    <script src="script.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('grade-list');
-            const schemes = data.gradingSchemes;
 
-            for (const [course, scheme] of Object.entries(schemes)) {
-                let rowsHtml = '';
-                let totalWeight = 0;
+    <script type="module">
+        import { GradingRenderer } from './grading-renderer.js';
+        import { DataService } from './data-service.js';
 
-                scheme.components.forEach((comp, compIdx) => {
-                    const count = comp.count || 1;
-                    const unitWeight = comp.weight / count;
+        async function init() {
+            try {
+                const container = document.getElementById('grade-list');
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseCode = urlParams.get('course') ? decodeURIComponent(urlParams.get('course')) : null;
 
-                    for (let i = 0; i < count; i++) {
-                        // Create a stable unique ID
-                        // If count > 1, append index to ID
-                        const uniqueId = `grade-${course.replace(/\s/g, '')}-${compIdx}-${i}`;
-                        const savedGrade = localStorage.getItem(uniqueId) || '';
+                // Update Header
+                if (courseCode) {
+                    document.querySelector('h1').innerText = `${courseCode} Grades`;
+                    document.querySelector('.subtitle').innerText = `Current grade breakdown for ${courseCode}.`;
+                    document.title = `${courseCode} Grades`;
+                }
 
-                        // Display Name (e.g., "Lab 1", "Lab 2" or just "Midterm")
-                        const displayName = count > 1 ? `${comp.name} ${i + 1}` : comp.name;
+                const assignments = await DataService.getAllAssignments(); // Pre-fetch to pass explicitly
 
-                        totalWeight += unitWeight;
+                await GradingRenderer.render(container, courseCode, assignments);
 
-                        rowsHtml += `
-                            <div class="grade-row">
-                                <span>${displayName}</span>
-                                <span>${unitWeight.toFixed(1)}%</span>
-                                <input type="number" class="grade-input" 
-                                    id="${uniqueId}" 
-                                    value="${savedGrade}" 
-                                    onchange="updateGrade('${course}', '${uniqueId}')" 
-                                    placeholder="-">
-                                <span id="${uniqueId}-contrib">0.00%</span>
-                            </div>
-                        `;
-                    }
+                // Re-render on update
+                window.addEventListener('gradeUpdated', async () => {
+                    const freshAssignments = await DataService.getAllAssignments();
+                    await GradingRenderer.render(container, courseCode, freshAssignments);
                 });
 
-                container.innerHTML += `
-                    <div class="grade-card" id="card-${course.replace(/\s/g, '')}">
-                        <div class="grade-header">
-                            <span class="grade-course">${course}</span>
-                            <span class="grade-score pending" id="score-${course.replace(/\s/g, '')}">--%</span>
-                        </div>
-                        <div class="grade-table-header">
-                            <span>Component</span>
-                            <span>Weight</span>
-                            <span>Grade</span>
-                            <span>Contrib</span>
-                        </div>
-                        ${rowsHtml}
-                    </div>
-                `;
-
-                // Initial Calculation
-                calculateCourseGrade(course, scheme.components);
-            }
-        });
-
-        function updateGrade(course, inputId) {
-            const input = document.getElementById(inputId);
-            localStorage.setItem(inputId, input.value);
-            const scheme = data.gradingSchemes[course];
-            calculateCourseGrade(course, scheme.components);
-        }
-
-        function calculateCourseGrade(course, components) {
-            let currentPoints = 0;
-            let currentWeight = 0;
-
-            components.forEach((comp, compIdx) => {
-                const count = comp.count || 1;
-                const unitWeight = comp.weight / count;
-
-                for (let i = 0; i < count; i++) {
-                    const uniqueId = `grade-${course.replace(/\s/g, '')}-${compIdx}-${i}`;
-                    const val = parseFloat(localStorage.getItem(uniqueId));
-
-                    if (!isNaN(val)) {
-                        const contribution = (val / 100) * unitWeight;
-                        const contribElem = document.getElementById(`${uniqueId}-contrib`);
-                        if (contribElem) contribElem.innerText = contribution.toFixed(2) + '%';
-
-                        currentPoints += contribution;
-                        currentWeight += unitWeight;
-                    } else {
-                        const contribElem = document.getElementById(`${uniqueId}-contrib`);
-                        if (contribElem) contribElem.innerText = '-';
-                    }
-                }
-            });
-
-            const scoreElem = document.getElementById(`score-${course.replace(/\s/g, '')}`);
-            if (currentWeight > 0) {
-                // Showing "Current Average" (What you have so far out of what you've done)
-                const currentAvg = (currentPoints / currentWeight) * 100;
-                scoreElem.innerText = currentAvg.toFixed(1) + '%';
-                scoreElem.classList.remove('pending');
-                scoreElem.style.color = getGradeColor(currentAvg);
-            } else {
-                scoreElem.innerText = '--%';
-                scoreElem.classList.add('pending');
+            } catch (err) {
+                console.error("Error initializing dashboard:", err);
+                document.getElementById('grade-list').innerHTML = `<p style="color:red">Error loading data.</p>`;
             }
         }
 
-        function getGradeColor(grade) {
-            if (grade >= 80) return '#4ade80'; // A - Green
-            if (grade >= 70) return '#facc15'; // B - Yellow
-            if (grade >= 60) return '#fb923c'; // C - Orange
-            return '#f87171'; // D/F - Red
-        }
+        init();
     </script>
 </body>
 

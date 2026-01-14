@@ -1,10 +1,41 @@
-// Data is now loaded from student-config.js
-const data = STUDENT_DATA;
+// Data is now loaded via DataService (Firebase)
+import { DataService } from "./data-service.js";
+
+// Make seedDB available globally for the console migration
+window.seedDB = () => DataService.seedDatabase(STUDENT_DATA);
+
+// State for data
+let appData = {
+    assignments: [],
+    courses: [],
+    planning: []
+};
+
+async function loadData() {
+    // Show loading state if needed
+    try {
+        const [assignments, courses, planning] = await Promise.all([
+            DataService.getAllAssignments(),
+            DataService.getCourses(),
+            DataService.getPlanning()
+        ]);
+
+        appData.assignments = assignments;
+        appData.courses = courses;
+        appData.planning = planning;
+
+        renderPlanning();
+        renderGlobalSchedule();
+        renderCourses();
+    } catch (e) {
+        console.error("Failed to load data", e);
+    }
+}
 
 function renderPlanning() {
     const container = document.getElementById('planning-list');
     if (!container) return;
-    container.innerHTML = data.planning.map(item => `
+    container.innerHTML = appData.planning.map(item => `
         <a href="${item.link}" target="${item.action === 'PDF' ? '_blank' : '_self'}" class="link-item planning-item">
             <span class="item-name">${item.name}</span>
             <span class="item-action">${item.action}</span>
@@ -20,7 +51,7 @@ function renderGlobalSchedule() {
     const listContainer = document.getElementById('global-schedule');
     if (listContainer) {
         // Render List View
-        const sorted = [...data.assignments].sort((a, b) => {
+        const sorted = [...appData.assignments].sort((a, b) => {
             // Handle TBD dates for sorting: place them at the end
             if (a.date === '2026-04-30' && a.category === 'FINAL') return 1;
             if (b.date === '2026-04-30' && b.category === 'FINAL') return -1;
@@ -95,7 +126,7 @@ function renderCalendar() {
     for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const currentDayObj = new Date(year, month, i);
-        const assignments = data.assignments.filter(a => a.date === dateStr);
+        const assignments = appData.assignments.filter(a => a.date === dateStr);
 
         // Reading Week Check
         const isReadingWeek = currentDayObj >= rwStart && currentDayObj <= rwEnd;
@@ -110,6 +141,7 @@ function renderCalendar() {
         }
 
         // Check if any assignment is stored as DONE locally
+        // NOTE: In the new DB version, status comes directly from 'item.status' in the DB
         let hasEvent = false;
         if (assignments.length > 0) {
             hasEvent = true;
@@ -137,7 +169,7 @@ function renderCalendar() {
             }
         }
 
-        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${i}${dot}${weekLabelHtml}</div>`;
+        html += `<div class="${classes}" onclick="window.selectDate('${dateStr}')">${i}${dot}${weekLabelHtml}</div>`;
     }
 
     // Next Month Days (to fill grid)
@@ -151,12 +183,13 @@ function renderCalendar() {
     calendarGrid.innerHTML = html;
 }
 
-function selectDate(dateStr) {
+// Expose to window for HTML onclick
+window.selectDate = function (dateStr) {
     selectedDate = dateStr;
     renderCalendar(); // Re-render to update selected style
 
     const detailsContainer = document.getElementById('selected-day-details');
-    const tasks = data.assignments.filter(a => a.date === dateStr);
+    const tasks = appData.assignments.filter(a => a.date === dateStr);
 
     const dateObj = new Date(dateStr + 'T12:00:00'); // Midday to avoid boundary issues
     const displayDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -216,9 +249,7 @@ function setupCalendarControls() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderPlanning();
-    renderGlobalSchedule();
-    renderCourses();
+    loadData(); // Start loading data
     setupCalendarControls();
 });
 
@@ -243,7 +274,7 @@ function filterAssignments(courseCode) {
     document.getElementById('course-subtitle').innerText = `Track deadlines for ${code}`;
 
     // Filter
-    const items = data.assignments.filter(a => a.course === code);
+    const items = appData.assignments.filter(a => a.course === code);
     renderAssignments(items);
 }
 
@@ -267,25 +298,6 @@ function getSemesterWeek(dateString) {
 
     let weekNum = Math.floor(diffDays / 7) + 1;
 
-    // Adjust for Reading Week gap (which is essentially a skipped week number in terms of "Instructional Weeks" usually,
-    // but user said "Feb 23 would start week 7".
-    // Week 1: Jan 5
-    // Week 2: Jan 12
-    // Week 3: Jan 19
-    // Week 4: Jan 26
-    // Week 5: Feb 2
-    // Week 6: Feb 9
-    // RW: Feb 16 (Week 7 calendar-wise, but is RW)
-    // Week 7 Instruction: Feb 23 (Week 8 calendar-wise)
-    // So if date is after RW, we subtract 1 from the raw week count effectively?
-    // Wait, Jan 5 (W1), Jan 12 (W2)... Feb 9 (W6).
-    // Feb 16 is starts RW.
-    // Feb 23 starts W7.
-    // My calculation:
-    // Feb 23 is 49 days after Jan 5. 49/7 = 7. floor(7)+1 = 8.
-    // So raw calculation gives Week 8. User wants Week 7.
-    // So yes, subtract 1 if > Feb 22.
-
     if (d > rwEnd) {
         weekNum -= 1;
     }
@@ -298,10 +310,8 @@ function createAssignmentCard(item) {
     const day = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
     const weekLabel = getSemesterWeek(item.date);
 
-    // Status Color Logic
-    let status = item.status;
-    const localStatus = localStorage.getItem(`status_${item.id}`);
-    if (localStatus) status = localStatus;
+    // Status is now directly from DB
+    const status = item.status;
 
     let statusClass = "status-pending";
     if (status === 'DONE') statusClass = "status-done";
@@ -340,7 +350,7 @@ function createAssignmentCard(item) {
 function renderCourses() {
     const container = document.getElementById('course-list');
     if (!container) return;
-    container.innerHTML = data.courses.map(course => createCourseCard(course)).join('');
+    container.innerHTML = appData.courses.map(course => createCourseCard(course)).join('');
 }
 
 function createCourseCard(course) {

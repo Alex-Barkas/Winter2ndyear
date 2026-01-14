@@ -29,6 +29,7 @@
                 <h2 class="section-label">UPCOMING</h2>
                 <div id="assignment-list" class="list-grid">
                     <!-- Assignments injected via JS -->
+                    <p style="opacity:0.5; font-size: 0.8rem; padding: 2rem;">Loading data...</p>
                 </div>
             </section>
         </div>
@@ -40,20 +41,110 @@
     </main>
 
     <script src="student-config.js"></script>
-    <script src="script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check for query param
-            const urlParams = new URLSearchParams(window.location.search);
-            const courseCode = urlParams.get('course');
+        // Helper to determine Semester Week
+        function getSemesterWeek(dateString) {
+            const d = new Date(dateString);
+            const startOfSem = new Date('2026-01-05');
+            const rwStart = new Date('2026-02-16');
+            const rwEnd = new Date('2026-02-22');
 
-            if (courseCode) {
-                filterAssignments(courseCode);
-            } else {
-                document.getElementById('course-title').innerText = "All Assignments";
-                renderAssignments(data.assignments);
+            if (d >= rwStart && d <= rwEnd) return "Reading Week";
+
+            const diffTime = d - startOfSem;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) return "Pre-Term";
+
+            let weekNum = Math.floor(diffDays / 7) + 1;
+            if (d > rwEnd) weekNum -= 1;
+
+            return `Week ${weekNum}`;
+        }
+
+        function createAssignmentCard(item) {
+            const dateObj = new Date(item.date + 'T' + item.time);
+            const day = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+            const weekLabel = getSemesterWeek(item.date);
+            const status = item.status || 'PENDING';
+
+            let statusClass = "status-pending";
+            if (status === 'DONE') statusClass = "status-done";
+            if (status === 'UPCOMING') statusClass = "status-upcoming";
+
+            const categoryClass = `category-${item.category.toLowerCase()}`;
+            const showStatus = status !== 'PENDING' && status !== 'UPCOMING';
+            const statusHtml = showStatus ? `<span class="assign-status ${statusClass}">${status}</span>` : '';
+
+            return `
+                <a href="details.html?id=${item.id}" class="assignment-item">
+                    <div class="assign-left">
+                        <span class="assign-date">
+                            ${day}
+                            <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 2px;">${weekLabel}</div>
+                        </span>
+                        <div class="assign-details">
+                            <div class="assign-meta">
+                                <span class="assign-course">${item.course}</span>
+                                <span class="assign-category ${categoryClass}">${item.category}</span>
+                            </div>
+                            <span class="assign-title">${item.title}</span>
+                        </div>
+                    </div>
+                    <div class="assign-right">
+                        <span class="assign-time">${item.time}</span>
+                        ${statusHtml}
+                    </div>
+                </a>
+            `;
+        }
+
+        function render(items) {
+            const container = document.getElementById('assignment-list');
+            if (items.length === 0) {
+                container.innerHTML = `<p class="subtitle" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No assignments found for this course.</p>`;
+                return;
             }
-        });
+            const sorted = items.sort((a, b) => new Date(a.date) - new Date(b.date));
+            container.innerHTML = sorted.map(createAssignmentCard).join('');
+        }
+
+        (async function init() {
+            try {
+                console.log("Importing DataService...");
+                const module = await import('./data-service.js');
+                const DataService = module.DataService;
+                console.log("DataService loaded", DataService);
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const courseCode = urlParams.get('course');
+
+                const allAssignments = await DataService.getAllAssignments();
+                console.log("Assignments fetched:", allAssignments ? allAssignments.length : 0);
+
+                if (courseCode) {
+                    const decodedCode = decodeURIComponent(courseCode);
+                    document.getElementById('course-title').innerText = `${decodedCode} Assignments`;
+                    const subtitle = document.getElementById('course-subtitle');
+                    if (subtitle) subtitle.innerText = `Track deadlines for ${decodedCode}`;
+
+                    if (allAssignments) {
+                        const filtered = allAssignments.filter(a => a.course === decodedCode);
+                        console.log("Filtered count:", filtered.length);
+                        render(filtered);
+                    } else {
+                        render([]);
+                    }
+                } else {
+                    document.getElementById('course-title').innerText = "All Assignments";
+                    render(allAssignments || []);
+                }
+            } catch (err) {
+                console.error("Init Error:", err);
+                const list = document.getElementById('assignment-list');
+                if (list) list.innerHTML = `<div style="background:rgba(255,0,0,0.1);color:red;padding:10px;border:1px solid red; grid-column: 1/-1;">Error loading data: ${err.message}</div>`;
+            }
+        })();
     </script>
 </body>
 

@@ -13,8 +13,8 @@
     /* Switched to Charter stack */
     --font-mono: 'JetBrains Mono', monospace;
 
-    --accent-color: #dc5815;
-    /* User preferred orange accent */
+    --accent-color: #2e7d32;
+    /* Dark nice green */
 }
 
 /* Removed local Latin Modern @font-face rules since we are switching to Charter (system/web stack) */
@@ -412,8 +412,7 @@ section {
     font-family: var(--font-sans);
     text-align: center;
     transition: all 0.2s ease;
-    --accent-color: #dc5815;
-    /* User preferred orange accent */
+    /* Local override removed to use global theme */
 }
 
 .action-btn span {

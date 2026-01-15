@@ -10,6 +10,62 @@ let appData = {
     courses: [],
 };
 
+// Global handlers for Add/Delete
+window.openAddModal = function () {
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('new-date').value = today;
+    document.getElementById('new-time').value = "23:59";
+    document.getElementById('add-modal').style.display = 'grid';
+}
+
+window.closeAddModal = function () {
+    document.getElementById('add-modal').style.display = 'none';
+    // Clear inputs
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-course').value = '';
+}
+
+window.saveNewAssignment = async function () {
+    const title = document.getElementById('new-title').value.trim();
+    const course = document.getElementById('new-course').value.trim();
+    const date = document.getElementById('new-date').value;
+    const time = document.getElementById('new-time').value;
+    const category = document.getElementById('new-category').value;
+
+    if (!title || !course || !date) {
+        alert("Please fill in at least Title, Course, and Date.");
+        return;
+    }
+
+    const newItem = {
+        id: 'manual_' + Date.now(),
+        title,
+        course,
+        date,
+        time,
+        category,
+        status: 'PENDING',
+        details: { type: 'text', content: 'Manually added assignment.' },
+        score: null
+    };
+
+    await DataService.addAssignment(newItem);
+    window.closeAddModal();
+    loadData(); // Reload to show new item
+}
+
+window.deleteAssignment = async function (id) {
+    if (confirm("Are you sure you want to delete this assignment?")) {
+        const success = await DataService.deleteAssignment(id);
+        if (success) {
+            loadData();
+        } else {
+            alert("Failed to delete item.");
+        }
+    }
+}
+
 async function loadData() {
     // Show loading state if needed
     try {
@@ -297,11 +353,18 @@ function createAssignmentCard(item) {
     const weekLabel = getSemesterWeek(item.date);
 
     // Status is now directly from DB
-    const status = item.status;
+    let status = item.status;
+
+    // Overdue Check
+    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    if (status !== 'DONE' && item.date < todayStr && item.date !== 'TBD' && item.category !== 'FINAL') {
+        status = 'OVERDUE';
+    }
 
     let statusClass = "status-pending";
     if (status === 'DONE') statusClass = "status-done";
     if (status === 'UPCOMING') statusClass = "status-upcoming";
+    if (status === 'OVERDUE') statusClass = "status-overdue";
 
     // Category Color Logic
     const categoryClass = `category-${item.category.toLowerCase()}`;
@@ -325,9 +388,13 @@ function createAssignmentCard(item) {
                     <span class="assign-title">${item.title}</span>
                 </div>
             </div>
+                    <span class="assign-title">${item.title}</span>
+                </div>
+            </div>
             <div class="assign-right">
                 <span class="assign-time">${item.time}</span>
                 ${statusHtml}
+                <button onclick="event.preventDefault(); window.deleteAssignment('${item.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem; line-height:1; opacity:0.5; margin-left:8px;" onmouseover="this.style.opacity=1; this.style.color='#ef4444'" onmouseout="this.style.opacity=0.5; this.style.color='var(--text-muted)'" title="Delete">×</button>
             </div>
         </a>
     `;

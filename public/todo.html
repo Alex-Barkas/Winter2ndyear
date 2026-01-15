@@ -42,6 +42,16 @@
             font-size: 0.95rem;
         }
 
+        .status-overdue {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid #ef4444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+
         .input-field:focus {
             outline: none;
             border-color: var(--accent-color);
@@ -335,7 +345,10 @@
                     <div class="todo-item">
                         <div class="todo-check ${t.completed ? 'checked' : ''}" onclick="toggleTodo('${t.id}')"></div>
                         <div class="todo-content">
-                            <span class="todo-title">${t.title}</span>
+                            <span class="todo-title">
+                                ${t.title}
+                                ${(!t.completed && t.date && t.date < new Date().toLocaleDateString('en-CA')) ? '<span class="status-overdue">OVERDUE</span>' : ''}
+                            </span>
                             <div class="todo-meta">
                                 <span class="todo-tag">${t.course}</span>
                                 <span>${t.date || 'No Date'}</span>

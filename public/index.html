@@ -60,6 +60,8 @@
                     <div class="view-switcher">
                         <button id="view-list-btn" class="view-btn active">List</button>
                         <button id="view-calendar-btn" class="view-btn">Calendar</button>
+                        <button onclick="window.openAddModal()" class="view-btn"
+                            style="color: var(--accent-color); border: 1px solid var(--accent-color);">+ Add</button>
                     </div>
                 </div>
 
@@ -99,6 +101,36 @@
         <!-- Footer -->
     </main>
 
+
+    <!-- Add Assignment Modal -->
+    <div id="add-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Add New Assignment</h3>
+            <div class="input-group"><label>Title</label><input type="text" id="new-title" class="input-field"
+                    placeholder="e.g. Lab 4 Report"></div>
+            <div class="input-group"><label>Course</label><input type="text" id="new-course" class="input-field"
+                    placeholder="e.g. MTHE 228"></div>
+            <div class="input-group"><label>Date</label><input type="date" id="new-date" class="input-field"></div>
+            <div class="input-group"><label>Time</label><input type="time" id="new-time" class="input-field"></div>
+            <div class="input-group">
+                <label>Category</label>
+                <select id="new-category" class="input-field"
+                    style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color);">
+                    <option value="ASSIGNMENT">Assignment</option>
+                    <option value="LAB">Lab</option>
+                    <option value="QUIZ">Quiz</option>
+                    <option value="MIDTERM">Midterm</option>
+                    <option value="FINAL">Final</option>
+                    <option value="HOMEWORK">Homework</option>
+                    <option value="REMINDER">Reminder</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button onclick="window.closeAddModal()" class="secondary">Cancel</button>
+                <button onclick="window.saveNewAssignment()">Add Item</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="data-service.js"></script>
     <script src="student-config.js"></script> <!-- Keep for migration fallback/source -->

@@ -2,17 +2,10 @@
 import { DataService } from "./data-service.js";
 
 // Make functions global for HTML onclick handlers
-window.toggleChecklistItem = toggleChecklistItem;
-window.addChecklistItem = addChecklistItem;
-window.toggleTimer = toggleTimer;
-window.resetTimer = resetTimer;
 window.saveAssignmentGrade = saveAssignmentGrade;
 window.updateStatus = updateStatus;
 
 let currentAssignmentId = null;
-let timerInterval = null;
-let timeLeft = 25 * 60; // 25 minutes in seconds
-let isTimerRunning = false;
 let currentItemData = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -24,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (currentItemData) {
             renderDetails(currentItemData);
-            loadChecklist(); // Still local or could be migrated to DB
+            renderDetails(currentItemData);
             loadGrade(currentItemData);
             loadStatus(currentItemData);
         } else {
@@ -87,85 +80,7 @@ function renderDetails(item) {
     }
 }
 
-// --- CHECKLIST MODULE ---
-// Note: For now, keeping checklist local to avoid complex DB structure changes immediately, 
-// or could migrate to DB. Let's keep local for v1 of Firebase migration to reduce risk.
-function loadChecklist() {
-    const list = document.getElementById('checklist-items');
-    // Still using LocalStorage for checklist for now
-    const saved = JSON.parse(localStorage.getItem(`checklist_${currentAssignmentId}`)) || [];
 
-    list.innerHTML = '';
-    saved.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.className = item.done ? 'checklist-item checked' : 'checklist-item';
-        li.innerHTML = `
-            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="window.toggleChecklistItem(${index})">
-            <span>${item.text}</span>
-        `;
-        list.appendChild(li);
-    });
-}
-
-function addChecklistItem() {
-    const input = document.getElementById('new-item-input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    const saved = JSON.parse(localStorage.getItem(`checklist_${currentAssignmentId}`)) || [];
-    saved.push({ text: text, done: false });
-    localStorage.setItem(`checklist_${currentAssignmentId}`, JSON.stringify(saved));
-
-    input.value = '';
-    loadChecklist();
-}
-
-function toggleChecklistItem(index) {
-    const saved = JSON.parse(localStorage.getItem(`checklist_${currentAssignmentId}`)) || [];
-    if (saved[index]) {
-        saved[index].done = !saved[index].done;
-        localStorage.setItem(`checklist_${currentAssignmentId}`, JSON.stringify(saved));
-        loadChecklist();
-    }
-}
-
-// --- TIMER MODULE ---
-function toggleTimer() {
-    const btn = document.getElementById('timer-btn');
-    if (isTimerRunning) {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        btn.innerText = "Start";
-    } else {
-        isTimerRunning = true;
-        btn.innerText = "Pause";
-        timerInterval = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateTimerDisplay();
-            } else {
-                clearInterval(timerInterval);
-                isTimerRunning = false;
-                alert("Focus session complete!");
-                btn.innerText = "Start";
-            }
-        }, 1000);
-    }
-}
-
-function resetTimer() {
-    clearInterval(timerInterval);
-    isTimerRunning = false;
-    timeLeft = 25 * 60;
-    document.getElementById('timer-btn').innerText = "Start";
-    updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    document.getElementById('timer-display').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
 
 // --- GRADE & SUBMISSION MODULE ---
 function loadGrade(item) {

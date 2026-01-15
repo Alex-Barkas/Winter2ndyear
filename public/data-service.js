@@ -52,6 +52,31 @@ export const DataService = {
         return assignments.find(a => a.id === id) || null;
     },
 
+    async addAssignment(assignment) {
+        const assignments = await this.getAllAssignments();
+        // Generate simple ID if not provided
+        if (!assignment.id) {
+            assignment.id = 'assign_' + Date.now();
+        }
+        assignments.push(assignment);
+        this._saveAssignments(assignments);
+        console.log(`Added assignment ${assignment.id}`);
+        return assignment;
+    },
+
+    async deleteAssignment(id) {
+        let assignments = await this.getAllAssignments();
+        const initialLength = assignments.length;
+        assignments = assignments.filter(a => a.id !== id);
+
+        if (assignments.length !== initialLength) {
+            this._saveAssignments(assignments);
+            console.log(`Deleted assignment ${id}`);
+            return true;
+        }
+        return false;
+    },
+
     // --- WRITE OPERATIONS ---
 
     async updateAssignmentStatus(id, newStatus) {

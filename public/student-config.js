@@ -100,19 +100,6 @@ const STUDENT_DATA = {
         { id: "mthe212-q5", course: "MTHE 212", category: "QUIZ", title: "Quiz 5", date: "2026-03-27", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },
 
         // --- MECH 210 ---
-        // Active Learning Assignments (10)
-        { id: "mech210-ala1", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 1", date: "2026-01-15", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 1 Tutorial" } }, // Approx Date - Week 1 (Jan 5-11) is past? Using Week 2 as start for list? Syllabus says Week 1: Jan 5-11. 
-        // Assuming current date is Jan 13, 2026.
-        { id: "mech210-ala2", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 2", date: "2026-01-22", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 3" } },
-        { id: "mech210-ala3", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 3", date: "2026-01-29", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 4" } },
-        { id: "mech210-ala4", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 4", date: "2026-02-05", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 5" } },
-        { id: "mech210-ala5", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 5", date: "2026-02-12", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 6" } },
-        { id: "mech210-ala6", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 6", date: "2026-02-26", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 7 (Review)" } },
-        { id: "mech210-ala7", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 7", date: "2026-03-05", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 8" } },
-        { id: "mech210-ala8", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 8", date: "2026-03-12", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 9" } },
-        { id: "mech210-ala9", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 9", date: "2026-03-19", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 10" } },
-        { id: "mech210-ala10", course: "MECH 210", category: "TUTORIAL", title: "Active Learning 10", date: "2026-03-26", time: "10:30", status: "PENDING", score: null, details: { type: "text", content: "Week 11" } },
-
         // MECH 210 Quizzes (Fridays 4:30 PM)
         { id: "mech210-q1", course: "MECH 210", category: "QUIZ", title: "Quiz 1", date: "2026-01-23", time: "16:30", status: "UPCOMING", score: null, details: { type: "text", content: "Week 3" } },
         { id: "mech210-q2", course: "MECH 210", category: "QUIZ", title: "Quiz 2", date: "2026-02-06", time: "16:30", status: "UPCOMING", score: null, details: { type: "text", content: "Week 5" } },

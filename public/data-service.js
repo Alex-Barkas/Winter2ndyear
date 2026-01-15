@@ -86,6 +86,20 @@ export const DataService = {
         }
     },
 
+    async updateAssignmentDetails(id, newDetails) {
+        const assignments = await this.getAllAssignments();
+        const index = assignments.findIndex(a => a.id === id);
+
+        if (index !== -1) {
+            // Merge new details
+            assignments[index] = { ...assignments[index], ...newDetails };
+            this._saveAssignments(assignments);
+            console.log(`Updated details for ${id}`, newDetails);
+            return assignments[index];
+        }
+        return null;
+    },
+
     // --- INTERNAL HELPERS ---
 
     _saveAssignments(assignments) {

@@ -71,100 +71,178 @@
         .btn-link:hover {
             opacity: 0.9;
         }
+
+        .btn-link:hover {
+            opacity: 0.9;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: grid;
+            place-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .modal-actions button {
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+        }
+
+        .modal-actions button.secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-actions button:not(.secondary) {
+            background: var(--text-primary);
+            color: #000;
+        }
     </style>
+
 </head>
 
 <body>
     <main class="container">
-        <header>
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
-        </header>
-
+        <header><a href="index.html" class="back-link">← Back to Dashboard</a></header>
         <div id="loading" class="subtitle">Loading...</div>
-
         <article id="detail-view" style="display: none;">
             <div class="details-header">
-                <div class="details-meta">
-                    <span id="detail-course"></span>
-                    <span>•</span>
-                    <span id="detail-date"></span>
+                <div class="details-meta"><span id="detail-course"></span><span>•</span><span id="detail-date"></span>
                 </div>
                 <h1 id="detail-title"></h1>
-                <span id="detail-category" class="assign-category"></span>
+                <div style="display: flex; justify-content: space-between; align-items: baseline;"><span
+                        id="detail-category" class="assign-category"></span><button onclick="window.openEditModal()"
+                        style="background:none; border:none; color:var(--text-muted); cursor:pointer; text-decoration:underline; font-size:0.85rem;">Edit
+                        Details</button></div>
             </div>
-
             <div id="content-area" class="details-content">
-                <!-- Injected Content -->
+                < !-- Injected Content -->
             </div>
-
-            <!-- Productivity Toolkit -->
-            <div class="toolkit-grid">
-
-                <!-- Info Box -->
-                <div class="tool-card" style="border-style: dashed; opacity: 0.8;">
-                    <h3>ℹ️ Available Tools</h3>
-                    <ul style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.6;">
-                        <li><strong>Checklist:</strong> Break down tasks.</li>
-                        <li><strong>Timer:</strong> 25m Focus Mode.</li>
-                        <li><strong>Grade Tracker:</strong> Log results.</li>
-                        <li><strong>Status:</strong> Global sync.</li>
-                    </ul>
-                </div>
-
-                <!-- 1. Active Checklist -->
-                <div class="tool-card">
-                    <h3>✅ Checklist</h3>
-                    <div class="checklist-container">
-                        <ul id="checklist-items">
-                            <!-- Items injected via JS -->
-                        </ul>
-                        <div class="checklist-input-group">
-                            <input type="text" id="new-item-input" placeholder="Add task...">
-                            <button onclick="addChecklistItem()">+</button>
+            < !-- Productivity Toolkit -->
+                <div class="toolkit-grid">
+                    < !-- Info Box -->
+                        <div class="tool-card" style="border-style: dashed; opacity: 0.8;">
+                            <h3>ℹ️ Available Tools</h3>
+                            <ul
+                                style="font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem; line-height: 1.6;">
+                                <li><strong>Checklist:</strong>Break down tasks.</li>
+                                <li><strong>Timer:</strong>25m Focus Mode.</li>
+                                <li><strong>Grade Tracker:</strong>Log results.</li>
+                                <li><strong>Status:</strong>Global sync.</li>
+                            </ul>
                         </div>
-                    </div>
+                        < !-- 1. Active Checklist -->
+                            <div class="tool-card">
+                                <h3>✅ Checklist</h3>
+                                <div class="checklist-container">
+                                    <ul id="checklist-items">
+                                        < !-- Items injected via JS -->
+                                    </ul>
+                                    <div class="checklist-input-group"><input type="text" id="new-item-input"
+                                            placeholder="Add task..."><button onclick="addChecklistItem()">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            < !-- 2. Pomodoro Timer -->
+                                <div class="tool-card">
+                                    <h3>⏱️ Focus Timer</h3>
+                                    <div class="timer-display" id="timer-display">25:00</div>
+                                    <div class="timer-controls"><button onclick="toggleTimer()"
+                                            id="timer-btn">Start</button><button onclick="resetTimer()"
+                                            class="secondary">Reset</button></div>
+                                </div>
+                                < !-- 3. Grades & Submission -->
+                                    <div class="tool-card">
+                                        <h3>🏆 Result</h3>
+                                        <div id="grade-input-container"><label>Grade Achieved (%)</label><input
+                                                type="number" id="assignment-grade" placeholder="-"
+                                                onchange="saveAssignmentGrade()"></div>
+                                        <div style="margin-top: 1rem;"><label
+                                                style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Current
+                                                Status</label><select id="status-selector" onchange="updateStatus()"
+                                                style="width: 100%; padding: 0.75rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; font-family: var(--font-sans);">
+                                                <option value="PENDING">Pending</option>
+                                                <option value="UPCOMING">Upcoming</option>
+                                                <option value="DONE">Done</option>
+                                            </select></div>
+                                    </div>
                 </div>
-
-                <!-- 2. Pomodoro Timer -->
-                <div class="tool-card">
-                    <h3>⏱️ Focus Timer</h3>
-                    <div class="timer-display" id="timer-display">25:00</div>
-                    <div class="timer-controls">
-                        <button onclick="toggleTimer()" id="timer-btn">Start</button>
-                        <button onclick="resetTimer()" class="secondary">Reset</button>
-                    </div>
-                </div>
-
-                <!-- 3. Grades & Submission -->
-                <div class="tool-card">
-                    <h3>🏆 Result</h3>
-                    <div id="grade-input-container">
-                        <label>Grade Achieved (%)</label>
-                        <input type="number" id="assignment-grade" placeholder="-" onchange="saveAssignmentGrade()">
-                    </div>
-                    <div style="margin-top: 1rem;">
-                        <label
-                            style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Current
-                            Status</label>
-                        <select id="status-selector" onchange="updateStatus()"
-                            style="width: 100%; padding: 0.75rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; font-family: var(--font-sans);">
-                            <option value="PENDING">Pending</option>
-                            <option value="UPCOMING">Upcoming</option>
-                            <option value="DONE">Done</option>
-                        </select>
-                    </div>
-                </div>
-
-            </div>
         </article>
-
     </main>
-
-    <script src="student-config.js"></script> <!-- Keep for migration -->
-
-    <script type="module" src="data-service.js"></script>
-    <script type="module" src="details.js"></script>
-    <!-- Script logic moved to details.js -->
+    < !-- Edit Details Modal -->
+        <div id="edit-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>Edit Details</h3>
+                <div class="input-group"><label>Title</label><input type="text" id="edit-title" class="input-field">
+                </div>
+                <div class="input-group"><label>Course</label><input type="text" id="edit-course" class="input-field">
+                </div>
+                <div class="input-group"><label>Date</label><input type="date" id="edit-date" class="input-field"></div>
+                <div class="input-group"><label>Time</label><input type="time" id="edit-time" class="input-field"></div>
+                <div class="modal-actions"><button onclick="window.closeEditModal()"
+                        class="secondary">Cancel</button><button onclick="window.saveEditDetails()">Save
+                        Changes</button></div>
+            </div>
+        </div>
+        <script src="student-config.js"></script>
+        < !-- Keep for migration -->
+            <script type="module" src="data-service.js"></script>
+            <script type="module" src="details.js"></script>
+            < !-- Script logic moved to details.js -->
 </body>
 
 </html>

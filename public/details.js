@@ -192,3 +192,48 @@ async function updateStatus() {
     const newStatus = selector.value;
     await DataService.updateAssignmentStatus(currentAssignmentId, newStatus);
 }
+
+// --- EDIT DETAILS MODULE ---
+window.openEditModal = function () {
+    if (!currentItemData) return;
+
+    document.getElementById('edit-title').value = currentItemData.title || '';
+    document.getElementById('edit-course').value = currentItemData.course || '';
+    document.getElementById('edit-date').value = currentItemData.date || '';
+    document.getElementById('edit-time').value = currentItemData.time || '';
+
+    document.getElementById('edit-modal').style.display = 'grid';
+}
+
+window.closeEditModal = function () {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+window.saveEditDetails = async function () {
+    const newTitle = document.getElementById('edit-title').value;
+    const newCourse = document.getElementById('edit-course').value;
+    const newDate = document.getElementById('edit-date').value;
+    const newTime = document.getElementById('edit-time').value;
+
+    if (!newTitle || !newCourse || !newDate) {
+        alert("Please fill in Title, Course, and Date");
+        return;
+    }
+
+    const updates = {
+        title: newTitle,
+        course: newCourse,
+        date: newDate,
+        time: newTime
+    };
+
+    const updatedItem = await DataService.updateAssignmentDetails(currentAssignmentId, updates);
+    if (updatedItem) {
+        currentItemData = updatedItem;
+        renderDetails(updatedItem); // Re-render page
+        window.closeEditModal();
+        // Also update local checklist key if ID changed? ID shouldn't change.
+    } else {
+        alert("Failed to update details.");
+    }
+}

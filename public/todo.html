@@ -236,19 +236,54 @@
         }
 
         async function getTodos() {
+            let serverData = null;
             try {
                 const res = await fetch('/api/db');
-                if (!res.ok) throw new Error('Fetch failed');
-                const data = await res.json();
-                return data.todos || [];
+                if (res.ok) {
+                    const db = await res.json();
+                    serverData = db.todos || [];
+                }
             } catch (e) {
-                console.error(e);
-                return JSON.parse(localStorage.getItem('personal_todos') || '[]');
+                console.warn('Server offline, using local storage');
+            }
+
+            const localData = JSON.parse(localStorage.getItem('personal_todos') || '[]');
+
+            if (serverData !== null) {
+                // Server is online. Check for migration need.
+                if (serverData.length === 0 && localData.length > 0) {
+                    console.log("Migrating Local Todos to Server...");
+                    // We must fetch full DB to preserve assignments, then update todos
+                    try {
+                        const res = await fetch('/api/db');
+                        const db = await res.json();
+                        db.todos = localData;
+
+                        await fetch('/api/db', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(db)
+                        });
+                        return localData;
+                    } catch (e) {
+                        console.error("Migration failed", e);
+                        return localData;
+                    }
+                }
+                // Server has data, or both empty. Server is truth.
+                // Update local cache to match server
+                localStorage.setItem('personal_todos', JSON.stringify(serverData));
+                return serverData;
+            } else {
+                // Server unreachable, use local
+                return localData;
             }
         }
 
         async function saveTodos(todos) {
-            // Get current full DB state to merge
+            // Optimistically update UI and LocalStorage
+            localStorage.setItem('personal_todos', JSON.stringify(todos));
+
             try {
                 const res = await fetch('/api/db');
                 const data = await res.json();
@@ -260,9 +295,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+                console.log("Saved to server");
             } catch (e) {
-                localStorage.setItem('personal_todos', JSON.stringify(todos));
-                alert("Saved locally (Server offline)");
+                console.error("Save to server failed, data saved locally only");
             }
             renderTodos();
         }

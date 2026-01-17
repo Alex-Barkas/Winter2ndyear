@@ -1,0 +1,446 @@
+{
+    "assignments": [
+        {
+            "id": "mthe281-h1",
+            "course": "MTHE 281",
+            "title": "Homework 1",
+            "date": "2026-01-16",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h2",
+            "course": "MTHE 281",
+            "title": "Homework 2",
+            "date": "2026-01-23",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h3",
+            "course": "MTHE 281",
+            "title": "Homework 3",
+            "date": "2026-01-30",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h4",
+            "course": "MTHE 281",
+            "title": "Homework 4",
+            "date": "2026-02-06",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-m1",
+            "course": "MTHE 281",
+            "title": "Midterm 1",
+            "date": "2026-02-11",
+            "time": "13:30",
+            "category": "MIDTERM",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe281-h5",
+            "course": "MTHE 281",
+            "title": "Homework 5",
+            "date": "2026-02-27",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h6",
+            "course": "MTHE 281",
+            "title": "Homework 6",
+            "date": "2026-03-06",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h7",
+            "course": "MTHE 281",
+            "title": "Homework 7",
+            "date": "2026-03-13",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-m2",
+            "course": "MTHE 281",
+            "title": "Midterm 2",
+            "date": "2026-03-18",
+            "time": "13:30",
+            "category": "MIDTERM",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe281-h8",
+            "course": "MTHE 281",
+            "title": "Homework 8",
+            "date": "2026-03-27",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h9",
+            "course": "MTHE 281",
+            "title": "Homework 9",
+            "date": "2026-04-03",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe281-h10",
+            "course": "MTHE 281",
+            "title": "Homework 10",
+            "date": "2026-04-10",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mthe212-q1",
+            "course": "MTHE 212",
+            "title": "Quiz 1",
+            "date": "2026-01-23",
+            "time": "10:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe212-q2",
+            "course": "MTHE 212",
+            "title": "Quiz 2",
+            "date": "2026-02-06",
+            "time": "10:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe212-q3",
+            "course": "MTHE 212",
+            "title": "Quiz 3",
+            "date": "2026-02-27",
+            "time": "10:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe212-q4",
+            "course": "MTHE 212",
+            "title": "Quiz 4",
+            "date": "2026-03-13",
+            "time": "10:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mthe212-q5",
+            "course": "MTHE 212",
+            "title": "Quiz 5",
+            "date": "2026-03-27",
+            "time": "10:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-q1",
+            "course": "MECH 210",
+            "title": "Quiz 1",
+            "date": "2026-01-23",
+            "time": "16:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-q2",
+            "course": "MECH 210",
+            "title": "Quiz 2",
+            "date": "2026-02-06",
+            "time": "16:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-q3",
+            "course": "MECH 210",
+            "title": "Quiz 3",
+            "date": "2026-03-13",
+            "time": "16:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-q4",
+            "course": "MECH 210",
+            "title": "Quiz 4",
+            "date": "2026-03-27",
+            "time": "16:30",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-mid",
+            "course": "MECH 210",
+            "title": "Midterm Exam",
+            "date": "2026-02-24",
+            "time": "08:30",
+            "category": "MIDTERM",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mech210-mania",
+            "course": "MECH 210",
+            "title": "MECHMania 2.0",
+            "date": "2026-03-30",
+            "time": "08:30",
+            "category": "ASSIGNMENT",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "enph225-a1",
+            "course": "ENPH 225",
+            "title": "Assignment 1",
+            "date": "2026-01-14",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a2",
+            "course": "ENPH 225",
+            "title": "Assignment 2",
+            "date": "2026-01-21",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a3",
+            "course": "ENPH 225",
+            "title": "Assignment 3",
+            "date": "2026-01-28",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a4",
+            "course": "ENPH 225",
+            "title": "Assignment 4",
+            "date": "2026-02-11",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a5",
+            "course": "ENPH 225",
+            "title": "Assignment 5",
+            "date": "2026-02-25",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a6",
+            "course": "ENPH 225",
+            "title": "Assignment 6",
+            "date": "2026-03-11",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a7",
+            "course": "ENPH 225",
+            "title": "Assignment 7",
+            "date": "2026-03-18",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-a8",
+            "course": "ENPH 225",
+            "title": "Assignment 8",
+            "date": "2026-04-01",
+            "time": "16:30",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "enph225-q1",
+            "course": "ENPH 225",
+            "title": "Quiz 1",
+            "date": "2026-02-03",
+            "time": "19:00",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "enph225-q2",
+            "course": "ENPH 225",
+            "title": "Quiz 2",
+            "date": "2026-03-03",
+            "time": "19:00",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "enph225-q3",
+            "course": "ENPH 225",
+            "title": "Quiz 3",
+            "date": "2026-03-24",
+            "time": "19:00",
+            "category": "QUIZ",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mren230-a1",
+            "course": "MREN 230",
+            "title": "Assignment 1",
+            "date": "2026-01-16",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a2",
+            "course": "MREN 230",
+            "title": "Assignment 2",
+            "date": "2026-01-23",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a3",
+            "course": "MREN 230",
+            "title": "Assignment 3",
+            "date": "2026-01-30",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a4",
+            "course": "MREN 230",
+            "title": "Assignment 4",
+            "date": "2026-02-06",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a5",
+            "course": "MREN 230",
+            "title": "Assignment 5",
+            "date": "2026-02-13",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a6",
+            "course": "MREN 230",
+            "title": "Assignment 6",
+            "date": "2026-02-27",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a7",
+            "course": "MREN 230",
+            "title": "Assignment 7",
+            "date": "2026-03-06",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a8",
+            "course": "MREN 230",
+            "title": "Assignment 8",
+            "date": "2026-03-13",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a9",
+            "course": "MREN 230",
+            "title": "Assignment 9",
+            "date": "2026-03-20",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-a10",
+            "course": "MREN 230",
+            "title": "Assignment 10",
+            "date": "2026-03-27",
+            "time": "23:59",
+            "category": "ASSIGNMENT",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-m1",
+            "course": "MREN 230",
+            "title": "Midterm 1",
+            "date": "2026-02-12",
+            "time": "18:00",
+            "category": "MIDTERM",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mren230-m2",
+            "course": "MREN 230",
+            "title": "Midterm 2",
+            "date": "2026-03-26",
+            "time": "18:00",
+            "category": "MIDTERM",
+            "status": "UPCOMING"
+        },
+        {
+            "id": "mren230-lab1",
+            "course": "MREN 230",
+            "title": "Lab 1",
+            "date": "2026-02-13",
+            "time": "23:59",
+            "category": "LAB",
+            "status": "PENDING"
+        },
+        {
+            "id": "mren230-lab2",
+            "course": "MREN 230",
+            "title": "Lab 2",
+            "date": "2026-03-27",
+            "time": "23:59",
+            "category": "LAB",
+            "status": "PENDING"
+        },
+        {
+            "id": "tuition-w26",
+            "course": "FINANCE",
+            "title": "Pay Tuition",
+            "date": "2026-01-10",
+            "time": "10:00",
+            "category": "REMINDER",
+            "status": "PENDING"
+        }
+    ],
+    "todos": []
+}

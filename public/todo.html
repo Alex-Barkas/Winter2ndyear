@@ -235,16 +235,39 @@
             }
         }
 
-        function getTodos() {
-            return JSON.parse(localStorage.getItem('personal_todos') || '[]');
+        async function getTodos() {
+            try {
+                const res = await fetch('/api/db');
+                if (!res.ok) throw new Error('Fetch failed');
+                const data = await res.json();
+                return data.todos || [];
+            } catch (e) {
+                console.error(e);
+                return JSON.parse(localStorage.getItem('personal_todos') || '[]');
+            }
         }
 
-        function saveTodos(todos) {
-            localStorage.setItem('personal_todos', JSON.stringify(todos));
+        async function saveTodos(todos) {
+            // Get current full DB state to merge
+            try {
+                const res = await fetch('/api/db');
+                const data = await res.json();
+
+                data.todos = todos;
+
+                await fetch('/api/db', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            } catch (e) {
+                localStorage.setItem('personal_todos', JSON.stringify(todos));
+                alert("Saved locally (Server offline)");
+            }
             renderTodos();
         }
 
-        function addTodo() {
+        async function addTodo() {
             const titleInput = document.getElementById('task-title');
             const courseInput = document.getElementById('task-course');
             const dateInput = document.getElementById('task-date');
@@ -261,25 +284,26 @@
                 createdAt: new Date().toISOString()
             };
 
-            const todos = getTodos();
+            const todos = await getTodos();
             todos.push(newTodo);
-            saveTodos(todos);
+            await saveTodos(todos);
 
             titleInput.value = '';
         }
 
-        function toggleTodo(id) {
-            const todos = getTodos();
+        async function toggleTodo(id) {
+            const todos = await getTodos();
             const todo = todos.find(t => t.id === id);
             if (todo) {
                 todo.completed = !todo.completed;
-                saveTodos(todos);
+                await saveTodos(todos);
             }
         }
 
-        function deleteTodo(id) {
-            const todos = getTodos().filter(t => t.id !== id);
-            saveTodos(todos);
+        async function deleteTodo(id) {
+            let todos = await getTodos();
+            todos = todos.filter(t => t.id !== id);
+            await saveTodos(todos);
         }
 
         // Helper: Get Week Info
@@ -303,9 +327,9 @@
             return `Week ${weekNum}`;
         }
 
-        function renderTodos() {
+        async function renderTodos() {
             const container = document.getElementById('todo-container');
-            const todos = getTodos();
+            const todos = await getTodos();
 
             if (todos.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:3rem;">No tasks yet. Add one above!</p>';

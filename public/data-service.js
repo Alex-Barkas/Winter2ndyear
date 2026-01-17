@@ -8,43 +8,83 @@ const STORAGE_KEYS = {
 // Helper to get data from global config if storage is empty
 const getInitialData = () => (typeof STUDENT_DATA !== 'undefined' ? STUDENT_DATA : { assignments: [], courses: [], planning: [] });
 
+const API_URL = '/api/db';
+
 export const DataService = {
 
     // --- READ OPERATIONS ---
 
-    async getAllAssignments() {
-        const stored = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
-        if (stored) return JSON.parse(stored);
-
-        // Auto-seed if empty
-        const initial = getInitialData().assignments;
-        if (initial.length > 0) {
-            console.log("Auto-seeding assignments to Local Storage");
-            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(initial));
+    async _fetchDB() {
+        try {
+            const res = await fetch(API_URL);
+            if (!res.ok) throw new Error("Failed to fetch DB");
+            return await res.json();
+        } catch (e) {
+            console.error("API Error, falling back to LocalStorage (Read-Only mode)", e);
+            // Fallback for offline viewing or if server not running
+            const assignments = JSON.parse(localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS) || '[]');
+            // Try to seed from config if empty
+            if (assignments.length === 0 && typeof STUDENT_DATA !== 'undefined') {
+                return { assignments: STUDENT_DATA.assignments, todos: [] };
+            }
+            return { assignments, todos: [] };
         }
-        return initial;
+    },
+
+    async _saveDB(data) {
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error("Failed to save DB");
+
+            // Also update LocalStorage as backup/cache
+            if (data.assignments) localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
+
+            return true;
+        } catch (e) {
+            console.error("API Error, save failed", e);
+            alert("Connection to server failed. Changes may not be saved persistently.");
+            return false;
+        }
+    },
+
+    async getAllAssignments() {
+        const db = await this._fetchDB();
+
+        // Auto-seed if empty and we have static data
+        if ((!db.assignments || db.assignments.length === 0) && typeof STUDENT_DATA !== 'undefined') {
+            console.log("Auto-seeding assignments to Server");
+            db.assignments = STUDENT_DATA.assignments;
+            await this._saveDB(db);
+        }
+
+        return db.assignments || [];
+    },
+
+    async getTodos() {
+        const db = await this._fetchDB();
+        return db.todos || [];
+    },
+
+    async saveTodos(todos) {
+        const db = await this._fetchDB();
+        db.todos = todos;
+        await this._saveDB(db);
     },
 
     async getCourses() {
-        const stored = localStorage.getItem(STORAGE_KEYS.COURSES);
-        if (stored) return JSON.parse(stored);
-
-        const initial = getInitialData().courses;
-        if (initial.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(initial));
-        }
-        return initial;
+        // Courses are static for now, usually coming from student-config.js via script.js
+        // But let's return from config if available
+        if (typeof STUDENT_DATA !== 'undefined') return STUDENT_DATA.courses;
+        return [];
     },
 
     async getPlanning() {
-        const stored = localStorage.getItem(STORAGE_KEYS.PLANNING);
-        if (stored) return JSON.parse(stored);
-
-        const initial = getInitialData().planning;
-        if (initial.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.PLANNING, JSON.stringify(initial));
-        }
-        return initial;
+        // Deprecated/Unused in new flow, return empty
+        return [];
     },
 
     async getAssignmentById(id) {
@@ -53,24 +93,28 @@ export const DataService = {
     },
 
     async addAssignment(assignment) {
-        const assignments = await this.getAllAssignments();
+        const db = await this._fetchDB();
+        if (!db.assignments) db.assignments = [];
+
         // Generate simple ID if not provided
         if (!assignment.id) {
             assignment.id = 'assign_' + Date.now();
         }
-        assignments.push(assignment);
-        this._saveAssignments(assignments);
+        db.assignments.push(assignment);
+        await this._saveDB(db);
         console.log(`Added assignment ${assignment.id}`);
         return assignment;
     },
 
     async deleteAssignment(id) {
-        let assignments = await this.getAllAssignments();
-        const initialLength = assignments.length;
-        assignments = assignments.filter(a => a.id !== id);
+        const db = await this._fetchDB();
+        if (!db.assignments) return false;
 
-        if (assignments.length !== initialLength) {
-            this._saveAssignments(assignments);
+        const initialLength = db.assignments.length;
+        db.assignments = db.assignments.filter(a => a.id !== id);
+
+        if (db.assignments.length !== initialLength) {
+            await this._saveDB(db);
             console.log(`Deleted assignment ${id}`);
             return true;
         }
@@ -80,69 +124,59 @@ export const DataService = {
     // --- WRITE OPERATIONS ---
 
     async updateAssignmentStatus(id, newStatus) {
-        const assignments = await this.getAllAssignments();
-        const index = assignments.findIndex(a => a.id === id);
+        const db = await this._fetchDB();
+        const index = db.assignments.findIndex(a => a.id === id);
 
         if (index !== -1) {
-            assignments[index].status = newStatus;
-            this._saveAssignments(assignments);
-            console.log(`Updated status for ${id} to ${newStatus} (Local Storage)`);
+            db.assignments[index].status = newStatus;
+            await this._saveDB(db);
+            console.log(`Updated status for ${id} to ${newStatus}`);
         }
     },
 
     async updateAssignmentGrade(id, newScore) {
-        const assignments = await this.getAllAssignments();
-        const index = assignments.findIndex(a => a.id === id);
+        const db = await this._fetchDB();
+        const index = db.assignments.findIndex(a => a.id === id);
 
         if (index !== -1) {
-            assignments[index].score = newScore;
-            this._saveAssignments(assignments);
-            console.log(`Updated score for ${id} to ${newScore} (Local Storage)`);
-        }
-    },
-
-    async updateChecklist(id, checklist) {
-        const assignments = await this.getAllAssignments();
-        const index = assignments.findIndex(a => a.id === id);
-
-        if (index !== -1) {
-            assignments[index].personalChecklist = checklist;
-            this._saveAssignments(assignments);
+            db.assignments[index].score = newScore;
+            await this._saveDB(db);
+            console.log(`Updated score for ${id} to ${newScore}`);
         }
     },
 
     async updateAssignmentDetails(id, newDetails) {
-        const assignments = await this.getAllAssignments();
-        const index = assignments.findIndex(a => a.id === id);
+        const db = await this._fetchDB();
+        const index = db.assignments.findIndex(a => a.id === id);
 
         if (index !== -1) {
-            // Merge new details
-            assignments[index] = { ...assignments[index], ...newDetails };
-            this._saveAssignments(assignments);
+            // Merge new details (spread only works if keys don't conflict logic)
+            // Just update specific fields
+            if (newDetails.title) db.assignments[index].title = newDetails.title;
+            if (newDetails.course) db.assignments[index].course = newDetails.course;
+            if (newDetails.date) db.assignments[index].date = newDetails.date;
+            if (newDetails.time) db.assignments[index].time = newDetails.time;
+
+            await this._saveDB(db);
             console.log(`Updated details for ${id}`, newDetails);
-            return assignments[index];
+            return db.assignments[index];
         }
         return null;
     },
 
     // --- INTERNAL HELPERS ---
-
-    _saveAssignments(assignments) {
-        localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(assignments));
-    },
+    // (Helpers removed as logic is now integrated)
 
     // --- MIGRATION UTILS ---
 
     async seedDatabase(data) {
         if (!data) return;
-
-        console.log("Seeding Local Storage...", data);
-
-        localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
-        localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(data.courses));
-        localStorage.setItem(STORAGE_KEYS.PLANNING, JSON.stringify(data.planning));
-
-        console.log("Local Storage seeded successfully!");
-        alert("Local Storage Updated! (Cloud API bypassed)");
+        const db = {
+            assignments: data.assignments,
+            todos: []
+        };
+        await this._saveDB(db);
+        console.log("Server DB seeded successfully!");
+        alert("Server DB Updated with Seed Data!");
     }
 };

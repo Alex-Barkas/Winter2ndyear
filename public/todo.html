@@ -166,6 +166,8 @@
             color: var(--text-primary);
             margin-bottom: 0.25rem;
             display: block;
+            display: flex;
+            align-items: center;
         }
 
         .todo-check.checked+.todo-content .todo-title {
@@ -189,9 +191,11 @@
         }
 
         .urgency-badge {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             margin-right: 8px;
             font-weight: bold;
+            display: inline-flex;
+            align-items: center;
         }
 
         .urgency-5 {
@@ -199,27 +203,11 @@
             text-shadow: 0 0 5px rgba(255, 77, 77, 0.4);
         }
 
-        /* Critical */
         .urgency-4 {
             color: #ff9f43;
         }
 
-        /* High */
-        .urgency-3 {
-            color: #feca57;
-        }
-
-        /* Medium */
-        .urgency-2 {
-            color: #54a0ff;
-        }
-
-        /* Low */
-        .urgency-1 {
-            color: #8395a7;
-        }
-
-        /* Trivial */
+        /* Levels 1-3 hidden or subtle as requested */
 
         .delete-btn {
             background: none;
@@ -252,24 +240,29 @@
 
         <!-- Input Section -->
         <div class="todo-input-container">
+            <!-- 1. Task Name -->
             <input type="text" id="task-title" class="input-field" placeholder="What needs to be done?">
 
+            <!-- 2. Course -->
             <select id="task-course" class="input-field">
                 <option value="Personal">Personal</option>
                 <!-- Courses injected here -->
             </select>
 
-            <select id="task-urgency" class="input-field">
-                <option value="1">⚪ Trivial (1)</option>
-                <option value="2">🔵 Low (2)</option>
-                <option value="3" selected>🟡 Normal (3)</option>
-                <option value="4">🟠 High (4)</option>
-                <option value="5">🔥 CRITICAL (5)</option>
+            <!-- 3. Urgency (Simplified) -->
+            <select id="task-urgency" class="input-field" title="Urgency Level">
+                <option value="1">1 - Trivial</option>
+                <option value="2">2 - Low</option>
+                <option value="3" selected>3 - Normal</option>
+                <option value="4">4 - High</option>
+                <option value="5">5 - Critical</option>
             </select>
 
+            <!-- 4. Date (Optional) -->
             <input type="date" id="task-date" class="input-field" title="Optional Due Date">
 
-            <button onclick="addTodo()" class="add-btn">Add Task</button>
+            <!-- 5. Button -->
+            <button onclick="addTodo()" class="add-btn">Add</button>
         </div>
 
         <!-- Lists -->
@@ -287,13 +280,9 @@
             loadCourses();
             renderTodos();
 
-            // Make add/toggle/delete global for onclick
             window.addTodo = addTodo;
             window.toggleTodo = toggleTodo;
             window.deleteTodo = deleteTodo;
-
-            // Optional: Set default date to today? User said they didn't care about date much.
-            // Let's leave it empty to signify optional.
         });
 
         function loadCourses() {
@@ -326,7 +315,7 @@
                 title: title,
                 course: courseInput.value,
                 urgency: parseInt(urgencyInput.value) || 3,
-                date: dateInput.value || "", // Optional
+                date: dateInput.value || "",
                 completed: false,
                 createdAt: new Date().toISOString()
             };
@@ -345,32 +334,25 @@
                 const wasCompleted = todo.completed;
                 todo.completed = !todo.completed;
 
-                // If marking AS COMPLETE (false -> true)
                 if (todo.completed && !wasCompleted) {
-                    // 1. Confetti
+                    // Confetti
                     confetti({
                         particleCount: 100,
                         spread: 70,
                         origin: { y: 0.6 }
                     });
 
-                    // 2. Glow Effect (Find the element)
-                    // We need to re-render first to update state, BUT we want to animate the specific row.
-                    // Ideally we toggle class first, then wait, then re-render.
-                    // But our renderTodos destroys DOM. 
-                    // Let's manually find the DOM element first for instant Feedback.
+                    // Glow Effect
                     const checkbox = document.querySelector(`[onclick="toggleTodo('${id}')"]`);
                     if (checkbox) {
                         const row = checkbox.closest('.todo-item');
                         row.classList.add('glow-success');
-                        checkbox.classList.add('checked'); // Visual update immediately
+                        checkbox.classList.add('checked');
                     }
 
-                    // Delay save/render slightly to let user enjoy the glow
                     await DataService.saveTodoItem(todo);
                     setTimeout(() => renderTodos(), 1000);
                 } else {
-                    // Normal toggle back to incomplete
                     await DataService.saveTodoItem(todo);
                     renderTodos();
                 }
@@ -383,32 +365,12 @@
         }
 
         function getUrgencyIcon(level) {
+            // Simplified as requested: Only show icons for high urgency
             switch (level) {
                 case 5: return "🔥";
                 case 4: return "⚡";
-                case 3: return "•";
-                case 2: return "☕";
-                case 1: return "💤";
-                default: return "•";
+                default: return "";
             }
-        }
-
-        // Helper: Get Week Info
-        function getWeekLabel(dateStr) {
-            if (!dateStr) return "Flexible / No Date";
-            const d = new Date(dateStr);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            // Reusing logic but date is less important now
-            const startOfSem = new Date('2026-01-05');
-            const diffTime = d - startOfSem;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays < 0) return "Backlog";
-            const weekNum = Math.floor(diffDays / 7) + 1;
-
-            return `Due: Week ${weekNum}`;
         }
 
         async function renderTodos() {
@@ -420,20 +382,17 @@
                 return;
             }
 
-            // SORT LOGIC: 
-            // 1. Incomplete first
-            // 2. Higher Urgency first (5 -> 1)
-            // 3. Date (if exists)
-
+            // Sort: Incomplete > Urgency (5->1) > Date
             todos.sort((a, b) => {
                 if (a.completed !== b.completed) return a.completed ? 1 : -1;
 
-                // Compare Urgency (Descending)
                 const uA = a.urgency || 3;
                 const uB = b.urgency || 3;
                 if (uA !== uB) return uB - uA;
 
-                // Compare Date (Ascending, Nulls last)
+                // Date logic: Tasks WITH dates come before NO date? 
+                // Or maybe Date is secondary to urgency. 
+                // Let's stick to Urgency being king.
                 if (a.date && b.date) return new Date(a.date) - new Date(b.date);
                 if (a.date && !b.date) return -1;
                 if (!a.date && b.date) return 1;
@@ -441,23 +400,16 @@
                 return 0;
             });
 
-            // Grouping:
-            // Since user wants to focus on Urgency, maybe group by Urgency?
-            // Or just one big list sorted by urgency?
-            // Let's stick to "Pending" vs "Completed" to keep it simple but sorted by importance.
-
             const pending = todos.filter(t => !t.completed);
             const completed = todos.filter(t => t.completed);
 
             let html = '';
 
-            // PENDING SECTION
             if (pending.length > 0) {
                 html += `<div class="section-header">Pending Tasks (${pending.length})</div>`;
                 html += pending.map(t => renderItem(t)).join('');
             }
 
-            // COMPLETED SECTION
             if (completed.length > 0) {
                 html += `<div class="section-header">Completed</div>`;
                 html += completed.map(t => renderItem(t)).join('');
@@ -469,14 +421,14 @@
         function renderItem(t) {
             const uLevel = t.urgency || 3;
             const uIcon = getUrgencyIcon(uLevel);
-            const uClass = `urgency-${uLevel}`;
+            const uClass = `urgency-${uLevel}`; // Class for coloring the icon
 
             return `
                 <div class="todo-item">
                     <div class="todo-check ${t.completed ? 'checked' : ''}" onclick="toggleTodo('${t.id}')"></div>
                     <div class="todo-content">
                         <span class="todo-title">
-                            <span class="urgency-badge ${uClass}" title="Urgency Level ${uLevel}">${uIcon}</span>
+                            ${uIcon ? `<span class="urgency-badge ${uClass}">${uIcon}</span>` : ''}
                             ${t.title}
                             ${(!t.completed && t.date && t.date < new Date().toLocaleDateString('en-CA')) ? '<span class="status-overdue">OVERDUE</span>' : ''}
                         </span>
@@ -488,369 +440,6 @@
                     <button class="delete-btn" onclick="deleteTodo('${t.id}')">×</button>
                 </div>
             `;
-        }
-    </script>
-</body>
-
-</html>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
-<link rel="icon" type="image/png" href="sports_car_favicon.png">
-<link rel="stylesheet" href="style.css">
-<script src="student-config.js"></script>
-<style>
-    .todo-input-container {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border-color);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr auto;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    @media (max-width: 768px) {
-        .todo-input-container {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .input-field {
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        font-family: var(--font-sans);
-        font-size: 0.95rem;
-    }
-
-    .status-overdue {
-        color: #ef4444;
-        font-weight: 600;
-        font-size: 0.75rem;
-        border: 1px solid #ef4444;
-        padding: 2px 6px;
-        border-radius: 4px;
-        margin-left: 8px;
-    }
-
-    .input-field:focus {
-        outline: none;
-        border-color: var(--accent-color);
-    }
-
-    .add-btn {
-        background: var(--accent-color);
-        color: #000;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: opacity 0.2s;
-    }
-
-    .add-btn:hover {
-        opacity: 0.9;
-    }
-
-    .section-header {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        margin: 2rem 0 1rem 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .section-header::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--border-color);
-        opacity: 0.5;
-    }
-
-    .todo-item {
-        display: flex;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid var(--border-color);
-        border-radius: 0.75rem;
-        padding: 1rem 1.25rem;
-        margin-bottom: 0.75rem;
-        transition: transform 0.2s, background 0.2s;
-    }
-
-    .todo-item:hover {
-        transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.04);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .todo-check {
-        width: 1.25rem;
-        height: 1.25rem;
-        border: 2px solid var(--text-muted);
-        border-radius: 50%;
-        margin-right: 1rem;
-        cursor: pointer;
-        display: grid;
-        place-items: center;
-    }
-
-    .todo-check.checked {
-        background: var(--accent-color);
-        border-color: var(--accent-color);
-    }
-
-    .todo-check::after {
-        content: '✓';
-        color: #000;
-        font-size: 0.8rem;
-        display: none;
-    }
-
-    .todo-check.checked::after {
-        display: block;
-    }
-
-    .todo-content {
-        flex: 1;
-    }
-
-    .todo-title {
-        font-weight: 500;
-        color: var(--text-primary);
-        margin-bottom: 0.25rem;
-        display: block;
-    }
-
-    .todo-check.checked+.todo-content .todo-title {
-        text-decoration: line-through;
-        color: var(--text-muted);
-    }
-
-    .todo-meta {
-        display: flex;
-        gap: 1rem;
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
-
-    .todo-tag {
-        padding: 0.1rem 0.4rem;
-        border-radius: 0.25rem;
-        background: rgba(255, 255, 255, 0.1);
-        font-weight: 500;
-    }
-
-    .delete-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        font-size: 1.2rem;
-        padding: 0.5rem;
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-
-    .todo-item:hover .delete-btn {
-        opacity: 1;
-    }
-
-    .delete-btn:hover {
-        color: #ef4444;
-    }
-</style>
-</head>
-
-<body>
-    <main class="container">
-        <header>
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
-            <h1>To-Do List</h1>
-            <p class="subtitle">Manage your personal tasks and weekly goals.</p>
-        </header>
-
-        <!-- Input Section -->
-        <div class="todo-input-container">
-            <input type="text" id="task-title" class="input-field" placeholder="What needs to be done?">
-            <select id="task-course" class="input-field">
-                <option value="Personal">Personal</option>
-                <!-- Courses injected here -->
-            </select>
-            <input type="date" id="task-date" class="input-field">
-            <button onclick="addTodo()" class="add-btn">Add Task</button>
-        </div>
-
-        <!-- Lists -->
-        <div id="todo-container">
-            <!-- Sections injected here -->
-        </div>
-
-    </main>
-
-    <script type="module">
-        import { DataService } from "./data-service.js";
-
-        // Init
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCourses();
-            renderTodos();
-
-            // Make add/toggle/delete global for onclick
-            window.addTodo = addTodo;
-            window.toggleTodo = toggleTodo;
-            window.deleteTodo = deleteTodo;
-
-            // Set default date to today
-            document.getElementById('task-date').valueAsDate = new Date();
-        });
-
-        function loadCourses() {
-            const select = document.getElementById('task-course');
-            if (window.STUDENT_DATA && window.STUDENT_DATA.courses) {
-                window.STUDENT_DATA.courses.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.code;
-                    opt.textContent = c.code;
-                    select.appendChild(opt);
-                });
-            }
-        }
-
-        async function getTodos() {
-            return await DataService.getTodos();
-        }
-
-        async function addTodo() {
-            const titleInput = document.getElementById('task-title');
-            const courseInput = document.getElementById('task-course');
-            const dateInput = document.getElementById('task-date');
-
-            const title = titleInput.value.trim();
-            if (!title) return;
-
-            const newTodo = {
-                id: Date.now().toString(),
-                title: title,
-                course: courseInput.value,
-                date: dateInput.value, // YYYY-MM-DD
-                completed: false,
-                createdAt: new Date().toISOString()
-            };
-
-            await DataService.saveTodoItem(newTodo);
-
-            // Optimistic Update
-            renderTodos();
-            titleInput.value = '';
-        }
-
-        async function toggleTodo(id) {
-            const todos = await getTodos();
-            const todo = todos.find(t => t.id === id);
-            if (todo) {
-                todo.completed = !todo.completed;
-                await DataService.saveTodoItem(todo);
-                renderTodos();
-            }
-        }
-
-        async function deleteTodo(id) {
-            await DataService.deleteTodoItem(id);
-            renderTodos();
-        }
-
-        // Helper: Get Week Info
-        function getWeekLabel(dateStr) {
-            if (!dateStr) return "No Date";
-            const d = new Date(dateStr);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            // Simple check for "This Week" vs "Next Week" vs "Later"
-            // Actually user wants "week by week". 
-            // Let's reuse the semantic weeks: Week 1, Week 2...
-            // Need the start of semester.
-            const startOfSem = new Date('2026-01-05');
-            const diffTime = d - startOfSem;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays < 0) return "Pre-Term / Break";
-            const weekNum = Math.floor(diffDays / 7) + 1;
-
-            return `Week ${weekNum}`;
-        }
-
-        async function renderTodos() {
-            const container = document.getElementById('todo-container');
-            const todos = await getTodos();
-
-            if (todos.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:3rem;">No tasks yet. Add one above!</p>';
-                return;
-            }
-
-            // Sort: Incomplete first, then by date
-            todos.sort((a, b) => {
-                if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                return new Date(a.date) - new Date(b.date);
-            });
-
-            // Group by Week (or "No Date")
-            const grouped = {};
-            todos.forEach(t => {
-                const group = t.completed ? "Completed" : (t.date ? getWeekLabel(t.date) : "Unscheduled");
-                if (!grouped[group]) grouped[group] = [];
-                grouped[group].push(t);
-            });
-
-            // Order of groups: Unscheduled, Week 1... Week X, Completed
-            // Simple sort of keys
-            const keys = Object.keys(grouped).sort((a, b) => {
-                if (a === "Unscheduled") return -1;
-                if (b === "Unscheduled") return 1;
-                if (a === "Completed") return 1;
-                if (b === "Completed") return -1;
-                // "Week 1" vs "Week 2" natural sort
-                return a.localeCompare(b, undefined, { numeric: true });
-            });
-
-            let html = '';
-            keys.forEach(group => {
-                const items = grouped[group];
-                html += `<div class="section-header">${group}</div>`;
-                html += items.map(t => `
-                    <div class="todo-item">
-                        <div class="todo-check ${t.completed ? 'checked' : ''}" onclick="toggleTodo('${t.id}')"></div>
-                        <div class="todo-content">
-                            <span class="todo-title">
-                                ${t.title}
-                                ${(!t.completed && t.date && t.date < new Date().toLocaleDateString('en-CA')) ? '<span class="status-overdue">OVERDUE</span>' : ''}
-                            </span>
-                            <div class="todo-meta">
-                                <span class="todo-tag">${t.course}</span>
-                                <span>${t.date || 'No Date'}</span>
-                            </div>
-                        </div>
-                        <button class="delete-btn" onclick="deleteTodo('${t.id}')">×</button>
-                    </div>
-                `).join('');
-            });
-
-            container.innerHTML = html;
         }
     </script>
 </body>

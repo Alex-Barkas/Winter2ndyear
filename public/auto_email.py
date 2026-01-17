@@ -76,40 +76,29 @@ def check_deadlines_and_email():
             continue # Skip invalid dates (TBD)
             
     # Check Todos
+    # Include ALL pending todos
     for todo in todos:
         if todo.get('completed', False):
             continue
-            
-        if not todo.get('date'):
-            continue
-            
-        try:
-            due_date = datetime.datetime.strptime(todo['date'], "%Y-%m-%d").date()
-            delta = (due_date - today).days
-            
-            if 0 <= delta <= NOTICE_DAYS:
-                upcoming_todos.append(todo)
-        except ValueError:
-            continue
+        upcoming_todos.append(todo)
 
     total_count = len(upcoming_assignments) + len(upcoming_todos)
-
-    if total_count == 0:
-        log("No upcoming deadlines found. No email sent.")
-        return
-
+    
+    # Always log count
     log(f"Found {len(upcoming_assignments)} assignments and {len(upcoming_todos)} tasks.")
     
     # Prepare Email
     msg = MIMEMultipart()
     msg['From'] = SENDER_EMAIL
     msg['To'] = RECEIVER_EMAIL
-    msg['Subject'] = f"📅 Upcoming Deadlines ({total_count} Tasks)"
+    msg['Subject'] = f"Daily Update: {len(upcoming_assignments)} Assignments, {len(upcoming_todos)} To-Dos"
 
-    body = "<h2>Upcoming Deadlines (Next 3 Days)</h2>"
+    body = "<h2>Daily Overview</h2>"
     
+    # Assignments Section
+    body += "<h3>Upcoming Deadlines (Next 3 Days)</h3>"
     if upcoming_assignments:
-        body += "<h3>assignments</h3><ul>"
+        body += "<ul>"
         for item in upcoming_assignments:
             d_str = item['date']
             # Highlight if TODAY
@@ -117,16 +106,22 @@ def check_deadlines_and_email():
                 d_str = "<strong>TODAY</strong>"
             body += f"<li>{d_str}: <strong>{item['course']} - {item['title']}</strong> (Status: {item.get('status', 'PENDING')})</li>"
         body += "</ul>"
+    else:
+        body += "<p><em>No assignments due in the next 3 days.</em></p>"
         
+    # To-Do Section (All Pending)
+    body += "<h3>To-Do List</h3>"
     if upcoming_todos:
-        body += "<h3>to-do list</h3><ul>"
+        body += "<ul>"
         for item in upcoming_todos:
-            d_str = item['date']
-             # Highlight if TODAY
+            d_str = item.get('date', 'No Date')
+            # Highlight if TODAY
             if d_str == str(today):
                 d_str = "<strong>TODAY</strong>"
             body += f"<li>{d_str}: <strong>{item['title']}</strong> ({item.get('course', 'Personal')})</li>"
         body += "</ul>"
+    else:
+        body += "<p><em>No active items in To-Do list.</em></p>"
         
     body += "<p style='margin-top:20px; color:#555;'>Good luck! You got this.</p>"
 

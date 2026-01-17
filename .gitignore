@@ -16,4 +16,7 @@ build/
 *.txt
 *.log
 
-
+# Secrets
+serviceAccountKey.json
+public/serviceAccountKey.json
+secondsemdashb-firebase-adminsdk-fbsvc-35d923123d.json

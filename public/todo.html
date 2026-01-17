@@ -213,11 +213,18 @@
 
     </main>
 
-    <script>
+    <script type="module">
+        import { DataService } from "./data-service.js";
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadCourses();
             renderTodos();
+
+            // Make add/toggle/delete global for onclick
+            window.addTodo = addTodo;
+            window.toggleTodo = toggleTodo;
+            window.deleteTodo = deleteTodo;
 
             // Set default date to today
             document.getElementById('task-date').valueAsDate = new Date();
@@ -236,70 +243,7 @@
         }
 
         async function getTodos() {
-            let serverData = null;
-            try {
-                const res = await fetch('/api/db');
-                if (res.ok) {
-                    const db = await res.json();
-                    serverData = db.todos || [];
-                }
-            } catch (e) {
-                console.warn('Server offline, using local storage');
-            }
-
-            const localData = JSON.parse(localStorage.getItem('personal_todos') || '[]');
-
-            if (serverData !== null) {
-                // Server is online. Check for migration need.
-                if (serverData.length === 0 && localData.length > 0) {
-                    console.log("Migrating Local Todos to Server...");
-                    // We must fetch full DB to preserve assignments, then update todos
-                    try {
-                        const res = await fetch('/api/db');
-                        const db = await res.json();
-                        db.todos = localData;
-
-                        await fetch('/api/db', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(db)
-                        });
-                        return localData;
-                    } catch (e) {
-                        console.error("Migration failed", e);
-                        return localData;
-                    }
-                }
-                // Server has data, or both empty. Server is truth.
-                // Update local cache to match server
-                localStorage.setItem('personal_todos', JSON.stringify(serverData));
-                return serverData;
-            } else {
-                // Server unreachable, use local
-                return localData;
-            }
-        }
-
-        async function saveTodos(todos) {
-            // Optimistically update UI and LocalStorage
-            localStorage.setItem('personal_todos', JSON.stringify(todos));
-
-            try {
-                const res = await fetch('/api/db');
-                const data = await res.json();
-
-                data.todos = todos;
-
-                await fetch('/api/db', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                console.log("Saved to server");
-            } catch (e) {
-                console.error("Save to server failed, data saved locally only");
-            }
-            renderTodos();
+            return await DataService.getTodos();
         }
 
         async function addTodo() {
@@ -319,10 +263,10 @@
                 createdAt: new Date().toISOString()
             };
 
-            const todos = await getTodos();
-            todos.push(newTodo);
-            await saveTodos(todos);
+            await DataService.saveTodoItem(newTodo);
 
+            // Optimistic Update
+            renderTodos();
             titleInput.value = '';
         }
 
@@ -331,14 +275,14 @@
             const todo = todos.find(t => t.id === id);
             if (todo) {
                 todo.completed = !todo.completed;
-                await saveTodos(todos);
+                await DataService.saveTodoItem(todo);
+                renderTodos();
             }
         }
 
         async function deleteTodo(id) {
-            let todos = await getTodos();
-            todos = todos.filter(t => t.id !== id);
-            await saveTodos(todos);
+            await DataService.deleteTodoItem(id);
+            renderTodos();
         }
 
         // Helper: Get Week Info

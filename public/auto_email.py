@@ -13,68 +13,88 @@ from email.mime.multipart import MIMEMultipart
 #    For Gmail: Account Settings > Security > 2-Step Verification > App Passwords.
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
+# --- CONFIGURATION ---
 SENDER_EMAIL = "deadline.upcoming@gmail.com"
-SENDER_PASSWORD = "wyqf nwmj ujsz yvxc"  # NOT your login password
+SENDER_PASSWORD = "wyqf nwmj ujsz yvxc"
 RECEIVER_EMAIL = "23KKV9@queensu.ca"
-
-# Determine absolute path to db.json (same directory as this script)
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_FILE = os.path.join(SCRIPT_DIR, "db.json")
-# 3 Days in advance
 NOTICE_DAYS = 3
 
-def load_database(file_path):
-    """
-    Loads assignments and todos from db.json
-    """
+# Paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CRED_PATH = os.path.join(SCRIPT_DIR, "serviceAccountKey.json")
+
+# --- DATABASE LOADER (Firebase) ---
+def get_database_data():
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            return data
+        # Initialize only if not already initialized
+        if not firebase_admin._apps:
+            cred = credentials.Certificate(CRED_PATH)
+            firebase_admin.initialize_app(cred)
+
+        db = firestore.client()
+
+        assignments = []
+        todos = []
+
+        # Fetch Assignments
+        docs = db.collection('assignments').stream()
+        for doc in docs:
+            assignments.append(doc.to_dict())
+
+        # Fetch Todos
+        docs = db.collection('todos').stream()
+        for doc in docs:
+            todos.append(doc.to_dict())
+
+        return assignments, todos
+
     except Exception as e:
-        print(f"Error loading database: {e}")
-        return {"assignments": [], "todos": []}
+        print(f"Firebase Error: {e}")
+        # Log to file if possible
+        with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a") as f:
+            f.write(f"[FIREBASE ERROR] {e}\n")
+        return [], []
 
 def check_deadlines_and_email():
     # Setup logging
     log_file = os.path.join(SCRIPT_DIR, "email_debug.log")
-    
+
     def log(message):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(log_file, "a", encoding="utf-8") as f:
             f.write(f"[{timestamp}] {message}\n")
         print(message)
 
-    log(f"Starting check. Notice Days: {NOTICE_DAYS}")
-    log(f"DB File Path: {DB_FILE}")
-    
-    if not os.path.exists(DB_FILE):
-        log(f"❌ ERROR: Database file not found at {DB_FILE}")
+    log(f"Starting check (Firebase Mode). Notice Days: {NOTICE_DAYS}")
+
+    if not os.path.exists(CRED_PATH):
+        log(f"❌ ERROR: Service Account Key not found at {CRED_PATH}")
         return
 
-    db = load_database(DB_FILE)
-    assignments = db.get('assignments', [])
-    todos = db.get('todos', [])
-    
+    assignments, todos = get_database_data()
+
     today = datetime.date.today()
-    
+
     upcoming_assignments = []
     upcoming_todos = []
-    
+
     # Check Assignments
     for assign in assignments:
         if assign.get('status') == 'DONE':
             continue
-            
+
         try:
+            # Handle potential missing date
+            if not assign.get('date'): continue
+
             due_date = datetime.datetime.strptime(assign['date'], "%Y-%m-%d").date()
             delta = (due_date - today).days
-            
+
             if 0 <= delta <= NOTICE_DAYS:
                 upcoming_assignments.append(assign)
         except ValueError:
             continue # Skip invalid dates (TBD)
-            
+
     # Check Todos
     # Include ALL pending todos
     for todo in todos:
@@ -83,10 +103,10 @@ def check_deadlines_and_email():
         upcoming_todos.append(todo)
 
     total_count = len(upcoming_assignments) + len(upcoming_todos)
-    
+
     # Always log count
-    log(f"Found {len(upcoming_assignments)} assignments and {len(upcoming_todos)} tasks.")
-    
+    log(f"Found {len(upcoming_assignments)} upcoming assignments and {len(upcoming_todos)} pending tasks.")
+
     # Prepare Email
     msg = MIMEMultipart()
     msg['From'] = SENDER_EMAIL
@@ -94,7 +114,7 @@ def check_deadlines_and_email():
     msg['Subject'] = f"Daily Update: {len(upcoming_assignments)} Assignments, {len(upcoming_todos)} To-Dos"
 
     body = "<h2>Daily Overview</h2>"
-    
+
     # Assignments Section
     body += "<h3>Upcoming Deadlines (Next 3 Days)</h3>"
     if upcoming_assignments:
@@ -108,7 +128,7 @@ def check_deadlines_and_email():
         body += "</ul>"
     else:
         body += "<p><em>No assignments due in the next 3 days.</em></p>"
-        
+
     # To-Do Section (All Pending)
     body += "<h3>To-Do List</h3>"
     if upcoming_todos:
@@ -122,14 +142,14 @@ def check_deadlines_and_email():
         body += "</ul>"
     else:
         body += "<p><em>No active items in To-Do list.</em></p>"
-        
+
     body += "<p style='margin-top:20px; color:#555;'>Good luck! You got this.</p>"
 
     msg.attach(MIMEText(body, 'html'))
 
     # Send
     if "your_email" in SENDER_EMAIL:
-        log("CONFIGURATION REQUIRED: SENDER_EMAIL not set.")
+        log("CONFIGURATION REQUIRED: SENDER_EMAIL not set inside auto_email.py")
         return
 
     try:

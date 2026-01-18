@@ -48,6 +48,7 @@ const STUDENT_DATA = {
             textbook: "textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
             solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
             assignments: "assignments.html?course=MTHE 281",
+            image: "course_images/mthe281.png"
         },
         {
             code: "MTHE 212",
@@ -56,25 +57,29 @@ const STUDENT_DATA = {
             textbook: "textbooks/LADR4e.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
             assignments: "assignments.html?course=MTHE 212",
+            image: "course_images/mthe212.png"
         },
         {
             code: "MREN 230",
             name: "Thermodynamics",
             notes: "pdfs/MREN230.pdf",
-            assignments: "assignments.html?course=MREN 230"
+            assignments: "assignments.html?course=MREN 230",
+            image: "course_images/mren230.png"
         },
         {
             code: "MECH 210",
             name: "Circuits",
             notes: "pdfs/MECH210.pdf",
-            assignments: "assignments.html?course=MECH 210"
+            assignments: "assignments.html?course=MECH 210",
+            image: "course_images/mech210.png"
         },
         {
             code: "ENPH 225",
             name: "Mechanics",
             notes: "pdfs/ENPH225.pdf",
             textbook: "https://api.pageplace.de/preview/DT0400.9781292088785_A26856513/preview-9781292088785_A26856513.pdf",
-            assignments: "assignments.html?course=ENPH 225"
+            assignments: "assignments.html?course=ENPH 225",
+            image: "course_images/enph225.png"
         }
     ],
     assignments: [

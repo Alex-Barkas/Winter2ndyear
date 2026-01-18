@@ -454,29 +454,34 @@ function createCourseCard(course) {
         </a>
     ` : '';
 
+    // Background Image Style
+    const bgStyle = course.image ?
+        `background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('${course.image}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);`
+        : '';
+
     return `
-        <div class="course-card">
+        <div class="course-card" style="${bgStyle}">
             <div class="course-header">
-                <span class="course-code">${course.code}</span>
-                <span class="course-title">${course.name}</span>
+                <span class="course-code" style="${course.image ? 'color: rgba(255,255,255,0.7); text-shadow: 0 1px 2px rgba(0,0,0,0.5);' : ''}">${course.code}</span>
+                <span class="course-title" style="${course.image ? 'text-shadow: 0 2px 4px rgba(0,0,0,0.8);' : ''}">${course.name}</span>
             </div>
             <div class="course-actions">
                 <a href="${course.notes}" target="_blank" class="action-btn primary">
                     <span>Notes</span>
                 </a>
-                <a href="${course.assignments}" class="action-btn secondary">
+                <a href="${course.assignments}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Assignments</span>
                 </a>
-                <a href="grades.html?course=${course.code}" class="action-btn secondary">
+                <a href="grades.html?course=${course.code}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Grades</span>
                 </a>
-                <a href="${syllabusUrl}" target="_blank" class="action-btn secondary">
+                <a href="${syllabusUrl}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Syllabus</span>
                 </a>
                 
-                ${textbookBtn}
+                ${course.textbook ? `<a href="${course.textbook}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}"><span>Textbook</span></a>` : ''}
                 
-                ${solutionsButton}
+                ${course.solutions ? `<a href="${course.solutions}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}"><span>Solutions</span></a>` : ''}
 
                 ${onqBtn}
                 ${notebookBtn}

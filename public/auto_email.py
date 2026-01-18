@@ -1,3 +1,6 @@
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 import smtplib
 import json
 import re
@@ -26,6 +29,7 @@ CRED_PATH = os.path.join(SCRIPT_DIR, "serviceAccountKey.json")
 # --- DATABASE LOADER (Firebase) ---
 def get_database_data():
     try:
+        print("DEBUG: Entering get_database_data")
         # Initialize only if not already initialized
         if not firebase_admin._apps:
             cred = credentials.Certificate(CRED_PATH)
@@ -44,8 +48,11 @@ def get_database_data():
         # Fetch Todos
         docs = db.collection('todos').stream()
         for doc in docs:
-            todos.append(doc.to_dict())
+            d = doc.to_dict()
+            print(f"DEBUG TODO: {d}")
+            todos.append(d)
 
+        print(f"Total Todos Fetched: {len(todos)}")
         return assignments, todos
 
     except Exception as e:
@@ -68,45 +75,49 @@ def check_deadlines_and_email():
     log(f"Starting check (Firebase Mode). Notice Days: {NOTICE_DAYS}")
 
     if not os.path.exists(CRED_PATH):
-        log(f"❌ ERROR: Service Account Key not found at {CRED_PATH}")
+        log(f"ERROR: Service Account Key not found at {CRED_PATH}")
         return
 
     assignments, todos = get_database_data()
 
     today = datetime.date.today()
-
+    
     upcoming_assignments = []
     upcoming_todos = []
-
+    
     # Check Assignments
     for assign in assignments:
-        if assign.get('status') == 'DONE':
+        # Robust status check
+        status = assign.get('status', 'PENDING')
+        if status == 'DONE':
             continue
-
+            
         try:
             # Handle potential missing date
-            if not assign.get('date'): continue
-
-            due_date = datetime.datetime.strptime(assign['date'], "%Y-%m-%d").date()
+            date_str = assign.get('date')
+            if not date_str: continue
+            
+            due_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
             delta = (due_date - today).days
-
+            
             if 0 <= delta <= NOTICE_DAYS:
                 upcoming_assignments.append(assign)
         except ValueError:
-            continue # Skip invalid dates (TBD)
-
+            continue
+            
     # Check Todos
-    # Include ALL pending todos
     for todo in todos:
-        if todo.get('completed', False):
+        # Explicit boolean check
+        is_completed = todo.get('completed')
+        if is_completed is True or str(is_completed).lower() == 'true':
             continue
         upcoming_todos.append(todo)
 
     total_count = len(upcoming_assignments) + len(upcoming_todos)
-
+    
     # Always log count
-    log(f"Found {len(upcoming_assignments)} upcoming assignments and {len(upcoming_todos)} pending tasks.")
-
+    log(f"Filtered: {len(upcoming_assignments)} upcoming assignments and {len(upcoming_todos)} pending tasks.")
+    
     # Prepare Email
     msg = MIMEMultipart()
     msg['From'] = SENDER_EMAIL
@@ -114,42 +125,38 @@ def check_deadlines_and_email():
     msg['Subject'] = f"Daily Update: {len(upcoming_assignments)} Assignments, {len(upcoming_todos)} To-Dos"
 
     body = "<h2>Daily Overview</h2>"
-
+    
     # Assignments Section
     body += "<h3>Upcoming Deadlines (Next 3 Days)</h3>"
     if upcoming_assignments:
         body += "<ul>"
         for item in upcoming_assignments:
-            d_str = item['date']
-            # Highlight if TODAY
-            if d_str == str(today):
-                d_str = "<strong>TODAY</strong>"
-            body += f"<li>{d_str}: <strong>{item['course']} - {item['title']}</strong> (Status: {item.get('status', 'PENDING')})</li>"
+            d_str = item.get('date', 'N/A')
+            if d_str == str(today): d_str = "<strong>TODAY</strong>"
+            body += f"<li>{d_str}: <strong>{item.get('course','')} - {item.get('title','')}</strong></li>"
         body += "</ul>"
     else:
         body += "<p><em>No assignments due in the next 3 days.</em></p>"
-
+        
     # To-Do Section (All Pending)
     body += "<h3>To-Do List</h3>"
     if upcoming_todos:
         body += "<ul>"
         for item in upcoming_todos:
             d_str = item.get('date', 'No Date')
-            # Highlight if TODAY
-            if d_str == str(today):
-                d_str = "<strong>TODAY</strong>"
-            body += f"<li>{d_str}: <strong>{item['title']}</strong> ({item.get('course', 'Personal')})</li>"
+            if d_str == str(today): d_str = "<strong>TODAY</strong>"
+            body += f"<li>{d_str}: <strong>{item.get('title','')}</strong> ({item.get('course', 'Personal')})</li>"
         body += "</ul>"
     else:
         body += "<p><em>No active items in To-Do list.</em></p>"
-
+        
     body += "<p style='margin-top:20px; color:#555;'>Good luck! You got this.</p>"
 
     msg.attach(MIMEText(body, 'html'))
 
     # Send
     if "your_email" in SENDER_EMAIL:
-        log("CONFIGURATION REQUIRED: SENDER_EMAIL not set inside auto_email.py")
+        log("CONFIGURATION REQUIRED: SENDER_EMAIL not set.")
         return
 
     try:
@@ -159,9 +166,9 @@ def check_deadlines_and_email():
         text = msg.as_string()
         server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, text)
         server.quit()
-        log("✅ Email sent successfully!")
+        log("Email sent successfully!")
     except Exception as e:
-        log(f"❌ Failed to send email: {e}")
+        log(f"Failed to send email: {e}")
 
 if __name__ == "__main__":
     check_deadlines_and_email()

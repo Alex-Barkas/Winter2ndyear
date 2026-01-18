@@ -31,7 +31,7 @@
         <!-- Header -->
         <header>
             <div class="header-titling">
-                <h1>Alex Barkas Dashboard</h1>
+                <h1>Alex Barkas' Dashboard</h1>
             </div>
 
 
@@ -57,15 +57,39 @@
                     <h2 class="section-label">SCHEDULE</h2>
                     <div class="view-switcher">
                         <button id="view-list-btn" class="view-btn active">List</button>
+                        <button id="view-calendar-btn" class="view-btn">Calendar</button>
 
-                        <button onclick="window.openAddModal()" class="view-btn"
-                            style="color: var(--accent-color); border: 1px solid var(--accent-color);">+ Add</button>
                     </div>
                 </div>
 
                 <!-- List View (Default) -->
                 <div id="global-schedule">
                     <!-- Schedule injected via JS -->
+                </div>
+
+                <!-- Calendar View -->
+                <div id="calendar-view" class="hidden">
+                    <div class="calendar-layout-wrapper">
+                        <div class="calendar-main-panel">
+                            <div class="calendar-header">
+                                <button id="prev-month" class="nav-btn">&lt;</button>
+                                <h3 id="current-month-year">January 2026</h3>
+                                <button id="next-month" class="nav-btn">&gt;</button>
+                            </div>
+                            <div class="calendar-grid-header">
+                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                            </div>
+                            <div id="calendar-days" class="calendar-grid">
+                                <!-- Days injected via JS -->
+                            </div>
+                        </div>
+                        <div class="calendar-side-panel">
+                            <div id="selected-day-details">
+                                <p class="subtitle" style="text-align: center; margin-top: 50%; opacity: 0.5;">Select a
+                                    date to view details.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
 
@@ -108,8 +132,8 @@
     </div>
 
     <script type="module" src="data-service.js"></script>
-    <script src="student-config.js"></script> <!-- Keep for migration fallback/source -->
-    <script type="module" src="script.js"></script>
+    <script src="student-config.js?v=4"></script> <!-- Keep for migration fallback/source -->
+    <script type="module" src="script.js?v=4"></script>
 </body>
 
 </html>

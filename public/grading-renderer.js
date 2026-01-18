@@ -129,11 +129,11 @@ export const GradingRenderer = {
         let targetCategory = "";
         const nameLower = componentName.toLowerCase();
 
-        if (nameLower.includes("homework") || nameLower.includes("assignment")) targetCategory = "ASSIGNMENT";
+        if (nameLower.includes("lab")) targetCategory = "LAB";
+        else if (nameLower.includes("tutorial") || nameLower.includes("active learning")) targetCategory = "TUTORIAL";
         else if (nameLower.includes("quiz")) targetCategory = "QUIZ";
         else if (nameLower.includes("midterm") || nameLower.includes("test")) targetCategory = "MIDTERM";
-        else if (nameLower.includes("lab")) targetCategory = "LAB";
-        else if (nameLower.includes("tutorial") || nameLower.includes("active learning")) targetCategory = "TUTORIAL";
+        else if (nameLower.includes("homework") || nameLower.includes("assignment")) targetCategory = "ASSIGNMENT";
 
         let matches = assignments.filter(a => a.course === course);
 
@@ -151,6 +151,7 @@ export const GradingRenderer = {
             } else {
                 const titleMatches = matches.filter(a => a.title.toLowerCase().includes(nameLower.replace(/s$/, '')));
                 if (titleMatches.length > 0) matches = titleMatches;
+                else matches = []; // Strict: If no category AND no title match, return nothing.
             }
         } else {
             matches = matches.filter(a => a.title.toLowerCase().includes(nameLower));

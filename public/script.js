@@ -466,7 +466,7 @@ function createCourseCard(course) {
                 <span class="course-title" style="${course.image ? 'text-shadow: 0 2px 4px rgba(0,0,0,0.8);' : ''}">${course.name}</span>
             </div>
             <div class="course-actions">
-                <a href="${course.notes}" target="_blank" class="action-btn primary">
+                <a href="${course.notes}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Notes</span>
                 </a>
                 <a href="${course.assignments}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
@@ -494,4 +494,43 @@ function createCourseCard(course) {
 document.addEventListener('DOMContentLoaded', () => {
     renderGlobalSchedule();
     renderCourses();
+
+    // View Switcher Logic
+    const listBtn = document.getElementById('view-list-btn');
+    const calBtn = document.getElementById('view-calendar-btn');
+    const listView = document.getElementById('global-schedule');
+    const calView = document.getElementById('calendar-view');
+
+    if (listBtn && calBtn && listView && calView) {
+        listBtn.addEventListener('click', () => {
+            listBtn.classList.add('active');
+            calBtn.classList.remove('active');
+            listView.classList.remove('hidden');
+            calView.classList.add('hidden');
+        });
+
+        calBtn.addEventListener('click', () => {
+            calBtn.classList.add('active');
+            listBtn.classList.remove('active');
+            calView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            renderCalendar(); // Render on show
+        });
+    }
+
+    // Calendar Navigation
+    const prevBtn = document.getElementById('prev-month');
+    const nextBtn = document.getElementById('next-month');
+
+    if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 });

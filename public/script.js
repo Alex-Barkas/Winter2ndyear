@@ -92,26 +92,42 @@ let selectedDate = null;
 function renderGlobalSchedule() {
     const listContainer = document.getElementById('global-schedule');
     if (listContainer) {
-        // Render List View (Flat List, Sorted by Date)
-        const sorted = [...appData.assignments].sort((a, b) => {
-            // Handle TBD dates for sorting: place them at the end
+        // Filter and Sort
+        const active = appData.assignments.filter(a => a.status !== 'DONE');
+        const done = appData.assignments.filter(a => a.status === 'DONE');
+
+        const sortByDate = (a, b) => {
+            // Handle TBD/Finals Logic
             if (a.date === '2026-04-30' && a.category === 'FINAL') return 1;
             if (b.date === '2026-04-30' && b.category === 'FINAL') return -1;
-            return new Date(a.date) - new Date(b.date);
-        });
+            return new Date(a.date) - new Date(b.date); // Chronological
+        };
+
+        active.sort(sortByDate);
+        done.sort(sortByDate);
+
+        const sorted = [...active, ...done];
 
         if (sorted.length === 0) {
             listContainer.innerHTML = '<p class="subtitle">No upcoming assignments.</p>';
             return;
         }
 
-        const html = `
-            <div class="list-grid">
-                ${sorted.map(item => createAssignmentCard(item)).join('')}
-            </div>
-        `;
+        const render = () => {
+            const html = `
+                <div class="list-grid">
+                    ${sorted.map(item => createAssignmentCard(item)).join('')}
+                </div>
+            `;
+            listContainer.innerHTML = html;
+        };
 
-        listContainer.innerHTML = html;
+        // Use View Transition API if available for smooth reordering
+        if (document.startViewTransition) {
+            document.startViewTransition(render);
+        } else {
+            render();
+        }
     }
 }
 
@@ -330,7 +346,10 @@ function getSemesterWeek(dateString) {
 
 function createAssignmentCard(item) {
     const dateObj = new Date(item.date + 'T' + item.time);
-    const day = dateObj.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+    // User requested Month in front: "Jan 14 Wed"
+    const monthDay = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+    const day = `${monthDay} ${weekday}`;
     const weekLabel = getSemesterWeek(item.date);
 
     // Status is now directly from DB
@@ -362,7 +381,7 @@ function createAssignmentCard(item) {
     const isDone = status === 'DONE';
 
     return `
-        <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative;">
+        <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative; view-transition-name: assign-${item.id.replace(/[^a-zA-Z0-9-_]/g, '')};">
             ${todayBanner}
             <a href="details.html?id=${item.id}" class="assign-link-wrapper">
                 <div class="assign-left">

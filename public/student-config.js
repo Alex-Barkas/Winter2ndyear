@@ -138,16 +138,16 @@ const STUDENT_DATA = {
         // --- MREN 230 ---
         // 10 Assignments (Assuming Weekly due dates, specifics not listed, defaulting to Fridays for now)
         // Syllabus says "Assigned online via OnQ". Creating placeholders.
-        { id: "mren230-a1", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 1", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a2", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 2", date: "2026-01-23", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a3", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 3", date: "2026-01-30", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a4", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 4", date: "2026-02-06", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a5", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 5", date: "2026-02-13", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a6", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 6", date: "2026-02-27", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a7", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 7", date: "2026-03-06", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a8", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 8", date: "2026-03-13", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a9", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 9", date: "2026-03-20", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
-        { id: "mren230-a10", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 10", date: "2026-03-27", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a1", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 1", date: "2026-01-18", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a2", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 2", date: "2026-01-25", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a3", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 3", date: "2026-02-01", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a4", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 4", date: "2026-02-08", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a5", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 5", date: "2026-02-15", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a6", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 6", date: "2026-03-01", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a7", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 7", date: "2026-03-08", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a8", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 8", date: "2026-03-15", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a9", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 9", date: "2026-03-22", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
+        { id: "mren230-a10", course: "MREN 230", category: "ASSIGNMENT", title: "Assignment 10", date: "2026-03-29", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Check OnQ" } },
 
         // MREN 230 Tests
         { id: "mren230-m1", course: "MREN 230", category: "MIDTERM", title: "Midterm 1", date: "2026-02-12", time: "18:00", status: "UPCOMING", score: null, details: { type: "text", content: "Details on Rooms and Formula sheets TBA" } },

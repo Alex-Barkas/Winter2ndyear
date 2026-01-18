@@ -92,43 +92,24 @@ let selectedDate = null;
 function renderGlobalSchedule() {
     const listContainer = document.getElementById('global-schedule');
     if (listContainer) {
-        // Render List View
+        // Render List View (Flat List, Sorted by Date)
         const sorted = [...appData.assignments].sort((a, b) => {
             // Handle TBD dates for sorting: place them at the end
             if (a.date === '2026-04-30' && a.category === 'FINAL') return 1;
             if (b.date === '2026-04-30' && b.category === 'FINAL') return -1;
             return new Date(a.date) - new Date(b.date);
         });
-        const grouped = sorted.reduce((acc, curr) => {
-            // Handle TBD dates for grouping
-            if (curr.date === '2026-04-30' && curr.category === 'FINAL') {
-                if (!acc['To Be Scheduled']) acc['To Be Scheduled'] = [];
-                acc['To Be Scheduled'].push(curr);
-                return acc;
-            }
 
-            const date = new Date(curr.date + 'T' + curr.time);
-            const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-            if (!acc[month]) acc[month] = [];
-            acc[month].push(curr);
-            return acc;
-        }, {});
-
-        let html = '';
-        for (const [month, items] of Object.entries(grouped)) {
-            html += `
-                <div class="month-group">
-                    <h3 class="month-label">${month}</h3>
-                    <div class="list-grid">
-                        ${items.map(item => createAssignmentCard(item)).join('')}
-                    </div>
-                </div>
-            `;
+        if (sorted.length === 0) {
+            listContainer.innerHTML = '<p class="subtitle">No upcoming assignments.</p>';
+            return;
         }
 
-        if (Object.keys(grouped).length === 0) {
-            html = '<p class="subtitle">No upcoming assignments.</p>';
-        }
+        const html = `
+            <div class="list-grid">
+                ${sorted.map(item => createAssignmentCard(item)).join('')}
+            </div>
+        `;
 
         listContainer.innerHTML = html;
     }
@@ -353,10 +334,13 @@ function createAssignmentCard(item) {
     const weekLabel = getSemesterWeek(item.date);
 
     // Status is now directly from DB
-    let status = item.status;
+    let status = item.status || 'PENDING';
+
+    // Date Logic
+    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    const isToday = item.date === todayStr;
 
     // Overdue Check
-    const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
     if (status !== 'DONE' && item.date < todayStr && item.date !== 'TBD' && item.category !== 'FINAL') {
         status = 'OVERDUE';
     }
@@ -369,35 +353,57 @@ function createAssignmentCard(item) {
     // Category Color Logic
     const categoryClass = `category-${item.category.toLowerCase()}`;
 
-    // Only show status if it's NOT Pending/Upcoming (e.g. show DONE)
-    const showStatus = status !== 'PENDING' && status !== 'UPCOMING';
+    // Status Badge (only if not done/pending or if overdue)
+    const showStatus = status === 'OVERDUE';
     const statusHtml = showStatus ? `<span class="assign-status ${statusClass}">${status}</span>` : '';
 
+    const todayBanner = isToday && status !== 'DONE' ? `<div class="today-banner">TODAY</div>` : '';
+
+    const isDone = status === 'DONE';
+
     return `
-        <a href="details.html?id=${item.id}" class="assignment-item">
-            <div class="assign-left">
-                <span class="assign-date">
-                    ${day}
-                    <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 2px;">${weekLabel}</div>
-                </span>
-                <div class="assign-details">
-                    <div class="assign-meta">
-                        <span class="assign-course">${item.course}</span>
-                        <span class="assign-category ${categoryClass}">${item.category}</span>
+        <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative;">
+            ${todayBanner}
+            <a href="details.html?id=${item.id}" class="assign-link-wrapper">
+                <div class="assign-left">
+                    <span class="assign-date">
+                        ${day}
+                        <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 2px;">${weekLabel}</div>
+                    </span>
+                    <div class="assign-details">
+                        <div class="assign-meta">
+                            <span class="assign-course">${item.course}</span>
+                            <span class="assign-category ${categoryClass}">${item.category}</span>
+                        </div>
+                        <span class="assign-title ${isDone ? 'done-text' : ''}">${item.title}</span>
                     </div>
-                    <span class="assign-title">${item.title}</span>
                 </div>
-            </div>
-                    <span class="assign-title">${item.title}</span>
-                </div>
-            </div>
+            </a>
+            
             <div class="assign-right">
                 <span class="assign-time">${item.time}</span>
                 ${statusHtml}
-                <button onclick="event.preventDefault(); window.deleteAssignment('${item.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem; line-height:1; opacity:0.5; margin-left:8px;" onmouseover="this.style.opacity=1; this.style.color='#ef4444'" onmouseout="this.style.opacity=0.5; this.style.color='var(--text-muted)'" title="Delete">×</button>
+                
+                <!-- Quick Status Toggle -->
+                <button onclick="window.toggleStatus('${item.id}', '${status}')" class="status-toggle-btn ${isDone ? 'checked' : ''}" title="${isDone ? 'Mark as Pending' : 'Mark as Done'}">
+                   ${isDone ? '✓' : ''}
+                </button>
+
+                <button onclick="window.deleteAssignment('${item.id}')" class="delete-btn" title="Delete">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13 1L1 13M1 1L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
             </div>
-        </a>
+        </div>
     `;
+}
+
+// Add global toggle function
+window.toggleStatus = async function (id, currentStatus) {
+    const newStatus = currentStatus === 'DONE' ? 'PENDING' : 'DONE';
+    await DataService.updateAssignmentStatus(id, newStatus);
+    loadData(); // Reload to reflect changes
 }
 
 function renderCourses() {

@@ -2,8 +2,7 @@
 import { DataService } from "./data-service.js";
 
 // Make functions global for HTML onclick handlers
-window.saveAssignmentGrade = saveAssignmentGrade;
-window.updateStatus = updateStatus;
+// window.toggleDetailStatus is defined below
 
 let currentAssignmentId = null;
 let currentItemData = null;
@@ -17,12 +16,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (currentItemData) {
             renderDetails(currentItemData);
-            renderDetails(currentItemData);
-            loadGrade(currentItemData);
             loadStatus(currentItemData);
         } else {
             console.error("Assignment not found in DB");
-            document.getElementById('loading').innerText = "Item not found in Database.";
+            document.getElementById('loading').innerText = "Assignment not found.";
         }
     }
 });
@@ -83,30 +80,40 @@ function renderDetails(item) {
 
 
 // --- GRADE & SUBMISSION MODULE ---
-function loadGrade(item) {
-    // Value from DB
-    if (item.score !== null && item.score !== undefined) {
-        document.getElementById('assignment-grade').value = item.score;
-    }
-}
-
-async function saveAssignmentGrade() {
-    const val = document.getElementById('assignment-grade').value;
-    await DataService.updateAssignmentGrade(currentAssignmentId, val);
-}
+// --- STATUS MODULE ---
 
 function loadStatus(item) {
-    const selector = document.getElementById('status-selector');
-    if (selector) {
-        selector.value = item.status || 'PENDING';
+    const btn = document.getElementById('mark-done-btn');
+    const txt = document.getElementById('current-status-text');
+
+    if (item.status === 'DONE') {
+        btn.innerText = 'Mark as Pending';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-muted)';
+        btn.style.border = '1px solid var(--border-color)';
+        txt.innerText = 'Completed';
+    } else {
+        btn.innerText = 'Mark as Done';
+        btn.style.background = 'var(--text-primary)';
+        btn.style.color = '#000';
+        btn.style.border = 'none';
+        txt.innerText = item.status || 'Pending';
     }
 }
 
-async function updateStatus() {
-    const selector = document.getElementById('status-selector');
-    const newStatus = selector.value;
+window.toggleDetailStatus = async function () {
+    if (!currentItemData) return;
+
+    const newStatus = currentItemData.status === 'DONE' ? 'PENDING' : 'DONE';
     await DataService.updateAssignmentStatus(currentAssignmentId, newStatus);
+
+    // Update local data
+    currentItemData.status = newStatus;
+    loadStatus(currentItemData);
 }
+
+// Removed Grade logic as per user request to remove result section
+
 
 // --- EDIT DETAILS MODULE ---
 window.openEditModal = function () {

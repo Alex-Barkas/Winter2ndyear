@@ -111,6 +111,14 @@ const STUDENT_DATA = {
         { id: "mech210-q3", course: "MECH 210", category: "QUIZ", title: "Quiz 3", date: "2026-03-13", time: "16:30", status: "UPCOMING", score: null, details: { type: "text", content: "Week 9" } },
         { id: "mech210-q4", course: "MECH 210", category: "QUIZ", title: "Quiz 4", date: "2026-03-27", time: "16:30", status: "UPCOMING", score: null, details: { type: "text", content: "Week 11" } },
 
+        // MECH 210 Pre-lab Quizzes (Every 2 weeks starting Jan 18)
+        { id: "mech210-prelab1", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 1", date: "2026-01-18", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 1" } },
+        { id: "mech210-prelab2", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 2", date: "2026-02-01", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 2" } },
+        { id: "mech210-prelab3", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 3", date: "2026-02-15", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 3" } },
+        { id: "mech210-prelab4", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 4", date: "2026-03-01", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 4" } },
+        { id: "mech210-prelab5", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 5", date: "2026-03-15", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 5" } },
+        { id: "mech210-prelab6", course: "MECH 210", category: "QUIZ", title: "Pre-lab Quiz 6", date: "2026-03-29", time: "23:59", status: "PENDING", score: null, details: { type: "text", content: "Pre-lab for Lab 6" } },
+
         // MECH 210 Midterm
         { id: "mech210-mid", course: "MECH 210", category: "MIDTERM", title: "Midterm Exam", date: "2026-02-24", time: "08:30", status: "UPCOMING", score: null, details: { type: "text", content: "During Lecture (Biosci 1101)" } },
 

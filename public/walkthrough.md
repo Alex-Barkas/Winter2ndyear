@@ -26,6 +26,12 @@ I have updated the website to simplify the assignment list and details view as r
 *   [x] **MREN 230**: Updated assignments to be due on **Sundays** at 11:59 PM (previously Fridays).
     *   *Note*: A database synchronization was performed to apply these changes to existing data.
     *   **Verified**: Assignment 1 is Jan 18.
+    ![Verified MREN Dates](file:///C:/Users/alexb/.gemini/antigravity/brain/ed58e498-f002-4e06-8f9b-5c0e297de2b2/mren230_sunday_dates_1768777479091.png)
+
+### MECH 210 Updates
+*   [x] **Pre-lab Quizzes**: Added 6 pre-lab quizzes starting Jan 18 and recurring every 2 weeks.
+    *   **Verified**: Quizzes appear on the schedule (e.g., Pre-lab Quiz 2 on Feb 1).
+    ![MECH 210 Pre-labs](file:///C:/Users/alexb/.gemini/antigravity/brain/ed58e498-f002-4e06-8f9b-5c0e297de2b2/mech210_prelab_quizzes_1768778087482.png)
 
 ### Manual Verification
 *   [x] **Browser Test**: Verified that the assignment list is flat and sorted by date.
@@ -42,3 +48,4 @@ I have updated the website to simplify the assignment list and details view as r
     *   **Commit 1**: "Redesign assignment list and details page: cleaner UI, removed clutter, fixed delete button".
     *   **Commit 2**: "Feature: Auto-reorder done items, update MREN schedule, and add month to dates".
     *   **Commit 3**: "Docs: Update walkthrough with MREN 230 date fix verification".
+    *   **Commit 4**: "Feature: Add MECH 210 Pre-lab Quizzes".

@@ -4,8 +4,7 @@ on:
   schedule:
     # Runs at 13:00 UTC, which is 8:00 AM EST (standard time) / 9:00 AM EDT (daylight savings)
     - cron: '0 13 * * *'
-    # TEST RUN: 4:10 PM EST = 21:10 UTC
-    - cron: '10 21 * * *'
+    - cron: '0 13 * * *'
   workflow_dispatch: # Allows manual triggering from GitHub UI
 
 jobs:

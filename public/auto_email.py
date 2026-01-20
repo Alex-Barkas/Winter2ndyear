@@ -17,9 +17,9 @@ from email.mime.multipart import MIMEMultipart
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 # --- CONFIGURATION ---
-SENDER_EMAIL = "deadline.upcoming@gmail.com"
-SENDER_PASSWORD = "wyqf nwmj ujsz yvxc"
-RECEIVER_EMAIL = "23KKV9@queensu.ca"
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "deadline.upcoming@gmail.com")
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "wyqf nwmj ujsz yvxc")
+RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "23KKV9@queensu.ca")
 NOTICE_DAYS = 3
 
 # Paths

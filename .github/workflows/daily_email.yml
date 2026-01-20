@@ -1,0 +1,39 @@
+name: Daily Agenda Email
+
+on:
+  schedule:
+    # Runs at 13:00 UTC, which is 8:00 AM EST (standard time) / 9:00 AM EDT (daylight savings)
+    - cron: '0 13 * * *'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install firebase-admin
+
+    - name: Create Service Account Key
+      run: |
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" > public/serviceAccountKey.json
+
+    - name: Run Auto Email Script
+      env:
+        SENDER_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        # SENDER_EMAIL and RECEIVER_EMAIL will use defaults defined in auto_email.py
+        # unless you add them to secrets and uncomment below:
+        # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+        # RECEIVER_EMAIL: ${{ secrets.TARGET_EMAIL }}
+      run: |
+        python public/auto_email.py

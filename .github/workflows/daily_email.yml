@@ -24,31 +24,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install firebase-admin
 
-    - name: Create Service Account Key
-      env:
-        FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
-      run: |
-        python -c "
-        import os, base64
-        secret = os.environ['FIREBASE_CREDENTIALS'].strip()
-        try:
-            # Try to see if it's already JSON (starts with {)
-            if secret.startswith('{'):
-                with open('public/serviceAccountKey.json', 'w', encoding='utf-8') as f:
-                    f.write(secret)
-                print('Detected JSON secret. Wrote directly.')
-            else:
-                # Assume Base64
-                decoded = base64.b64decode(secret)
-                with open('public/serviceAccountKey.json', 'wb') as f:
-                    f.write(decoded)
-                print('Detected Base64 secret. Decoded and wrote.')
-        except Exception as e:
-            print(f'Error writing key: {e}')
-            exit(1)
-        "
-        ls -l public/serviceAccountKey.json
-
     - name: Run Auto Email Script
       env:
         SENDER_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}

@@ -60,7 +60,7 @@ def get_database_data():
         # Log to file if possible
         with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a") as f:
             f.write(f"[FIREBASE ERROR] {e}\n")
-        return [], []
+        raise e
 
 def check_deadlines_and_email():
     # Setup logging

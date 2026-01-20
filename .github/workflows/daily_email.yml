@@ -26,7 +26,7 @@ jobs:
 
     - name: Create Service Account Key
       run: |
-        echo "${{ secrets.FIREBASE_CREDENTIALS }}" > public/serviceAccountKey.json
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" | base64 -d > public/serviceAccountKey.json
 
     - name: Run Auto Email Script
       env:

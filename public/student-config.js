@@ -69,7 +69,7 @@ const STUDENT_DATA = {
         {
             code: "MECH 210",
             name: "Circuits",
-            notes: "pdfs/MECH210.pdf",
+            notes: "https://drive.google.com/file/d/12C3rud5o0KoWcUNGl0hZ1TxdCPE6trTH/view",
             assignments: "assignments.html?course=MECH 210",
             image: "course_images/mech210.png"
         },

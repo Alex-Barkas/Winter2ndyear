@@ -44,7 +44,7 @@ const STUDENT_DATA = {
         {
             code: "MTHE 281",
             name: "Introduction To Real Analysis",
-            notes: "pdfs/MTHE281.pdf",
+            notes: "https://drive.google.com/file/d/1y7jHLLebL2k7jrH9ZtfrYzh006xu3Gp2/view",
             textbook: "textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
             solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
             assignments: "assignments.html?course=MTHE 281",
@@ -53,7 +53,7 @@ const STUDENT_DATA = {
         {
             code: "MTHE 212",
             name: "Linear Algebra II",
-            notes: "pdfs/MTHE212.pdf",
+            notes: "https://drive.google.com/file/d/1eMrAt7o6aUSZgd3wJR2YhXkbRvBdazPn/view",
             textbook: "textbooks/LADR4e.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
             assignments: "assignments.html?course=MTHE 212",
@@ -62,7 +62,7 @@ const STUDENT_DATA = {
         {
             code: "MREN 230",
             name: "Thermodynamics",
-            notes: "pdfs/MREN230.pdf",
+            notes: "https://drive.google.com/file/d/1OrM-Drq0OBAF3WQIGSY55KmHxygYt-sF/view",
             assignments: "assignments.html?course=MREN 230",
             image: "course_images/mren230.png"
         },
@@ -76,7 +76,7 @@ const STUDENT_DATA = {
         {
             code: "ENPH 225",
             name: "Mechanics",
-            notes: "pdfs/ENPH225.pdf",
+            notes: "https://drive.google.com/file/d/1n-zqAfJS_mg_nCCy0crXwi0Yi2BOBZHh/view",
             textbook: "https://api.pageplace.de/preview/DT0400.9781292088785_A26856513/preview-9781292088785_A26856513.pdf",
             assignments: "assignments.html?course=ENPH 225",
             image: "course_images/enph225.png"

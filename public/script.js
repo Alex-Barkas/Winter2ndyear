@@ -347,7 +347,8 @@ function getSemesterWeek(dateString) {
 function createAssignmentCard(item) {
     const dateObj = new Date(item.date + 'T' + item.time);
     // Explicitly format: "Jan 14 Sun"
-    const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const month = MONTHS[dateObj.getMonth()];
     const dayNum = dateObj.getDate();
     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
 

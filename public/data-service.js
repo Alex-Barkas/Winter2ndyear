@@ -1,5 +1,9 @@
 // Local Storage / API Implementation
 const API_URL = '/api/db';
+const STORAGE_KEYS = {
+    ASSIGNMENTS: 'dashboard_assignments',
+    TODOS: 'dashboard_todos'
+};
 
 export const DataService = {
 
@@ -10,11 +14,20 @@ export const DataService = {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error("Failed to fetch DB");
             const data = await response.json();
+            // Sync to local storage for backup
+            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments || []));
             return data.assignments || [];
         } catch (e) {
-            console.warn("API unavailable, falling back to empty/config:", e);
-            // If offline/file-protocol, maybe return STUDENT_DATA as fallback or empty
-            if (typeof STUDENT_DATA !== 'undefined') return STUDENT_DATA.assignments || [];
+            console.warn("API unavailable, checking LocalStorage/Config:", e);
+
+            // 1. Try LocalStorage
+            const local = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
+            if (local) return JSON.parse(local);
+
+            // 2. Fallback to Config (window.STUDENT_DATA)
+            if (typeof window.STUDENT_DATA !== 'undefined') {
+                return window.STUDENT_DATA.assignments || [];
+            }
             return [];
         }
     },
@@ -24,37 +37,70 @@ export const DataService = {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error("Failed to fetch DB");
             const data = await response.json();
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos || []));
             return data.todos || [];
         } catch (e) {
-            console.warn("API unavailable for todos:", e);
-            return [];
+            console.warn("API unavailable for todos, checking LocalStorage:", e);
+            const local = localStorage.getItem(STORAGE_KEYS.TODOS);
+            return local ? JSON.parse(local) : [];
         }
     },
 
     // --- WRITE OPERATIONS ---
-    // Helper to get full DB, modify, and save back
+    // Helper to get full DB, modify, and save back (with Fallback)
     async _updateDb(modifierFn) {
         try {
-            // 1. Fetch current DB
+            // OPTIMISTIC / API PATH
             const response = await fetch(API_URL);
-            if (!response.ok) throw new Error("Failed to fetch DB for update");
-            const data = await response.json();
+            if (response.ok) {
+                const data = await response.json();
+                modifierFn(data); // Modify
 
-            // 2. Modify
+                const postResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (!postResponse.ok) throw new Error("Failed to save to API");
+
+                // Update LocalStorage to match
+                if (data.assignments) localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
+                if (data.todos) localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos));
+
+                return true;
+            } else {
+                throw new Error("API Read failed");
+            }
+        } catch (e) {
+            console.warn("API Write failed, falling back to LocalStorage:", e);
+
+            // FALLBACK PATH
+            // 1. Load current state from LS or Config
+            let assignments = [];
+            const localAssign = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
+            if (localAssign) {
+                assignments = JSON.parse(localAssign);
+            } else if (typeof window.STUDENT_DATA !== 'undefined') {
+                assignments = JSON.parse(JSON.stringify(window.STUDENT_DATA.assignments || [])); // Deep copy
+            }
+
+            let todos = [];
+            const localTodos = localStorage.getItem(STORAGE_KEYS.TODOS);
+            if (localTodos) {
+                todos = JSON.parse(localTodos);
+            }
+
+            // 2. Construct Mock DB object
+            const data = { assignments, todos };
+
+            // 3. Modify
             modifierFn(data);
 
-            // 3. Save back
-            const postResponse = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            // 4. Save back to LocalStorage
+            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos));
 
-            if (!postResponse.ok) throw new Error("Failed to save DB");
             return true;
-        } catch (e) {
-            console.error("Error updating DB:", e);
-            return false;
         }
     },
 
@@ -87,7 +133,6 @@ export const DataService = {
         await this._updateDb((data) => {
             let item = data.assignments.find(a => a.id === id);
             if (item) {
-                // Merge details
                 Object.assign(item, newDetails);
             }
         });
@@ -139,20 +184,29 @@ export const DataService = {
     },
 
     async getCourses() {
-        if (typeof STUDENT_DATA !== 'undefined') return STUDENT_DATA.courses;
+        if (typeof window.STUDENT_DATA !== 'undefined') return window.STUDENT_DATA.courses;
         return [];
     },
 
     async seedDatabase(data) {
         try {
+            // Try API first
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            if (response.ok) alert("Database seeded!");
+            if (response.ok) {
+                alert("Database seeded (API)!");
+                return;
+            }
         } catch (e) {
             console.error(e);
         }
+
+        // Fallback seed to LS
+        localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
+        localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos || []));
+        alert("Database seeded (LocalStorage)!");
     }
 };

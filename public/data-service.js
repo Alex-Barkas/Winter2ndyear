@@ -12,7 +12,9 @@ export const DataService = {
             const data = await response.json();
             return data.assignments || [];
         } catch (e) {
-            console.error("Error getting assignments:", e);
+            console.warn("API unavailable, falling back to empty/config:", e);
+            // If offline/file-protocol, maybe return STUDENT_DATA as fallback or empty
+            if (typeof STUDENT_DATA !== 'undefined') return STUDENT_DATA.assignments || [];
             return [];
         }
     },
@@ -24,7 +26,7 @@ export const DataService = {
             const data = await response.json();
             return data.todos || [];
         } catch (e) {
-            console.error("Error getting todos:", e);
+            console.warn("API unavailable for todos:", e);
             return [];
         }
     },

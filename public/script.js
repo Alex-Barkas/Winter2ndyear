@@ -346,10 +346,13 @@ function getSemesterWeek(dateString) {
 
 function createAssignmentCard(item) {
     const dateObj = new Date(item.date + 'T' + item.time);
-    // User requested Month in front: "Jan 14 Wed"
-    const monthDay = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // Explicitly format: "Jan 14 Sun"
+    const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+    const dayNum = dateObj.getDate();
     const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-    const day = `${monthDay} ${weekday}`;
+
+    // Construct string: "Jan 14 Sun"
+    const day = `${month} ${dayNum} ${weekday}`;
     const weekLabel = getSemesterWeek(item.date);
 
     // Status is now directly from DB

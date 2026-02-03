@@ -24,6 +24,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install firebase-admin
 
+    - name: Create Service Account Key
+      env:
+        FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+      run: |
+        echo "$FIREBASE_KEY" > public/serviceAccountKey.json
+
     - name: Run Auto Email Script
       env:
         SENDER_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}

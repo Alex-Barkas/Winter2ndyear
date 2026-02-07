@@ -264,7 +264,14 @@
             <a href="index.html" class="back-link">← Back to Dashboard</a>
             <h1>To-Do List</h1>
             <p class="subtitle">Manage everything. Prioritize what matters.</p>
+            <button onclick="syncData()" class="sync-btn"
+                style="background:var(--accent-color); color:black; border:none; padding:8px 16px; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:10px;">☁️
+                Sync to Server</button>
         </header>
+
+        <!-- DEBUG SCRIPT FOR DIAGNOSIS -->
+        <script type="module" src="debug_sync.js"></script>
+
 
         <!-- Input Section -->
         <div class="todo-input-container">
@@ -311,7 +318,26 @@
             window.addTodo = addTodo;
             window.toggleTodo = toggleTodo;
             window.deleteTodo = deleteTodo;
+            window.syncData = syncData;
         });
+
+        async function syncData() {
+            const btn = document.querySelector('.sync-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Syncing...";
+            btn.disabled = true;
+
+            const result = await DataService.pushLocalTodosToServer();
+
+            if (result.success) {
+                alert(`✅ Success! Synced ${result.count} tasks to the server. The emailer will now include these.`);
+            } else {
+                alert(`❌ Sync Failed: ${result.message}\n\nMake sure 'python server.py' is running!`);
+            }
+
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
 
         function loadCourses() {
             const select = document.getElementById('task-course');

@@ -1,5 +1,17 @@
-// Local Storage / API Implementation
-const API_URL = '/api/db';
+// Firebase Implementation
+import { db } from "./firebase-config.js";
+import {
+    collection,
+    getDocs,
+    doc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    writeBatch
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 const STORAGE_KEYS = {
     ASSIGNMENTS: 'dashboard_assignments',
     TODOS: 'dashboard_todos'
@@ -11,20 +23,21 @@ export const DataService = {
 
     async getAllAssignments() {
         try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error("Failed to fetch DB");
-            const data = await response.json();
-            // Sync to local storage for backup
-            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments || []));
-            return data.assignments || [];
-        } catch (e) {
-            console.warn("API unavailable, checking LocalStorage/Config:", e);
+            const querySnapshot = await getDocs(collection(db, "assignments"));
+            const assignments = [];
+            querySnapshot.forEach((doc) => {
+                assignments.push(doc.data());
+            });
 
-            // 1. Try LocalStorage
+            // Sync to local storage for offline viewing/backup
+            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(assignments));
+            return assignments;
+        } catch (e) {
+            console.warn("Firestore unavailable, checking LocalStorage:", e);
             const local = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
             if (local) return JSON.parse(local);
 
-            // 2. Fallback to Config (window.STUDENT_DATA)
+            // Fallback to Config
             if (typeof window.STUDENT_DATA !== 'undefined') {
                 return window.STUDENT_DATA.assignments || [];
             }
@@ -34,73 +47,29 @@ export const DataService = {
 
     async getTodos() {
         try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error("Failed to fetch DB");
-            const data = await response.json();
-            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos || []));
-            return data.todos || [];
+            const querySnapshot = await getDocs(collection(db, "todos"));
+            const todos = [];
+            querySnapshot.forEach((doc) => {
+                todos.push(doc.data());
+            });
+
+            // CRITICAL: If cloud is empty but local has data, KEEP LOCAL (don't overwrite with empty)
+            // This handles the case where we purged the cloud but user has local work.
+            if (todos.length === 0) {
+                const local = localStorage.getItem(STORAGE_KEYS.TODOS);
+                const localTodos = local ? JSON.parse(local) : [];
+                if (localTodos.length > 0) {
+                    console.log("Cloud empty, preserving local data.");
+                    return localTodos;
+                }
+            }
+
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(todos));
+            return todos;
         } catch (e) {
-            console.warn("API unavailable for todos, checking LocalStorage:", e);
+            console.warn("Firestore unavailable for todos, checking LocalStorage:", e);
             const local = localStorage.getItem(STORAGE_KEYS.TODOS);
             return local ? JSON.parse(local) : [];
-        }
-    },
-
-    // --- WRITE OPERATIONS ---
-    // Helper to get full DB, modify, and save back (with Fallback)
-    async _updateDb(modifierFn) {
-        try {
-            // OPTIMISTIC / API PATH
-            const response = await fetch(API_URL);
-            if (response.ok) {
-                const data = await response.json();
-                modifierFn(data); // Modify
-
-                const postResponse = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!postResponse.ok) throw new Error("Failed to save to API");
-
-                // Update LocalStorage to match
-                if (data.assignments) localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
-                if (data.todos) localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos));
-
-                return true;
-            } else {
-                throw new Error("API Read failed");
-            }
-        } catch (e) {
-            console.warn("API Write failed, falling back to LocalStorage:", e);
-
-            // FALLBACK PATH
-            // 1. Load current state from LS or Config
-            let assignments = [];
-            const localAssign = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
-            if (localAssign) {
-                assignments = JSON.parse(localAssign);
-            } else if (typeof window.STUDENT_DATA !== 'undefined') {
-                assignments = JSON.parse(JSON.stringify(window.STUDENT_DATA.assignments || [])); // Deep copy
-            }
-
-            let todos = [];
-            const localTodos = localStorage.getItem(STORAGE_KEYS.TODOS);
-            if (localTodos) {
-                todos = JSON.parse(localTodos);
-            }
-
-            // 2. Construct Mock DB object
-            const data = { assignments, todos };
-
-            // 3. Modify
-            modifierFn(data);
-
-            // 4. Save back to LocalStorage
-            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
-            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos));
-
-            return true;
         }
     },
 
@@ -108,76 +77,72 @@ export const DataService = {
 
     async addAssignment(assignment) {
         if (!assignment.id) assignment.id = 'assign_' + Date.now();
-        const success = await this._updateDb((data) => {
-            if (!data.assignments) data.assignments = [];
-            data.assignments.push(assignment);
-        });
-        return success ? assignment : null;
+        try {
+            await setDoc(doc(db, "assignments", assignment.id), assignment);
+            return assignment;
+        } catch (e) {
+            console.error("Error adding assignment: ", e);
+            return null;
+        }
     },
 
     async updateAssignmentStatus(id, newStatus) {
-        await this._updateDb((data) => {
-            const item = data.assignments.find(a => a.id === id);
-            if (item) item.status = newStatus;
-        });
+        try {
+            const ref = doc(db, "assignments", id);
+            await updateDoc(ref, { status: newStatus });
+        } catch (e) {
+            console.error("Error updating status: ", e);
+        }
     },
 
     async updateAssignmentGrade(id, newScore) {
-        await this._updateDb((data) => {
-            const item = data.assignments.find(a => a.id === id);
-            if (item) item.score = newScore;
-        });
+        try {
+            const ref = doc(db, "assignments", id);
+            await updateDoc(ref, { score: newScore });
+        } catch (e) {
+            console.error("Error updating grade: ", e);
+        }
     },
 
     async updateAssignmentDetails(id, newDetails) {
-        await this._updateDb((data) => {
-            let item = data.assignments.find(a => a.id === id);
-            if (item) {
-                Object.assign(item, newDetails);
-            }
-        });
-        // Return updated item (simulated)
-        const assignments = await this.getAllAssignments();
-        return assignments.find(a => a.id === id) || null;
+        try {
+            const ref = doc(db, "assignments", id);
+            await updateDoc(ref, newDetails);
+            // Return updated (simulated)
+            return { id, ...newDetails };
+        } catch (e) {
+            console.error("Error updating details: ", e);
+            return null;
+        }
     },
 
     async deleteAssignment(id) {
-        return await this._updateDb((data) => {
-            if (data.assignments) {
-                data.assignments = data.assignments.filter(a => a.id !== id);
-            }
-        });
+        try {
+            await deleteDoc(doc(db, "assignments", id));
+        } catch (e) {
+            console.error("Error deleting assignment: ", e);
+        }
     },
 
     // --- TODOS ---
 
     async saveTodoItem(todo) {
-        await this._updateDb((data) => {
-            if (!data.todos) data.todos = [];
-            const index = data.todos.findIndex(t => t.id === todo.id);
-            if (index >= 0) {
-                data.todos[index] = todo;
-            } else {
-                data.todos.push(todo);
-            }
-        });
+        try {
+            await setDoc(doc(db, "todos", todo.id), todo);
+        } catch (e) {
+            console.error("Error saving todo: ", e);
+        }
     },
 
     async deleteTodoItem(id) {
-        await this._updateDb((data) => {
-            if (data.todos) {
-                data.todos = data.todos.filter(t => t.id !== id);
-            }
-        });
+        try {
+            await deleteDoc(doc(db, "todos", id));
+        } catch (e) {
+            console.error("Error deleting todo: ", e);
+        }
     },
 
-    async saveTodos(todosList) {
-        // Full replace of todos list
-        await this._updateDb((data) => {
-            data.todos = todosList;
-        });
-    },
-
+    // Legacy support / helpers
     async getAssignmentById(id) {
         const assignments = await this.getAllAssignments();
         return assignments.find(a => a.id === id) || null;
@@ -188,25 +153,33 @@ export const DataService = {
         return [];
     },
 
-    async seedDatabase(data) {
+    // No longer needed but kept for compatibility logic if called
+    async pushLocalTodosToServer() {
         try {
-            // Try API first
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (response.ok) {
-                alert("Database seeded (API)!");
-                return;
-            }
-        } catch (e) {
-            console.error(e);
-        }
+            const local = localStorage.getItem(STORAGE_KEYS.TODOS);
+            if (!local) return { success: false, message: "No local todos found." };
 
-        // Fallback seed to LS
-        localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(data.assignments));
-        localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(data.todos || []));
-        alert("Database seeded (LocalStorage)!");
+            const todos = JSON.parse(local);
+            if (!Array.isArray(todos) || todos.length === 0) {
+                return { success: false, message: "Local list is empty." };
+            }
+
+            // Use the top-level writeBatch import
+            const batch = writeBatch(db);
+            const todosRef = collection(db, "todos");
+
+            todos.forEach(todo => {
+                // Use existing ID or generate one if missing (shouldn't happen)
+                const docId = todo.id || Date.now().toString();
+                const docRef = doc(todosRef, docId);
+                batch.set(docRef, todo);
+            });
+
+            await batch.commit();
+            return { success: true, count: todos.length };
+        } catch (e) {
+            console.error("Sync Error:", e);
+            return { success: false, message: e.message };
+        }
     }
 };

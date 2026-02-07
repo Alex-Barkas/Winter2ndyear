@@ -7,7 +7,7 @@
             "date": "2026-01-16",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mthe281-h2",
@@ -16,7 +16,7 @@
             "date": "2026-01-23",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mthe281-h3",
@@ -25,7 +25,7 @@
             "date": "2026-01-30",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mthe281-h4",
@@ -34,7 +34,7 @@
             "date": "2026-02-06",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mthe281-m1",
@@ -115,7 +115,7 @@
             "date": "2026-01-23",
             "time": "10:30",
             "category": "QUIZ",
-            "status": "UPCOMING"
+            "status": "DONE"
         },
         {
             "id": "mthe212-q2",
@@ -124,7 +124,7 @@
             "date": "2026-02-06",
             "time": "10:30",
             "category": "QUIZ",
-            "status": "UPCOMING"
+            "status": "DONE"
         },
         {
             "id": "mthe212-q3",
@@ -160,7 +160,7 @@
             "date": "2026-01-23",
             "time": "16:30",
             "category": "QUIZ",
-            "status": "UPCOMING"
+            "status": "DONE"
         },
         {
             "id": "mech210-q2",
@@ -169,7 +169,7 @@
             "date": "2026-02-06",
             "time": "16:30",
             "category": "QUIZ",
-            "status": "UPCOMING"
+            "status": "DONE"
         },
         {
             "id": "mech210-q3",
@@ -214,7 +214,7 @@
             "date": "2026-01-14",
             "time": "16:30",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "enph225-a2",
@@ -223,7 +223,7 @@
             "date": "2026-01-21",
             "time": "16:30",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "enph225-a3",
@@ -232,7 +232,7 @@
             "date": "2026-01-28",
             "time": "16:30",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "enph225-a4",
@@ -286,7 +286,7 @@
             "date": "2026-02-03",
             "time": "19:00",
             "category": "QUIZ",
-            "status": "UPCOMING"
+            "status": "DONE"
         },
         {
             "id": "enph225-q2",
@@ -322,7 +322,7 @@
             "date": "2026-01-25",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mren230-a3",
@@ -331,7 +331,7 @@
             "date": "2026-02-01",
             "time": "23:59",
             "category": "ASSIGNMENT",
-            "status": "PENDING"
+            "status": "DONE"
         },
         {
             "id": "mren230-a4",
@@ -439,8 +439,18 @@
             "date": "2026-01-10",
             "time": "10:00",
             "category": "REMINDER",
-            "status": "PENDING"
+            "status": "DONE"
         }
     ],
-    "todos": []
+    "todos": [
+        {
+            "id": "1770485277571",
+            "title": "hii",
+            "course": "Personal",
+            "urgency": 3,
+            "date": "",
+            "completed": false,
+            "createdAt": "2026-02-07T17:27:57.572Z"
+        }
+    ]
 }

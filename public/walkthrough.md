@@ -9,6 +9,28 @@ I have updated the website to simplify the assignment list and details view as r
 *   **"Today" Banner**: Added a **TODAY** banner to assignments due on the current day.
 *   **Quick Status Toggle**: Added a checkmark button directly on the assignment card to toggle "Done" / "Pending" without entering the details page.
 
+### Database Sync Fix
+1.  **Issue**: `auto_email.py` was reading from Firebase, but the website was writing to `db.json` locally.
+2.  **Fix**: Updated `auto_email.py` to read directly from `db.json`.
+3.  **Result**: Emailer now sees the same data as the local website.
+
+## Firebase Migration (Cloud Sync)
+### Why?
+To allow the **GitHub Action** (Auto-Emailer) and the **Website** to share the same data source without needing to manually commit `db.json`.
+
+### Changes
+-   **Database**: Migrated all assignments and tasks from `db.json` to **Firebase Firestore**.
+-   **Website**: Updated `data-service.js` to read/write directly to Firestore.
+-   **Emailer**: Reverted `auto_email.py` to use `firebase-admin` SDK.
+
+### Verification
+-   running `python public/auto_email.py` successfully fetches data from Firebase and sends the email.
+-   Website now loads data from the cloud.
+
+### Important
+-   You no longer need to run `python server.py` for the website to save data! It saves directly to the cloud.
+-   GitHub Actions will now use the live data from Firebase.
+
 ### Details Page (`details.html`)
 *   **Removed Toolkit**: Deleted the "Available Tools" and "Result/Grade" sections.
 *   **Simplified Status**: Replaced the complex status selector with a simple "Mark as Done" / "Mark as Pending" button.

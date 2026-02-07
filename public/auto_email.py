@@ -1,91 +1,95 @@
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
 import smtplib
 import json
 import re
 import datetime
 import os
 from email.mime.text import MIMEText
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-# ==========================================
-# CONFIGURATION
-# ==========================================
-# 1. Enable "Less Secure Apps" or (better) generate an "App Password" for your email.
-#    For Gmail: Account Settings > Security > 2-Step Verification > App Passwords.
+# --- CONFIGURATION ---
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-# --- CONFIGURATION ---
-SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "deadline.upcoming@gmail.com")
-SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "wyqf nwmj ujsz yvxc")
-RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "23KKV9@queensu.ca")
+SENDER_EMAIL = "deadline.upcoming@gmail.com"
+SENDER_PASSWORD = os.environ.get("EMAIL_PASSWORD", "wyqf nwmj ujsz yvxc") # Use env var if available
+RECEIVER_EMAIL = "Alexander.Barkas@queensu.ca"
 NOTICE_DAYS = 3
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CRED_PATH = os.path.join(SCRIPT_DIR, "serviceAccountKey.json")
+CRED_PATH = os.path.join(SCRIPT_DIR, "secondsemdashb-firebase-adminsdk-fbsvc-574ee6bf41.json")
 
-# --- DATABASE LOADER (Firebase) ---
+def log(msg):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] {msg}")
+    try:
+        with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a") as f:
+            f.write(f"[{timestamp}] {msg}\n")
+    except Exception as e:
+        print(f"Log Error: {e}")
+
 def get_database_data():
     try:
-        print("DEBUG: Entering get_database_data")
-        # Initialize only if not already initialized
+        log("Connecting to Firebase...")
+        
         if not firebase_admin._apps:
-            cred = credentials.Certificate(CRED_PATH)
-            firebase_admin.initialize_app(cred)
-
+            if os.path.exists(CRED_PATH):
+                 cred = credentials.Certificate(CRED_PATH)
+                 firebase_admin.initialize_app(cred)
+            else:
+                # If running in GitHub Actions, secrets might be handling this differently 
+                # or we expect the file to be created by the workflow
+                log(f"WARNING: {CRED_PATH} not found. initialization might fail.")
+                firebase_admin.initialize_app()
+        
         db = firestore.client()
+        
+        # Fetch Assignments (Collection)
+        assignments_ref = db.collection('assignments')
+        assignments = [doc.to_dict() for doc in assignments_ref.stream()]
+        
+        # Fetch Todos (Collection)
+        todos_ref = db.collection('todos')
+        todos = [doc.to_dict() for doc in todos_ref.stream()]
+        
+        log(f"Fetched {len(assignments)} assignments and {len(todos)} todos from Firebase.")
+        
+        # DEBUG: Print all todos to see what we have
+        log("--- RAW TODOS DUMP ---")
+        for t in todos:
+            log(f"ID: {t.get('id')} | Title: {t.get('title')} | Completed: {t.get('completed', 'N/A')}")
+        log("----------------------")
 
-        assignments = []
-        todos = []
-
-        # Fetch Assignments
-        docs = db.collection('assignments').stream()
-        for doc in docs:
-            assignments.append(doc.to_dict())
-
-        # Fetch Todos
-        docs = db.collection('todos').stream()
-        for doc in docs:
-            d = doc.to_dict()
-            print(f"DEBUG TODO: {d}")
-            todos.append(d)
-
-        print(f"Total Todos Fetched: {len(todos)}")
         return assignments, todos
 
     except Exception as e:
-        print(f"Firebase Error: {e}")
-        # Log to file if possible
-        with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a") as f:
-            f.write(f"[FIREBASE ERROR] {e}\n")
-        raise e
+        log(f"[FIREBASE ERROR] {e}")
+        # Return empty lists on failure to prevent crash, but log heavily
+        return [], []
+
+def format_date_display(date_str):
+    if not date_str: return "N/A"
+    try:
+        d = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        # Format: "Mon, Jan 01"
+        return d.strftime("%a, %b %d")
+    except:
+        return date_str
 
 def check_deadlines_and_email():
-    # Setup logging
-    log_file = os.path.join(SCRIPT_DIR, "email_debug.log")
-
-    def log(message):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] {message}\n")
-        print(message)
-
     log(f"Starting check (Firebase Mode). Notice Days: {NOTICE_DAYS}")
-
-    if not os.path.exists(CRED_PATH):
-        log(f"ERROR: Service Account Key not found at {CRED_PATH}")
-        return
-
+    
     assignments, todos = get_database_data()
-
+    
     today = datetime.date.today()
-    
     upcoming_assignments = []
+    overdue_assignments = []
     upcoming_todos = []
-    
-    # Check Assignments
+
+    # 1. Process Assignments
     for assign in assignments:
         # Robust status check
         status = assign.get('status', 'PENDING')
@@ -100,124 +104,127 @@ def check_deadlines_and_email():
             due_date = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
             delta = (due_date - today).days
             
-            if 0 <= delta <= NOTICE_DAYS:
+            if delta < 0:
+                overdue_assignments.append(assign)
+            elif 0 <= delta <= NOTICE_DAYS:
                 upcoming_assignments.append(assign)
         except ValueError:
             continue
-            
-    # Check Todos
+
+    # 2. Process Todos (Simple filter)
     for todo in todos:
-        # Explicit boolean check
-        is_completed = todo.get('completed')
-        if is_completed is True or str(is_completed).lower() == 'true':
-            continue
-        upcoming_todos.append(todo)
+        if not todo.get('completed', False):
+             upcoming_todos.append(todo)
 
-    total_count = len(upcoming_assignments) + len(upcoming_todos)
-    
-    # Always log count
-    log(f"Filtered: {len(upcoming_assignments)} upcoming assignments and {len(upcoming_todos)} pending tasks.")
-    
-    # Prepare Email
+    count_overdue = len(overdue_assignments)
+    count_upcoming = len(upcoming_assignments)
+    count_todos = len(upcoming_todos)
+
+    log(f"Filtered: {count_overdue} overdue, {count_upcoming} upcoming, and {count_todos} pending tasks.")
+
+    if count_overdue == 0 and count_upcoming == 0 and count_todos == 0:
+        log("Nothing to report. No email sent.")
+        return
+
+    # --- COMPOSE EMAIL ---
     msg = MIMEMultipart()
-    msg['From'] = SENDER_EMAIL
+    msg['From'] = f"Deadlines <{SENDER_EMAIL}>"
     msg['To'] = RECEIVER_EMAIL
-    msg['Subject'] = f"Daily Update: {len(upcoming_assignments)} Assignments, {len(upcoming_todos)} To-Dos"
+    msg['Subject'] = f"Daily Update: {count_overdue} Overdue, {count_upcoming} Upcoming, {count_todos} To-Dos"
 
-    # Sort lists by date
-    upcoming_assignments.sort(key=lambda x: x.get('date', '9999-99-99'))
-    upcoming_todos.sort(key=lambda x: x.get('date', '9999-99-99'))
-
-    # --- HTML TEMPLATE GENERATION ---
-    body = f"""
+    # HTML Body Construction
+    body = """
     <html>
     <head>
         <style>
-            body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 0; }}
-            .container {{ max-width: 600px; margin: 0 auto; background-color: #1e1e1e; padding: 15px; border-radius: 8px; }}
-            .header {{ text-align: center; padding-bottom: 10px; border-bottom: 1px solid #333; margin-bottom: 15px; }}
-            .header h1 {{ color: #ffffff; margin: 0; font-size: 20px; }}
-            .header p {{ color: #aaaaaa; margin: 2px 0 0; font-size: 13px; }}
-            .section-title {{ color: #4fc3f7; font-size: 16px; margin-top: 20px; margin-bottom: 10px; border-left: 3px solid #4fc3f7; padding-left: 8px; }}
-            .card {{ background-color: #2c2c2c; padding: 10px; border-radius: 4px; margin-bottom: 6px; border-left: 3px solid #555; }}
-            .card.today {{ border-left-color: #ff5252; background-color: #382424; }}
-            .card-title {{ font-weight: bold; font-size: 14px; color: #ffffff; display: flex; justify-content: space-between; align-items: center; }}
-            .card-meta {{ color: #bbbbbb; font-size: 12px; margin-top: 2px; }}
-            .badge {{ display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 5px; }}
-            .badge-today {{ background-color: #ff5252; color: white; }}
-            .footer {{ text-align: center; margin-top: 20px; font-size: 11px; color: #666; }}
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #1e1e1e; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+            .header { background-color: #1e1e1e; padding: 30px; text-align: center; border-bottom: 1px solid #333; }
+            .header h1 { margin: 0; font-size: 24px; color: #ffffff; }
+            .header p { margin: 5px 0 0; color: #aaaaaa; font-size: 14px; }
+            .content { padding: 20px; }
+            .section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #bbbbbb; margin: 25px 0 10px; border-left: 3px solid #bbbbbb; padding-left: 10px; }
+            .section-title.overdue { color: #ff5252; border-left-color: #ff5252; }
+            .section-title.upcoming { color: #64b5f6; border-left-color: #64b5f6; }
+            .section-title.todo { color: #69f0ae; border-left-color: #69f0ae; }
+            
+            .card { background-color: #252525; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 4px solid transparent; }
+            .card.overdue { border-left-color: #d32f2f; background-color: #2b1d1d; }
+            .card.upcoming { border-left-color: #1976d2; }
+            .card.todo { border-left-color: #00c853; }
+            
+            .card-title { font-weight: 600; font-size: 16px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+            .card-meta { font-size: 12px; color: #888888; }
+            
+            .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-right: 5px; }
+            .badge-overdue { background-color: #d32f2f; color: white; }
+            
+            .footer { text-align: center; padding: 20px; color: #666666; font-size: 11px; border-top: 1px solid #333; }
+            .empty-state { font-style: italic; color: #666; font-size: 13px; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header">
                 <h1>Daily Agenda</h1>
-                <p>{datetime.date.today().strftime('%A, %B %d')}</p>
+                <p>""" + datetime.date.today().strftime("%A, %B %d") + """</p>
             </div>
+            <div class="content">
     """
 
-    def format_date_display(date_string):
-        if not date_string: return "No Date"
-        try:
-            dt = datetime.datetime.strptime(date_string, "%Y-%m-%d")
-            return dt.strftime("%a, %b %d") # Mon, Jan 01
-        except:
-            return date_string
-
-    # --- ASSIGNMENTS ---
-    body += '<div class="section-title">📅 Upcoming Deadlines</div>'
-    if upcoming_assignments:
-        for item in upcoming_assignments:
+    # Overdue Section
+    if overdue_assignments:
+        body += '<div class="section-title overdue">🚨 Overdue Assignments</div>'
+        for item in overdue_assignments:
             d_str = item.get('date', 'N/A')
             display_date = format_date_display(d_str)
-            
             course = item.get('course', 'General')
             title = item.get('title', 'Untitled')
             
-            is_today = (d_str == str(today))
-            card_class = "card today" if is_today else "card"
-            
-            badge_html = '<span class="badge badge-today">TODAY</span>' if is_today else ''
-            
-            # Compact Layout: Title on left, Date on right
             body += f"""
-            <div class="{card_class}">
+            <div class="card overdue">
                 <div class="card-title">
-                    <span>{badge_html} {course} - {title}</span>
-                    <span style="font-weight:normal; color:#aaa; font-size:12px;">{display_date}</span>
+                    <span><span class="badge badge-overdue">LATE</span> {course} - {title}</span>
+                    <span style="font-weight:normal; color:#ff8a80; font-size:12px;">{display_date}</span>
                 </div>
             </div>
             """
-    else:
-        body += '<div class="card" style="border-left-color: #4caf50; color: #a5d6a7; padding:8px;">🎉 No upcoming deadlines!</div>'
 
-    # --- TO-DOS ---
-    body += '<div class="section-title">✅ To-Do List</div>'
-    if upcoming_todos:
-        for item in upcoming_todos:
-            d_str = item.get('date', '')
-            display_date = format_date_display(d_str) if d_str else "No Date"
-            
-            course = item.get('course', 'Personal')
+    # Upcoming Section
+    if upcoming_assignments:
+        body += '<div class="section-title upcoming">🗓 Upcoming Deadlines</div>'
+        for item in upcoming_assignments:
+            d_str = item.get('date', 'N/A')
+            display_date = format_date_display(d_str)
+            course = item.get('course', 'General')
             title = item.get('title', 'Untitled')
             
-            is_today = (d_str == str(today))
-            card_class = "card today" if is_today else "card"
-            badge_html = '<span class="badge badge-today">NOW</span>' if is_today else ''
-            
             body += f"""
-            <div class="{card_class}" style="border-left-color: #ab47bc;">
-                 <div class="card-title">
-                    <span>{badge_html} {title}</span>
-                    <span style="font-weight:normal; color:#aaa; font-size:12px;">{display_date}</span>
-                </div>
-                <div class="card-meta">
-                    {course}
+            <div class="card upcoming">
+                <div class="card-title">
+                    <span>{course} - {title}</span>
+                    <span style="font-weight:normal; font-size:12px;">{display_date}</span>
                 </div>
             </div>
             """
-    else:
-        body += '<div class="card" style="border-left-color: #4caf50; color: #a5d6a7; padding:8px;">✨ All caught up!</div>'
+    
+    if not upcoming_assignments and not overdue_assignments:
+         body += '<div class="empty-state">No upcoming assignments for the next 3 days.</div>'
+
+    # Todo Section
+    if upcoming_todos:
+        body += '<div class="section-title todo">✅ To-Do List</div>'
+        for item in upcoming_todos:
+            title = item.get('title', 'Untitled')
+            course = item.get('course', 'Personal')
+            body += f"""
+            <div class="card todo">
+                <div class="card-title">{title}</div>
+                <div class="card-meta">{course}</div>
+            </div>
+            """
+    elif not upcoming_assignments and not overdue_assignments:
+        body += '<div class="card todo" style="border-left-color:#444;"><div class="card-title">✨ All caught up!</div></div>'
 
     body += """
             <div class="footer">

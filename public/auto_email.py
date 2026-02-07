@@ -24,6 +24,7 @@ CRED_PATH = os.path.join(SCRIPT_DIR, "secondsemdashb-firebase-adminsdk-fbsvc-574
 
 def log(msg):
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # PRINT TO CONSOLE for GitHub Actions visibility
     print(f"[{timestamp}] {msg}")
     try:
         with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a") as f:
@@ -35,38 +36,63 @@ def get_database_data():
     try:
         log("Connecting to Firebase...")
         
+        # Check if credential file exists and has content
+        if os.path.exists(CRED_PATH):
+            size = os.path.getsize(CRED_PATH)
+            log(f"Credential file found at {CRED_PATH}. Size: {size} bytes.")
+            if size == 0:
+                log("ERROR: Credential file is empty!")
+        else:
+            log(f"WARNING: Credential file NOT found at {CRED_PATH}")
+
         if not firebase_admin._apps:
             if os.path.exists(CRED_PATH):
-                 cred = credentials.Certificate(CRED_PATH)
-                 firebase_admin.initialize_app(cred)
+                 try:
+                    cred = credentials.Certificate(CRED_PATH)
+                    firebase_admin.initialize_app(cred)
+                    log("Firebase initialized with Certificate.")
+                 except Exception as e:
+                    log(f"CRITICAL ERROR initializing Firebase Certificate: {e}")
+                    raise e
             else:
                 # If running in GitHub Actions, secrets might be handling this differently 
                 # or we expect the file to be created by the workflow
-                log(f"WARNING: {CRED_PATH} not found. initialization might fail.")
+                log(f"WARNING: No credential file. Attempting default initialization (Workload Identity/Env Vars)...")
                 firebase_admin.initialize_app()
         
         db = firestore.client()
+        log("Firestore client initialized.")
         
         # Fetch Assignments (Collection)
-        assignments_ref = db.collection('assignments')
-        assignments = [doc.to_dict() for doc in assignments_ref.stream()]
+        try:
+            assignments_ref = db.collection('assignments')
+            assignments = [doc.to_dict() for doc in assignments_ref.stream()]
+            log(f"Fetched {len(assignments)} assignments.")
+        except Exception as e:
+            log(f"Error fetching assignments: {e}")
+            assignments = []
         
         # Fetch Todos (Collection)
-        todos_ref = db.collection('todos')
-        todos = [doc.to_dict() for doc in todos_ref.stream()]
-        
-        log(f"Fetched {len(assignments)} assignments and {len(todos)} todos from Firebase.")
-        
-        # DEBUG: Print all todos to see what we have
-        log("--- RAW TODOS DUMP ---")
-        for t in todos:
-            log(f"ID: {t.get('id')} | Title: {t.get('title')} | Completed: {t.get('completed', 'N/A')}")
-        log("----------------------")
-
+        try:
+            todos_ref = db.collection('todos')
+            todos = [doc.to_dict() for doc in todos_ref.stream()]
+            log(f"Fetched {len(todos)} todos.")
+            
+            # DEBUG: Print all todos to see what we have
+            log("--- RAW TODOS DUMP ---")
+            for t in todos:
+                title = t.get('title', 'Unknown')
+                tid = t.get('id', 'No ID')
+                log(f"ID: {tid} | Title: {title} | Completed: {t.get('completed', 'N/A')}")
+            log("----------------------")
+        except Exception as e:
+             log(f"Error fetching todos: {e}")
+             todos = []
+             
         return assignments, todos
 
     except Exception as e:
-        log(f"[FIREBASE ERROR] {e}")
+        log(f"[FIREBASE CRITICAL ERROR] {e}")
         # Return empty lists on failure to prevent crash, but log heavily
         return [], []
 

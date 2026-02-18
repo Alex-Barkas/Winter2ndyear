@@ -39,4 +39,4 @@ jobs:
         # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
         # RECEIVER_EMAIL: ${{ secrets.TARGET_EMAIL }}
       run: |
-        python scripts/auto_email.py
+        python -u scripts/auto_email.py

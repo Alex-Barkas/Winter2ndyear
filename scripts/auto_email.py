@@ -256,7 +256,7 @@ def check_deadlines_and_email():
     print(f"Attempting to send email from {SENDER_EMAIL} to {RECEIVER_EMAIL}...")
     
     # try: # REMOVED TRY BLOCK TO EXPOSE ERRORS
-    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30)
     server.set_debuglevel(1) # Enable SMTP debug logging
     server.starttls()
     print("SMTP connection established. Logging in...")

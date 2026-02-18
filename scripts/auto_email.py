@@ -149,8 +149,8 @@ def check_deadlines_and_email():
     log(f"Filtered: {count_overdue} overdue, {count_upcoming} upcoming, and {count_todos} pending tasks.")
 
     if count_overdue == 0 and count_upcoming == 0 and count_todos == 0:
-        log("Nothing to report. No email sent.")
-        return
+        log("No tasks found. Sending 'All caught up' email.")
+        # return # COMMENTED OUT: Always send email to confirm it ran
 
     # --- COMPOSE EMAIL ---
     msg = MIMEMultipart()

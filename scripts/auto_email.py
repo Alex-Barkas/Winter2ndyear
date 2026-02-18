@@ -14,6 +14,9 @@ from email.mime.text import MIMEText
 # This needs to be high enough for SSL handshakes but low enough to catch hangs
 socket.setdefaulttimeout(60)
 
+# Fix for potential gRPC hangs in GitHub Actions
+os.environ["GRPC_DNS_RESOLVER"] = "native"
+
 # --- CONFIGURATION ---
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -60,8 +63,9 @@ def get_database_data():
         try:
             log("Fetching assignments...")
             assignments_ref = db.collection('assignments')
-            # stream(timeout=X) is supported in newer google-cloud-firestore
-            assignments = [doc.to_dict() for doc in assignments_ref.stream(timeout=60)]
+            # Use get() instead of stream() to avoid gRPC stream hangs
+            docs = assignments_ref.get()
+            assignments = [doc.to_dict() for doc in docs]
             log(f"Fetched {len(assignments)} assignments.")
         except Exception as e:
             log(f"Error fetching assignments: {e}")
@@ -70,7 +74,8 @@ def get_database_data():
         try:
             log("Fetching todos...")
             todos_ref = db.collection('todos')
-            todos = [doc.to_dict() for doc in todos_ref.stream(timeout=60)]
+            docs = todos_ref.get()
+            todos = [doc.to_dict() for doc in docs]
             log(f"Fetched {len(todos)} todos.")
             
             # DEBUG: Print todos summary

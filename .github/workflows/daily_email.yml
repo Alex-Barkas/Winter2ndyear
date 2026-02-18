@@ -28,7 +28,7 @@ jobs:
       env:
         FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
       run: |
-        echo "$FIREBASE_KEY" > public/secondsemdashb-firebase-adminsdk-fbsvc-574ee6bf41.json
+        echo "$FIREBASE_KEY" > scripts/secondsemdashb-firebase-adminsdk-fbsvc-574ee6bf41.json
 
     - name: Run Auto Email Script
       env:
@@ -38,4 +38,4 @@ jobs:
         # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
         # RECEIVER_EMAIL: ${{ secrets.TARGET_EMAIL }}
       run: |
-        python public/auto_email.py
+        python scripts/auto_email.py

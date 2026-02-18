@@ -4,7 +4,7 @@ import json
 import os
 import mimetypes
 
-PORT = 8000
+PORT = 8080
 DB_FILE = os.path.join("public", "db.json")
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
@@ -22,13 +22,14 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
             return
         
         # Serve static files from 'public' directory
-        if self.path == '/':
+        path_clean = self.path.split('?')[0]
+        if path_clean == '/':
             self.path = '/public/index.html'
-        elif not self.path.startswith('/public/'):
+        elif not path_clean.startswith('/public/'):
             # allow accessing files directly if they are requested relative to root, maps to public
             # But the user might be requesting /style.css which is in public/style.css
             # Let's just try to find it in public if not found
-            if os.path.exists(os.path.join("public", self.path.lstrip('/'))):
+            if os.path.exists(os.path.join("public", path_clean.lstrip('/'))):
                 self.path = "/public" + self.path
         
         return http.server.SimpleHTTPRequestHandler.do_GET(self)

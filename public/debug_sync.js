@@ -46,3 +46,4 @@ async function runDiagnostics() {
 
 window.runDiagnostics = runDiagnostics;
 console.log("Diagnostic script loaded. Type 'runDiagnostics()' to start.");
+  

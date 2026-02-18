@@ -36,29 +36,14 @@ def get_database_data():
     try:
         log("Connecting to Firebase...")
         
-        # Check if credential file exists and has content
-        if os.path.exists(CRED_PATH):
-            size = os.path.getsize(CRED_PATH)
-            log(f"Credential file found at {CRED_PATH}. Size: {size} bytes.")
-            if size == 0:
-                log("ERROR: Credential file is empty!")
-        else:
-            log(f"WARNING: Credential file NOT found at {CRED_PATH}")
-
+        # Initialize with default credentials (GOOGLE_APPLICATION_CREDENTIALS env var)
         if not firebase_admin._apps:
-            if os.path.exists(CRED_PATH):
-                 try:
-                    cred = credentials.Certificate(CRED_PATH)
-                    firebase_admin.initialize_app(cred)
-                    log("Firebase initialized with Certificate.")
-                 except Exception as e:
-                    log(f"CRITICAL ERROR initializing Firebase Certificate: {e}")
-                    raise e
-            else:
-                # If running in GitHub Actions, secrets might be handling this differently 
-                # or we expect the file to be created by the workflow
-                log(f"WARNING: No credential file. Attempting default initialization (Workload Identity/Env Vars)...")
+            try:
                 firebase_admin.initialize_app()
+                log("Firebase initialized (using default credentials/env var).")
+            except Exception as e:
+                log(f"CRITICAL ERROR initializing Firebase: {e}")
+                raise e
         
         db = firestore.client()
         log("Firestore client initialized.")

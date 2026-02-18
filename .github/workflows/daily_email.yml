@@ -28,10 +28,11 @@ jobs:
       env:
         FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
       run: |
-        echo "$FIREBASE_KEY" > scripts/secondsemdashb-firebase-adminsdk-fbsvc-574ee6bf41.json
+        echo "$FIREBASE_KEY" > firebase_credentials.json
 
     - name: Run Auto Email Script
       env:
+        GOOGLE_APPLICATION_CREDENTIALS: firebase_credentials.json
         SENDER_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         # SENDER_EMAIL and RECEIVER_EMAIL will use defaults defined in auto_email.py
         # unless you add them to secrets and uncomment below:

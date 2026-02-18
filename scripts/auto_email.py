@@ -268,16 +268,23 @@ def check_deadlines_and_email():
         log("CONFIGURATION REQUIRED: SENDER_EMAIL not set.")
         return
 
-    try:
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        text = msg.as_string()
-        server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, text)
-        server.quit()
-        log("Email sent successfully!")
-    except Exception as e:
-        log(f"Failed to send email: {e}")
+    print(f"Attempting to send email from {SENDER_EMAIL} to {RECEIVER_EMAIL}...")
+    
+    # try: # REMOVED TRY BLOCK TO EXPOSE ERRORS
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.set_debuglevel(1) # Enable SMTP debug logging
+    server.starttls()
+    print("SMTP connection established. Logging in...")
+    server.login(SENDER_EMAIL, SENDER_PASSWORD)
+    print("Logged in. Sending message...")
+    text = msg.as_string()
+    server.sendmail(SENDER_EMAIL, RECEIVER_EMAIL, text)
+    server.quit()
+    print("SUCCESS: Email sent to server.")
+    log("Email sent successfully!")
+    # except Exception as e:
+    #     log(f"Failed to send email: {e}")
+    #     raise e # FORCE FAILURE
 
 if __name__ == "__main__":
     check_deadlines_and_email()

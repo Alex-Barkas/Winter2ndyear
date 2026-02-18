@@ -3,6 +3,8 @@ import json
 import re
 import datetime
 import os
+import sys
+import threading
 import socket
 import firebase_admin
 from firebase_admin import credentials
@@ -32,11 +34,35 @@ def log(msg):
     """Log to console (seen in GitHub Actions) and local file."""
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{timestamp}] {msg}")
+    sys.stdout.flush() # Force output to appear immediately in GitHub Actions
     try:
         with open(os.path.join(SCRIPT_DIR, "email_debug.log"), "a", encoding='utf-8') as f:
             f.write(f"[{timestamp}] {msg}\n")
     except Exception as e:
         print(f"Log Error: {e}")
+
+def get_with_timeout(query_ref, timeout_sec=30):
+    """Wraps a Firestore query.get() call in a thread to enforce strict timeout."""
+    result_container = {}
+    
+    def target():
+        try:
+            result_container['data'] = query_ref.get()
+        except Exception as e:
+            result_container['error'] = e
+
+    t = threading.Thread(target=target)
+    t.daemon = True
+    t.start()
+    t.join(timeout_sec)
+
+    if t.is_alive():
+        raise TimeoutError(f"Operation timed out after {timeout_sec} seconds (Force Stop)")
+    
+    if 'error' in result_container:
+        raise result_container['error']
+        
+    return result_container.get('data', [])
 
 def get_database_data():
     """Fetch assignments and todos from Firestore with timeouts."""
@@ -61,10 +87,12 @@ def get_database_data():
         
         # Fetch Assignments
         try:
-            log("Fetching assignments...")
+            log("Fetching assignments (with 30s timeout)...")
             assignments_ref = db.collection('assignments')
-            # Use get() instead of stream() to avoid gRPC stream hangs
-            docs = assignments_ref.get()
+            
+            # Use threaded timeout wrapper
+            docs = get_with_timeout(assignments_ref, timeout_sec=30)
+            
             assignments = [doc.to_dict() for doc in docs]
             log(f"Fetched {len(assignments)} assignments.")
         except Exception as e:
@@ -72,9 +100,12 @@ def get_database_data():
         
         # Fetch Todos
         try:
-            log("Fetching todos...")
+            log("Fetching todos (with 30s timeout)...")
             todos_ref = db.collection('todos')
-            docs = todos_ref.get()
+            
+            # Use threaded timeout wrapper
+            docs = get_with_timeout(todos_ref, timeout_sec=30)
+            
             todos = [doc.to_dict() for doc in docs]
             log(f"Fetched {len(todos)} todos.")
             
@@ -86,7 +117,7 @@ def get_database_data():
                 log(f"ID: {tid} | Title: {title} | Completed: {t.get('completed', 'N/A')}")
             log("----------------------")
         except Exception as e:
-             log(f"Error fetching todos: {e}")
+            log(f"Error fetching todos: {e}")
              
         return assignments, todos
 

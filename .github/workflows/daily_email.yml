@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install firebase-admin
+        pip install requests firebase-admin
 
     - name: Create Service Account Key
       env:
@@ -30,7 +30,7 @@ jobs:
       run: |
         echo "$FIREBASE_KEY" > firebase_credentials.json
 
-    - name: Run Auto Email Script
+    - name: Run Auto Email Script (REST API)
       env:
         GOOGLE_APPLICATION_CREDENTIALS: firebase_credentials.json
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
@@ -39,5 +39,5 @@ jobs:
         # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
         # RECEIVER_EMAIL: ${{ secrets.TARGET_EMAIL }}
       run: |
-        # Run with unbuffered output to catch hangs immediately
-        python -u scripts/auto_email.py
+        # Run with unbuffered output
+        python -u scripts/auto_email_rest.py

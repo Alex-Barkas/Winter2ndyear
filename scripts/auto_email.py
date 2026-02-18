@@ -24,7 +24,7 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "deadline.upcoming@gmail.com"
 SENDER_PASSWORD = os.environ.get("EMAIL_PASSWORD", "wyqf nwmj ujsz yvxc") # Use env var if available
-RECEIVER_EMAIL = "Alexander.Barkas@queensu.ca"
+RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "alex.barkas@queensu.ca")
 NOTICE_DAYS = 3
 
 # Paths

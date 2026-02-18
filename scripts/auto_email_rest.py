@@ -5,8 +5,9 @@ import datetime
 import os
 import sys
 import requests
-import firebase_admin
-from firebase_admin import credentials
+import google.auth
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -35,31 +36,36 @@ def log(msg):
         pass
 
 def get_access_token():
-    """Get OAuth2 access token using firebase-admin SDK (proven to work)."""
+    """Get OAuth2 access token by manually loading service account JSON."""
     try:
-        # Initialize Firebase Admin if not already
-        if not firebase_admin._apps:
-            # This automatically uses GOOGLE_APPLICATION_CREDENTIALS env var
-            firebase_admin.initialize_app()
-            log("Firebase Admin initialized for Auth.")
+        creds_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+        if not creds_path or not os.path.exists(creds_path):
+             # Try to find it in the script directory if env var is missing (local dev convenience)
+             local_key = os.path.join(SCRIPT_DIR, "secondsemdashb-firebase-adminsdk-fbsvc-574ee6bf41.json")
+             if os.path.exists(local_key):
+                 creds_path = local_key
+             else:
+                 raise Exception("GOOGLE_APPLICATION_CREDENTIALS not set or file not found.")
 
-        # Get credentials from the app
-        app = firebase_admin.get_app()
-        # Refresh and get token
-        # Note: get_access_token() returns an AccessToken object with 'access_token' and 'expiry'
-        token_obj = app.credential.get_access_token() 
-        return token_obj.access_token
+        log(f"Loading credentials from {creds_path}")
+        
+        with open(creds_path, 'r') as f:
+            info = json.load(f)
+        
+        # FIX: Ensure private key newlines are correct
+        # This fixes "Invalid JWT Signature" if newlines are escaped as \\n
+        if 'private_key' in info:
+            info['private_key'] = info['private_key'].replace('\\n', '\n')
+
+        creds = service_account.Credentials.from_service_account_info(
+            info,
+            scopes=['https://www.googleapis.com/auth/cloud-platform']
+        )
+        
+        creds.refresh(Request())
+        return creds.token
     except Exception as e:
-        log(f"Auth Error (firebase-admin): {e}")
-        # Fallback for local testing if env var isn't perfect but we have the file
-        try:
-             creds_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-             if creds_path:
-                 cred = credentials.Certificate(creds_path)
-                 # Re-init? No, just use credential directly
-                 return cred.get_access_token().access_token
-        except Exception as e2:
-             log(f"Fallback Auth Error: {e2}")
+        log(f"Auth Error: {e}")
         raise e
 
 def parse_firestore_doc(doc):

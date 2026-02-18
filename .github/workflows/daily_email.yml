@@ -33,7 +33,7 @@ jobs:
     - name: Run Auto Email Script
       env:
         GOOGLE_APPLICATION_CREDENTIALS: firebase_credentials.json
-        SENDER_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         # SENDER_EMAIL and RECEIVER_EMAIL will use defaults defined in auto_email.py
         # unless you add them to secrets and uncomment below:
         # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}

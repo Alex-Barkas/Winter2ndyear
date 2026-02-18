@@ -68,7 +68,7 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
 print(f"Server started at http://localhost:{PORT}")
-print("Run 'python auto_email.py' to test the emailer.")
+print("Run 'python scripts/auto_email.py' to test the emailer.")
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
     httpd.serve_forever()

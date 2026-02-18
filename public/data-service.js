@@ -9,7 +9,8 @@ import {
     deleteDoc,
     query,
     orderBy,
-    writeBatch
+    writeBatch,
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const STORAGE_KEYS = {
@@ -71,6 +72,21 @@ export const DataService = {
             const local = localStorage.getItem(STORAGE_KEYS.TODOS);
             return local ? JSON.parse(local) : [];
         }
+    },
+
+    subscribeToTodos(callback) {
+        const q = query(collection(db, "todos"));
+        return onSnapshot(q, (snapshot) => {
+            const todos = [];
+            snapshot.forEach((doc) => {
+                todos.push(doc.data());
+            });
+            // Update local storage for backup (optional but good)
+            localStorage.setItem(STORAGE_KEYS.TODOS, JSON.stringify(todos));
+            callback(todos);
+        }, (error) => {
+            console.error("Error subscribing to todos:", error);
+        });
     },
 
     // --- ASSIGNMENTS ---
@@ -154,32 +170,10 @@ export const DataService = {
     },
 
     // No longer needed but kept for compatibility logic if called
+    // No longer needed: Real-time sync handles everything.
     async pushLocalTodosToServer() {
-        try {
-            const local = localStorage.getItem(STORAGE_KEYS.TODOS);
-            if (!local) return { success: false, message: "No local todos found." };
-
-            const todos = JSON.parse(local);
-            if (!Array.isArray(todos) || todos.length === 0) {
-                return { success: false, message: "Local list is empty." };
-            }
-
-            // Use the top-level writeBatch import
-            const batch = writeBatch(db);
-            const todosRef = collection(db, "todos");
-
-            todos.forEach(todo => {
-                // Use existing ID or generate one if missing (shouldn't happen)
-                const docId = todo.id || Date.now().toString();
-                const docRef = doc(todosRef, docId);
-                batch.set(docRef, todo);
-            });
-
-            await batch.commit();
-            return { success: true, count: todos.length };
-        } catch (e) {
-            console.error("Sync Error:", e);
-            return { success: false, message: e.message };
-        }
+        console.warn("pushLocalTodosToServer is deprecated. Use real-time sync.");
+        return { success: true, message: "Deprecated" };
     }
+
 };

@@ -264,9 +264,7 @@
             <a href="index.html" class="back-link">← Back to Dashboard</a>
             <h1>To-Do List</h1>
             <p class="subtitle">Manage everything. Prioritize what matters.</p>
-            <button onclick="syncData()" class="sync-btn"
-                style="background:var(--accent-color); color:black; border:none; padding:8px 16px; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:10px;">☁️
-                Sync to Server</button>
+
         </header>
 
 
@@ -306,36 +304,20 @@
 
     <script type="module" src="debug_sync.js"></script>
     <script type="module">
-        import { DataService } from "./data-service.js";
+        import { DataService } from "./data-service.js?v=10";
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadCourses();
-            renderTodos();
+            // Subscribe to real-time updates
+            DataService.subscribeToTodos(renderTodos);
 
             window.addTodo = addTodo;
             window.toggleTodo = toggleTodo;
             window.deleteTodo = deleteTodo;
-            window.syncData = syncData;
         });
 
-        async function syncData() {
-            const btn = document.querySelector('.sync-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "Syncing...";
-            btn.disabled = true;
-
-            const result = await DataService.pushLocalTodosToServer();
-
-            if (result.success) {
-                alert(`✅ Success! Synced ${result.count} tasks to the server. The emailer will now include these.`);
-            } else {
-                alert(`❌ Sync Failed: ${result.message}\n\nMake sure 'python server.py' is running!`);
-            }
-
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+        // syncData removed - Real-time sync enabled.
 
         function loadCourses() {
             const select = document.getElementById('task-course');
@@ -374,8 +356,7 @@
 
             await DataService.saveTodoItem(newTodo);
 
-            // Optimistic Update
-            renderTodos();
+            // Optimistic Update removed - using real-time listener
             titleInput.value = '';
         }
 
@@ -403,17 +384,17 @@
                     }
 
                     await DataService.saveTodoItem(todo);
-                    setTimeout(() => renderTodos(), 1000);
+                    // setTimeout(() => renderTodos(), 1000); // Listener handles this
                 } else {
                     await DataService.saveTodoItem(todo);
-                    renderTodos();
+                    // renderTodos(); // Listener handles this
                 }
             }
         }
 
         async function deleteTodo(id) {
             await DataService.deleteTodoItem(id);
-            renderTodos();
+            // renderTodos(); // Listener handles this
         }
 
         function getUrgencyIcon(level) {
@@ -452,9 +433,9 @@
             return "";
         }
 
-        async function renderTodos() {
+        function renderTodos(todos) {
             const container = document.getElementById('todo-container');
-            const todos = await getTodos();
+            // const todos = await getTodos(); // Data passed via subscription now
 
             if (todos.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:3rem;">No tasks yet. Add one above!</p>';

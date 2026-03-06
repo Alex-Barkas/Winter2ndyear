@@ -167,13 +167,6 @@ export const DataService = {
     async getCourses() {
         if (typeof window.STUDENT_DATA !== 'undefined') return window.STUDENT_DATA.courses;
         return [];
-    },
-
-    // No longer needed but kept for compatibility logic if called
-    // No longer needed: Real-time sync handles everything.
-    async pushLocalTodosToServer() {
-        console.warn("pushLocalTodosToServer is deprecated. Use real-time sync.");
-        return { success: true, message: "Deprecated" };
     }
 
 };

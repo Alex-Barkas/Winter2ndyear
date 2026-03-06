@@ -1,9 +1,6 @@
 // Data is now loaded via DataService (Firebase)
 import { DataService } from "./data-service.js";
 
-// Make seedDB available globally for the console migration
-window.seedDB = () => DataService.seedDatabase(STUDENT_DATA);
-
 // State for data
 let appData = {
     assignments: [],
@@ -254,11 +251,11 @@ function setupCalendarControls() {
 
     if (prevBtn && nextBtn) {
         prevBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
             renderCalendar();
         });
         nextBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
+            currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
             renderCalendar();
         });
     }
@@ -520,46 +517,3 @@ function createCourseCard(course) {
     `;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderGlobalSchedule();
-    renderCourses();
-
-    // View Switcher Logic
-    const listBtn = document.getElementById('view-list-btn');
-    const calBtn = document.getElementById('view-calendar-btn');
-    const listView = document.getElementById('global-schedule');
-    const calView = document.getElementById('calendar-view');
-
-    if (listBtn && calBtn && listView && calView) {
-        listBtn.addEventListener('click', () => {
-            listBtn.classList.add('active');
-            calBtn.classList.remove('active');
-            listView.classList.remove('hidden');
-            calView.classList.add('hidden');
-        });
-
-        calBtn.addEventListener('click', () => {
-            calBtn.classList.add('active');
-            listBtn.classList.remove('active');
-            calView.classList.remove('hidden');
-            listView.classList.add('hidden');
-            renderCalendar(); // Render on show
-        });
-    }
-
-    // Calendar Navigation
-    const prevBtn = document.getElementById('prev-month');
-    const nextBtn = document.getElementById('next-month');
-
-    if (prevBtn && nextBtn) {
-        prevBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
-
-        nextBtn.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
-    }
-});

@@ -1,4 +1,5 @@
 const STUDENT_DATA = {
+    termRange: { start: "2026-01-01", end: "2026-04-30" },
     gradingSchemes: {
         "MTHE 281": {
             components: [
@@ -47,7 +48,7 @@ const STUDENT_DATA = {
             notes: "https://drive.google.com/file/d/1y7jHLLebL2k7jrH9ZtfrYzh006xu3Gp2/view",
             textbook: "textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
             solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
-            assignments: "assignments.html?course=MTHE 281",
+            assignments: "winter2026-assignments.html?course=MTHE 281",
             image: "course_images/mthe281.png"
         },
         {
@@ -56,21 +57,21 @@ const STUDENT_DATA = {
             notes: "https://drive.google.com/file/d/1eMrAt7o6aUSZgd3wJR2YhXkbRvBdazPn/view",
             textbook: "textbooks/LADR4e.pdf",
             solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
-            assignments: "assignments.html?course=MTHE 212",
+            assignments: "winter2026-assignments.html?course=MTHE 212",
             image: "course_images/mthe212.png"
         },
         {
             code: "MREN 230",
             name: "Thermodynamics",
             notes: "https://drive.google.com/file/d/1OrM-Drq0OBAF3WQIGSY55KmHxygYt-sF/view",
-            assignments: "assignments.html?course=MREN 230",
+            assignments: "winter2026-assignments.html?course=MREN 230",
             image: "course_images/mren230.png"
         },
         {
             code: "MECH 210",
             name: "Circuits",
             notes: "https://drive.google.com/file/d/12C3rud5o0KoWcUNGl0hZ1TxdCPE6trTH/view",
-            assignments: "assignments.html?course=MECH 210",
+            assignments: "winter2026-assignments.html?course=MECH 210",
             image: "course_images/mech210.png"
         },
         {
@@ -78,7 +79,7 @@ const STUDENT_DATA = {
             name: "Mechanics",
             notes: "https://drive.google.com/file/d/1n-zqAfJS_mg_nCCy0crXwi0Yi2BOBZHh/view",
             textbook: "https://api.pageplace.de/preview/DT0400.9781292088785_A26856513/preview-9781292088785_A26856513.pdf",
-            assignments: "assignments.html?course=ENPH 225",
+            assignments: "winter2026-assignments.html?course=ENPH 225",
             image: "course_images/enph225.png"
         }
     ],

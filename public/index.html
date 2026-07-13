@@ -11,8 +11,24 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/sports_car_favicon.png">
-    <link rel="stylesheet" href="css/style.css?v=6">
+    <link rel="stylesheet" href="css/style.css?v=7">
     <meta name="description" content="Archive of course materials and notes from my undergraduate studies.">
+    <style>
+        .term-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 160px;
+        }
+
+        .term-status {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,7 +38,6 @@
         </div>
         <div class="nav-divider"></div>
         <nav class="side-nav">
-
             <a href="todo.html" class="nav-link">to-do</a>
         </nav>
     </div>
@@ -32,108 +47,56 @@
         <header>
             <div class="header-titling">
                 <h1>Alex Barkas' Dashboard</h1>
+                <p class="subtitle">Pick a semester to view courses, assignments, and grades.</p>
             </div>
-
-
-
         </header>
 
         <!-- Content -->
         <div class="content-stack">
-
-            <!-- Courses Section (Moved to Top) -->
             <section>
-                <h2 class="section-label">WINTER 2026</h2>
-                <div id="course-list" class="list-grid">
-                    <!-- Courses injected via JS -->
-                </div>
-            </section>
+                <h2 class="section-label">SEMESTERS</h2>
+                <div id="term-list" class="list-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
 
-
-
-            <!-- Schedule Section -->
-            <section>
-                <div class="section-header">
-                    <h2 class="section-label">SCHEDULE</h2>
-                    <div class="view-switcher">
-                        <button id="view-list-btn" class="view-btn active">List</button>
-                        <button id="view-calendar-btn" class="view-btn">Calendar</button>
-
-                    </div>
-                </div>
-
-                <!-- List View (Default) -->
-                <div id="global-schedule">
-                    <!-- Schedule injected via JS -->
-                </div>
-
-                <!-- Calendar View -->
-                <div id="calendar-view" class="hidden">
-                    <div class="calendar-layout-wrapper">
-                        <div class="calendar-main-panel">
-                            <div class="calendar-header">
-                                <button id="prev-month" class="nav-btn">&lt;</button>
-                                <h3 id="current-month-year">January 2026</h3>
-                                <button id="next-month" class="nav-btn">&gt;</button>
-                            </div>
-                            <div class="calendar-grid-header">
-                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                            </div>
-                            <div id="calendar-days" class="calendar-grid">
-                                <!-- Days injected via JS -->
-                            </div>
+                    <div class="course-card term-card">
+                        <div class="course-header">
+                            <span class="course-code">WINTER 2026</span>
+                            <span class="course-title">Completed Semester</span>
                         </div>
-                        <div class="calendar-side-panel">
-                            <div id="selected-day-details">
-                                <p class="subtitle" style="text-align: center; margin-top: 50%; opacity: 0.5;">Select a
-                                    date to view details.</p>
-                            </div>
+                        <div class="course-actions">
+                            <a href="winter2026.html" class="action-btn primary">
+                                <span>Enter</span>
+                            </a>
                         </div>
                     </div>
+
+                    <div class="course-card term-card">
+                        <div class="course-header">
+                            <span class="course-code">SUMMER 2026</span>
+                            <span class="course-title">In Progress</span>
+                        </div>
+                        <div class="course-actions">
+                            <a href="summer2026.html" class="action-btn primary">
+                                <span>Enter</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="course-card term-card">
+                        <div class="course-header">
+                            <span class="course-code">FALL 2026</span>
+                            <span class="course-title">Coming Soon</span>
+                        </div>
+                        <div class="course-actions">
+                            <a href="fall2026.html" class="action-btn secondary">
+                                <span>Enter</span>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
-
-
             </section>
-
         </div>
-
-        <!-- Footer -->
     </main>
-
-
-    <!-- Add Assignment Modal -->
-    <div id="add-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h3>Add New Assignment</h3>
-            <div class="input-group"><label>Title</label><input type="text" id="new-title" class="input-field"
-                    placeholder="e.g. Lab 4 Report"></div>
-            <div class="input-group"><label>Course</label><input type="text" id="new-course" class="input-field"
-                    placeholder="e.g. MTHE 228"></div>
-            <div class="input-group"><label>Date</label><input type="date" id="new-date" class="input-field"></div>
-            <div class="input-group"><label>Time</label><input type="time" id="new-time" class="input-field"></div>
-            <div class="input-group">
-                <label>Category</label>
-                <select id="new-category" class="input-field"
-                    style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary); border: 1px solid var(--border-color);">
-                    <option value="ASSIGNMENT">Assignment</option>
-                    <option value="LAB">Lab</option>
-                    <option value="QUIZ">Quiz</option>
-                    <option value="MIDTERM">Midterm</option>
-                    <option value="FINAL">Final</option>
-                    <option value="HOMEWORK">Homework</option>
-                    <option value="REMINDER">Reminder</option>
-                </select>
-            </div>
-            <div class="modal-actions">
-                <button onclick="window.closeAddModal()" class="secondary">Cancel</button>
-                <button onclick="window.saveNewAssignment()">Add Item</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module" src="js/data-service.js?v=10"></script>
-    <script src="js/student-config.js?v=10"></script>
-    <script type="module" src="js/script.js?v=10"></script>
 </body>
 
 </html>

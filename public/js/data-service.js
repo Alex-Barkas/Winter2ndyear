@@ -3,6 +3,7 @@ import { db } from "./firebase-config.js";
 import {
     collection,
     getDocs,
+    getDoc,
     doc,
     setDoc,
     updateDoc,
@@ -155,6 +156,34 @@ export const DataService = {
             await deleteDoc(doc(db, "todos", id));
         } catch (e) {
             console.error("Error deleting todo: ", e);
+        }
+    },
+
+    // --- FINAL GRADES (manually-entered letter grade per course) ---
+
+    async getFinalGrade(courseCode) {
+        const storageKey = `finalGrade_${courseCode}`;
+        try {
+            const snap = await getDoc(doc(db, "finalGrades", courseCode));
+            if (snap.exists()) {
+                const grade = snap.data().grade || "";
+                localStorage.setItem(storageKey, grade);
+                return grade;
+            }
+            return localStorage.getItem(storageKey) || "";
+        } catch (e) {
+            console.warn("Firestore unavailable for final grade, checking LocalStorage:", e);
+            return localStorage.getItem(storageKey) || "";
+        }
+    },
+
+    async setFinalGrade(courseCode, grade) {
+        const storageKey = `finalGrade_${courseCode}`;
+        localStorage.setItem(storageKey, grade);
+        try {
+            await setDoc(doc(db, "finalGrades", courseCode), { course: courseCode, grade });
+        } catch (e) {
+            console.error("Error saving final grade (kept in localStorage):", e);
         }
     },
 

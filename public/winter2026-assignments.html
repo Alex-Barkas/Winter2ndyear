@@ -11,14 +11,14 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/favicon.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 
 <body>
     <main class="container">
         <!-- Header -->
         <header>
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
+            <a href="winter2026.html" class="back-link">← Back to Dashboard</a>
             <h1 id="course-title">Assignments</h1>
             <p id="course-subtitle" class="subtitle">Upcoming deliverables and deadlines.</p>
         </header>
@@ -42,7 +42,7 @@
         <!-- Footer -->
     </main>
 
-    <script src="js/student-config.js"></script>
+    <script src="js/student-config-winter2026.js"></script>
 
     <script>
         // Helper to determine Semester Week
@@ -87,7 +87,7 @@
                 const statusHtml = showStatus ? `<span class="assign-status ${statusClass}">${status}</span>` : '';
 
                 return `
-                    <a href="details.html?id=${item.id}" class="assignment-item">
+                    <a href="winter2026-details.html?id=${item.id}" class="assignment-item">
                         <div class="assign-left">
                             <span class="assign-date">
                                 ${day}

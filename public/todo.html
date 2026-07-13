@@ -11,8 +11,20 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="icon" type="image/png" href="assets/sports_car_favicon.png">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/student-config.js"></script>
+    <link rel="stylesheet" href="css/style.css?v=7">
+    <!-- Merge courses across all terms for the "Course" dropdown below -->
+    <script src="js/student-config-winter2026.js"></script>
+    <script>window.__coursesWinter2026 = window.STUDENT_DATA.courses;</script>
+    <script src="js/student-config-summer2026.js"></script>
+    <script>window.__coursesSummer2026 = window.STUDENT_DATA.courses;</script>
+    <script src="js/student-config-fall2026.js"></script>
+    <script>
+        window.STUDENT_DATA.courses = [
+            ...window.__coursesWinter2026,
+            ...window.__coursesSummer2026,
+            ...window.STUDENT_DATA.courses
+        ];
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
     <style>
         .todo-input-container {
@@ -303,7 +315,7 @@
     </main>
 
     <script type="module">
-        import { DataService } from "./js/data-service.js?v=10";
+        import { DataService } from "./js/data-service.js?v=12";
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {

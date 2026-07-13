@@ -1,10 +1,18 @@
 // Data is now loaded via DataService (Firebase)
 import { DataService } from "./data-service.js";
 
+// Each term dashboard sets window.TERM_PREFIX (e.g. 'winter2026') before loading this script,
+// so course/assignment links point at that term's paged (e.g. winter2026-grades.html).
+const TERM_PREFIX = window.TERM_PREFIX || '';
+function termPage(name) {
+    return TERM_PREFIX ? `${TERM_PREFIX}-${name}` : name;
+}
+
 // State for data
 let appData = {
     assignments: [],
     courses: [],
+    todos: [],
 };
 
 // Global handlers for Add/Delete
@@ -66,13 +74,24 @@ window.deleteAssignment = async function (id) {
 async function loadData() {
     // Show loading state if needed
     try {
-        const [assignments, courses] = await Promise.all([
+        const [assignments, courses, todos] = await Promise.all([
             DataService.getAllAssignments(),
-            DataService.getCourses()
+            DataService.getCourses(),
+            DataService.getTodos()
         ]);
 
-        appData.assignments = assignments;
+        // Each term dashboard only wants its own window: assignments/todos are stored
+        // in one global Firestore collection across all terms, so scope by date here.
+        const range = window.STUDENT_DATA && window.STUDENT_DATA.termRange;
+        const inRange = (dateStr) => !range || (dateStr >= range.start && dateStr <= range.end);
+
+        appData.assignments = assignments.filter(a => inRange(a.date));
         appData.courses = courses;
+        // Only dated todos can be plotted on the schedule/calendar; tag them so
+        // renderGlobalSchedule can tell them apart from assignments when merging.
+        appData.todos = todos
+            .filter(t => t.date && inRange(t.date))
+            .map(t => ({ ...t, __isTodo: true }));
 
         renderGlobalSchedule();
         renderCourses();
@@ -83,23 +102,30 @@ async function loadData() {
 
 
 // Calendar State
-let currentDate = new Date();
+let currentDate = (() => {
+    const range = window.STUDENT_DATA && window.STUDENT_DATA.termRange;
+    const today = new Date();
+    if (!range) return today;
+    const todayStr = today.toLocaleDateString('en-CA');
+    if (todayStr >= range.start && todayStr <= range.end) return today;
+    // "Today" is outside this term's window (e.g. viewing Winter's calendar in July) -
+    // open on the term's first month instead of a blank, out-of-range month.
+    const [y, m, d] = range.start.split('-').map(Number);
+    return new Date(y, m - 1, d);
+})();
 let selectedDate = null;
 
 function renderGlobalSchedule() {
     const listContainer = document.getElementById('global-schedule');
     if (listContainer) {
-        // Filter and Sort
-        const active = appData.assignments.filter(a => a.status !== 'DONE');
-        const done = appData.assignments.filter(a => a.status === 'DONE');
+        // Merge assignments and dated to-dos into one chronological feed
+        const items = [...appData.assignments, ...appData.todos];
+        const isDone = (item) => item.__isTodo ? !!item.completed : item.status === 'DONE';
 
-        const sortByDate = (a, b) => {
-            // Handle TBD/Finals Logic
-            if (a.date === '2026-04-30' && a.category === 'FINAL') return 1;
-            if (b.date === '2026-04-30' && b.category === 'FINAL') return -1;
-            return new Date(a.date) - new Date(b.date); // Chronological
-        };
+        const active = items.filter(item => !isDone(item));
+        const done = items.filter(isDone);
 
+        const sortByDate = (a, b) => new Date(a.date) - new Date(b.date);
         active.sort(sortByDate);
         done.sort(sortByDate);
 
@@ -113,7 +139,7 @@ function renderGlobalSchedule() {
         const render = () => {
             const html = `
                 <div class="list-grid">
-                    ${sorted.map(item => createAssignmentCard(item)).join('')}
+                    ${sorted.map(item => item.__isTodo ? createTodoScheduleCard(item) : createAssignmentCard(item)).join('')}
                 </div>
             `;
             listContainer.innerHTML = html;
@@ -159,10 +185,15 @@ function renderCalendar() {
 
     // Current Month Days
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const upcomingCutoff = new Date(today);
+    upcomingCutoff.setDate(upcomingCutoff.getDate() + 7);
+
     for (let i = 1; i <= daysInMonth; i++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
         const currentDayObj = new Date(year, month, i);
-        const assignments = appData.assignments.filter(a => a.date === dateStr);
+        const dayAssignments = appData.assignments.filter(a => a.date === dateStr);
+        const dayTodos = appData.todos.filter(t => t.date === dateStr);
 
         // Reading Week Check
         const isReadingWeek = currentDayObj >= rwStart && currentDayObj <= rwEnd;
@@ -170,19 +201,22 @@ function renderCalendar() {
         let classes = 'day-cell';
         if (isReadingWeek) classes += ' reading-week';
 
-        let dot = '';
+        const isToday = (i === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+        if (isToday) classes += ' today';
 
-        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-            classes += ' today';
-        }
+        // Highlight days in the next 7 days that still have something pending due,
+        // distinct from "today" itself, so near-term deadlines pop out.
+        const hasPending = dayAssignments.some(a => a.status !== 'DONE') || dayTodos.some(t => !t.completed);
+        const isUpcoming = !isToday && hasPending && currentDayObj >= today && currentDayObj <= upcomingCutoff;
+        if (isUpcoming) classes += ' upcoming';
 
-        // Check if any assignment is stored as DONE locally
-        // NOTE: In the new DB version, status comes directly from 'item.status' in the DB
-        let hasEvent = false;
-        if (assignments.length > 0) {
-            hasEvent = true;
+        let dotsHtml = '';
+        if (dayAssignments.length > 0 || dayTodos.length > 0) {
             classes += ' has-event';
-            dot = '<div class="event-dot"></div>';
+            const categories = new Set();
+            dayAssignments.forEach(a => categories.add((a.category || 'assignment').toLowerCase()));
+            if (dayTodos.length > 0) categories.add('todo');
+            dotsHtml = `<div class="cal-dots">${[...categories].slice(0, 5).map(c => `<span class="cal-dot cal-dot-${c}"></span>`).join('')}</div>`;
         }
 
         if (selectedDate === dateStr) {
@@ -193,7 +227,7 @@ function renderCalendar() {
         let weekLabelHtml = '';
         if (currentDayObj.getDay() === 1 || i === 1) { // 1 is Monday
             const wLabel = getSemesterWeek(dateStr);
-            // Only show "Week X", ignore "Pre-Term" or "Reading Week" to not clutter, 
+            // Only show "Week X", ignore "Pre-Term" or "Reading Week" to not clutter,
             // OR show all? User want "week visual". Let's show abbreviated.
             let shortLabel = wLabel;
             if (wLabel.startsWith("Week ")) shortLabel = "W" + wLabel.split(' ')[1];
@@ -205,7 +239,7 @@ function renderCalendar() {
             }
         }
 
-        html += `<div class="${classes}" onclick="window.selectDate('${dateStr}')">${i}${dot}${weekLabelHtml}</div>`;
+        html += `<div class="${classes}" onclick="window.selectDate('${dateStr}')"><span class="cal-day-num">${i}</span>${dotsHtml}${weekLabelHtml}</div>`;
     }
 
     // Next Month Days (to fill grid)
@@ -226,22 +260,24 @@ window.selectDate = function (dateStr) {
 
     const detailsContainer = document.getElementById('selected-day-details');
     const tasks = appData.assignments.filter(a => a.date === dateStr);
+    const todos = appData.todos.filter(t => t.date === dateStr);
 
     const dateObj = new Date(dateStr + 'T12:00:00'); // Midday to avoid boundary issues
     const displayDate = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-    console.log(`Selected: ${dateStr}, Tasks: ${tasks.length}`);
+    let html = `<span class="selected-date-label">${displayDate}</span>`;
 
-    if (tasks.length > 0) {
-        let html = `<span class="selected-date-label">${displayDate}</span><div class="list-grid">`;
+    if (tasks.length > 0 || todos.length > 0) {
+        html += `<div class="list-grid">`;
         html += tasks.map(item => createAssignmentCard(item)).join('');
+        html += todos.map(item => createTodoScheduleCard(item)).join('');
         html += '</div>';
-        detailsContainer.innerHTML = html;
-        detailsContainer.classList.add('active');
     } else {
-        detailsContainer.classList.remove('active');
-        detailsContainer.innerHTML = '';
+        html += `<p class="subtitle" style="text-align:center; padding: 1.5rem 0; opacity: 0.6;">Nothing due on this day.</p>`;
     }
+
+    detailsContainer.innerHTML = html;
+    detailsContainer.classList.add('active');
 }
 
 
@@ -317,8 +353,10 @@ function filterAssignments(courseCode) {
 // Helper to determine Semester Week
 function getSemesterWeek(dateString) {
     const d = new Date(dateString);
-    // Week 1 starts Jan 5, 2026
-    const startOfSem = new Date('2026-01-05');
+    // Week 1 starts on this term's own range start (falls back to Winter's Jan 5 anchor
+    // if no termRange is set, e.g. an older page that hasn't been updated).
+    const range = window.STUDENT_DATA && window.STUDENT_DATA.termRange;
+    const startOfSem = new Date(range ? range.start : '2026-01-05');
 
     // Reading Week: Feb 16 - Feb 22
     const rwStart = new Date('2026-02-16');
@@ -384,7 +422,7 @@ function createAssignmentCard(item) {
     return `
         <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative; view-transition-name: assign-${item.id.replace(/[^a-zA-Z0-9-_]/g, '')};">
             ${todayBanner}
-            <a href="details.html?id=${item.id}" class="assign-link-wrapper">
+            <a href="${termPage('details.html')}?id=${item.id}" class="assign-link-wrapper">
                 <div class="assign-left">
                     <span class="assign-date">
                         ${day}
@@ -419,6 +457,46 @@ function createAssignmentCard(item) {
     `;
 }
 
+// Renders a dated to-do item using the same card shell as assignments, so the
+// Schedule list/calendar reads as one unified feed. Not a link - editing a to-do
+// still happens on todo.html.
+function createTodoScheduleCard(todo) {
+    const dateObj = new Date(todo.date + 'T00:00:00');
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const day = `${MONTHS[dateObj.getMonth()]} ${dateObj.getDate()} ${dateObj.toLocaleDateString('en-US', { weekday: 'short' })}`;
+    const weekLabel = getSemesterWeek(todo.date);
+
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    const isToday = todo.date === todayStr;
+    const isOverdue = !todo.completed && todo.date < todayStr;
+
+    const statusHtml = isOverdue ? `<span class="assign-status status-overdue">OVERDUE</span>` : '';
+    const todayBanner = isToday && !todo.completed ? `<div class="today-banner">TODAY</div>` : '';
+
+    return `
+        <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative;">
+            ${todayBanner}
+            <div class="assign-left">
+                <span class="assign-date">
+                    ${day}
+                    <div style="font-size: 0.65rem; opacity: 0.6; margin-top: 2px;">${weekLabel}</div>
+                </span>
+                <div class="assign-details">
+                    <div class="assign-meta">
+                        <span class="assign-course">${todo.course || 'Personal'}</span>
+                        <span class="assign-category category-todo">TO-DO</span>
+                    </div>
+                    <span class="assign-title ${todo.completed ? 'done-text' : ''}">${todo.title}</span>
+                </div>
+            </div>
+            <div class="assign-right">
+                <span class="assign-time"></span>
+                ${statusHtml}
+            </div>
+        </div>
+    `;
+}
+
 // Add global toggle function
 window.toggleStatus = async function (id, currentStatus) {
     const newStatus = currentStatus === 'DONE' ? 'PENDING' : 'DONE';
@@ -429,6 +507,10 @@ window.toggleStatus = async function (id, currentStatus) {
 function renderCourses() {
     const container = document.getElementById('course-list');
     if (!container) return;
+    if (appData.courses.length === 0) {
+        container.innerHTML = `<p class="subtitle" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No courses yet — check back once this semester's syllabi are released.</p>`;
+        return;
+    }
     container.innerHTML = appData.courses.map(course => createCourseCard(course)).join('');
 }
 
@@ -498,7 +580,7 @@ function createCourseCard(course) {
                 <a href="${course.assignments}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Assignments</span>
                 </a>
-                <a href="grades.html?course=${course.code}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
+                <a href="${termPage('grades.html')}?course=${course.code}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Grades</span>
                 </a>
                 <a href="${syllabusUrl}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">

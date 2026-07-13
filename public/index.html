@@ -14,19 +14,80 @@
     <link rel="stylesheet" href="css/style.css?v=7">
     <meta name="description" content="Archive of course materials and notes from my undergraduate studies.">
     <style>
+        .term-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
         .term-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 160px;
+            min-height: 220px;
+            background: linear-gradient(145deg, rgba(30, 30, 35, 0.8), rgba(20, 20, 25, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .term-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+            background: linear-gradient(145deg, rgba(40, 40, 45, 0.9), rgba(25, 25, 30, 0.95));
+        }
+
+        .term-card .course-header {
+            margin-bottom: auto;
+        }
+
+        .term-card .course-code {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            display: block;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .term-card .course-title {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
         }
 
         .term-status {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            opacity: 0.6;
+            letter-spacing: 0.15em;
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status-active {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .status-upcoming {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
@@ -55,43 +116,37 @@
         <div class="content-stack">
             <section>
                 <h2 class="section-label">SEMESTERS</h2>
-                <div id="term-list" class="list-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div id="term-list" class="term-list">
 
-                    <div class="course-card term-card">
+                    <a href="winter2026.html" class="term-card">
                         <div class="course-header">
                             <span class="course-code">WINTER 2026</span>
                             <span class="course-title">Completed Semester</span>
                         </div>
-                        <div class="course-actions">
-                            <a href="winter2026.html" class="action-btn primary">
-                                <span>Enter</span>
-                            </a>
+                        <div>
+                            <span class="term-status status-completed">Completed</span>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="course-card term-card">
+                    <a href="summer2026.html" class="term-card">
                         <div class="course-header">
                             <span class="course-code">SUMMER 2026</span>
                             <span class="course-title">In Progress</span>
                         </div>
-                        <div class="course-actions">
-                            <a href="summer2026.html" class="action-btn primary">
-                                <span>Enter</span>
-                            </a>
+                        <div>
+                            <span class="term-status status-active">Active</span>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="course-card term-card">
+                    <a href="fall2026.html" class="term-card">
                         <div class="course-header">
                             <span class="course-code">FALL 2026</span>
                             <span class="course-title">Coming Soon</span>
                         </div>
-                        <div class="course-actions">
-                            <a href="fall2026.html" class="action-btn secondary">
-                                <span>Enter</span>
-                            </a>
+                        <div>
+                            <span class="term-status status-upcoming">Upcoming</span>
                         </div>
-                    </div>
+                    </a>
 
                 </div>
             </section>

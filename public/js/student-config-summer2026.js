@@ -15,9 +15,9 @@ const STUDENT_DATA = {
         {
             code: "APSC 221",
             name: "Economics and Business Practices in Engineering",
-            notes: "syllabus/APSC 221 - Syllabus S26 - V3.pdf",
-            assignments: "summer2026-assignments.html?course=APSC 221",
-            image: "course_images/apsc221_modern_economics.png"
+            notes: "/syllabus/APSC 221 - Syllabus S26 - V3.pdf",
+            assignments: "/summer2026/assignments.html?course=APSC 221",
+            image: "/course_images/apsc221_modern_economics.png"
         }
     ],
     assignments: [

@@ -1,20 +1,17 @@
 # Gradebook System
 
-The gradebook (`grades.html`) allows students to input grades for individual components and see their potential final mark.
+The grade calculator (`{term}2026-grades.html`, and course cards on the dashboard) lets you input grades per component and see the resulting weighted mark, rendered by `js/grading-renderer.js` (`GradingRenderer`).
 
 ## How it Works
-1.  **Configuration**: Defined in `student-config.js` under `gradingSchemes`.
-    -   Supports `weight` (percent of total course).
-    -   Supports `count` (e.g., 4 Labs -> expands to Lab 1, Lab 2, Lab 3, Lab 4).
-2.  **Persistence**:
-    -   Input grades are saved to `localStorage` with a key like `grade-MTHE281-0-1` (Course + Component Index + Sub-index).
-    -   On load, these values are retrieved to populate the inputs.
-3.  **Calculation**:
-    -   Dynamic updates happen via `calculateCourseGrade` in `script.js`.
-    -   Currently supports standard weighted sum: `Sum(Grade * Weight)`.
-    -   Future: Support "Max Option" logic (e.g., Best of Method A vs Method B).
+1. **Configuration**: defined per term in `student-config-{term}2026.js` under `gradingSchemes`.
+   - `weight`: percent of the course grade.
+   - `count`: e.g. 4 Labs → expands to Lab 1, Lab 2, Lab 3, Lab 4 input rows.
+   - `dropLowest` (optional): drop the N lowest scores of that component.
+2. **Persistence**:
+   - If a component row is linked to a real assignment (matched by course + component name), its score is stored on that assignment via `DataService` (Firestore).
+   - Manually-entered component scores that aren't tied to a specific assignment fall back to `localStorage`, keyed per course/component/index.
+3. **Calculation**: `GradingRenderer` computes each course's weighted total from the entered component scores as they're typed.
 
 ## Use Case
-Students use this to:
--   Log quiz/lab marks as they get them.
--   Estimate what they need on the final exam to pass or get an A.
+- Log quiz/lab/assignment marks as they come back.
+- See a running estimate of the current grade, and what's still needed on remaining components.

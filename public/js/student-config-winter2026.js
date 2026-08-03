@@ -46,57 +46,57 @@ const STUDENT_DATA = {
             code: "MTHE 281",
             name: "Introduction To Real Analysis",
             notes: "https://drive.google.com/file/d/1y7jHLLebL2k7jrH9ZtfrYzh006xu3Gp2/view",
-            textbook: "textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
-            solutions: "textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
-            assignments: "winter2026-assignments.html?course=MTHE 281",
-            image: "course_images/mthe281.png"
+            textbook: "/textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
+            solutions: "/textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
+            assignments: "/winter2026/assignments.html?course=MTHE 281",
+            image: "/course_images/mthe281.png"
         },
         {
             code: "MTHE 212",
             name: "Linear Algebra II",
             notes: "https://drive.google.com/file/d/1eMrAt7o6aUSZgd3wJR2YhXkbRvBdazPn/view",
-            textbook: "textbooks/LADR4e.pdf",
-            solutions: "textbooks/MTHE212-Textbook-Solutions.pdf",
-            assignments: "winter2026-assignments.html?course=MTHE 212",
-            image: "course_images/mthe212.png"
+            textbook: "/textbooks/LADR4e.pdf",
+            solutions: "/textbooks/MTHE212-Textbook-Solutions.pdf",
+            assignments: "/winter2026/assignments.html?course=MTHE 212",
+            image: "/course_images/mthe212.png"
         },
         {
             code: "MREN 230",
             name: "Thermodynamics",
             notes: "https://drive.google.com/file/d/1OrM-Drq0OBAF3WQIGSY55KmHxygYt-sF/view",
-            assignments: "winter2026-assignments.html?course=MREN 230",
-            image: "course_images/mren230.png"
+            assignments: "/winter2026/assignments.html?course=MREN 230",
+            image: "/course_images/mren230.png"
         },
         {
             code: "MECH 210",
             name: "Circuits",
             notes: "https://drive.google.com/file/d/12C3rud5o0KoWcUNGl0hZ1TxdCPE6trTH/view",
-            assignments: "winter2026-assignments.html?course=MECH 210",
-            image: "course_images/mech210.png"
+            assignments: "/winter2026/assignments.html?course=MECH 210",
+            image: "/course_images/mech210.png"
         },
         {
             code: "ENPH 225",
             name: "Mechanics",
             notes: "https://drive.google.com/file/d/1n-zqAfJS_mg_nCCy0crXwi0Yi2BOBZHh/view",
             textbook: "https://api.pageplace.de/preview/DT0400.9781292088785_A26856513/preview-9781292088785_A26856513.pdf",
-            assignments: "winter2026-assignments.html?course=ENPH 225",
-            image: "course_images/enph225.png"
+            assignments: "/winter2026/assignments.html?course=ENPH 225",
+            image: "/course_images/enph225.png"
         }
     ],
     assignments: [
         // --- MTHE 281 ---
-        { id: "mthe281-h1", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 1", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "assignments/MTHE281Homework1.pdf" } },
-        { id: "mthe281-h2", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 2", date: "2026-01-23", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h3", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 3", date: "2026-01-30", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h4", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 4", date: "2026-02-06", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h1", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 1", date: "2026-01-16", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/assignments/MTHE281Homework1.pdf" } },
+        { id: "mthe281-h2", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 2", date: "2026-01-23", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h3", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 3", date: "2026-01-30", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h4", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 4", date: "2026-02-06", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
         { id: "mthe281-m1", course: "MTHE 281", category: "MIDTERM", title: "Midterm 1", date: "2026-02-11", time: "13:30", status: "UPCOMING", score: null, details: { type: "text", content: "No calculators allowed." } },
-        { id: "mthe281-h5", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 5", date: "2026-02-27", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h6", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 6", date: "2026-03-06", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h7", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 7", date: "2026-03-13", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h5", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 5", date: "2026-02-27", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h6", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 6", date: "2026-03-06", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h7", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 7", date: "2026-03-13", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
         { id: "mthe281-m2", course: "MTHE 281", category: "MIDTERM", title: "Midterm 2", date: "2026-03-18", time: "13:30", status: "UPCOMING", score: null, details: { type: "text", content: "No calculators allowed." } },
-        { id: "mthe281-h8", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 8", date: "2026-03-27", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
-        { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h8", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 8", date: "2026-03-27", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h9", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 9", date: "2026-04-03", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
+        { id: "mthe281-h10", course: "MTHE 281", category: "ASSIGNMENT", title: "Homework 10", date: "2026-04-10", time: "23:59", status: "PENDING", score: null, details: { type: "pdf", url: "/pdfs/MTHE281.pdf" } },
 
         // --- MTHE 212 ---
         { id: "mthe212-q1", course: "MTHE 212", category: "QUIZ", title: "Quiz 1", date: "2026-01-23", time: "10:30", status: "UPCOMING", score: null, details: { type: "text", content: "In-class quiz (50 mins)." } },

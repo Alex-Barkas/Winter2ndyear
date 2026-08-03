@@ -2,10 +2,10 @@
 import { DataService } from "./data-service.js";
 
 // Each term dashboard sets window.TERM_PREFIX (e.g. 'winter2026') before loading this script,
-// so course/assignment links point at that term's paged (e.g. winter2026-grades.html).
+// so course/assignment links point at that term's folder (e.g. /winter2026/grades.html).
 const TERM_PREFIX = window.TERM_PREFIX || '';
 function termPage(name) {
-    return TERM_PREFIX ? `${TERM_PREFIX}-${name}` : name;
+    return TERM_PREFIX ? `/${TERM_PREFIX}/${name}` : `/${name}`;
 }
 
 // State for data
@@ -523,7 +523,7 @@ function createCourseCard(course) {
 
     // Construct Syllabus URL
     const cleanCode = course.code.toLowerCase().replace(/\s+/g, '');
-    const syllabusUrl = `syllabus/${cleanCode}-grading.md`;
+    const syllabusUrl = `/syllabus/${cleanCode}-grading.md`;
 
     // Icons
     const driveIcon = `<svg width="20" height="20" viewBox="0 0 87 78" xmlns="http://www.w3.org/2000/svg">

@@ -1,21 +1,22 @@
 # Item Detail Pages
 
-The `details.html` page is a generic template that renders content for *any* schedule item based on its ID.
+`{term}2026/details.html` is a generic template that renders content for any schedule item based on its ID, fetched from Firestore.
 
 ## Query Parameter Routing
-When you click an item in the calendar, you go to `details.html?id=some-id`.
--   `details.js` reads this ID.
--   It finds the corresponding object in `student-config.js`.
--   It injects the title, date, and specific content into the DOM.
+When you click an item on the dashboard, you go to `{term}2026/details.html?id=some-id`.
+- `js/details.js` reads the `id` query param.
+- It fetches the matching item via `DataService.getAssignmentById(id)`.
+- It injects the title, date, category, and content into the DOM (`renderDetails()`).
 
-## Productivity Modules
-This page includes interactive tools to help students complete the task:
-1.  **Checklist**: Add breakdown tasks (e.g., "Question 1", "Format Report"). Saved to `localStorage`.
-2.  **Focus Timer**: A simple Pomodoro timer (25m default) to encourage deep work.
-3.  **Grade Input**: Quick way to log the grade for this specific item once returned.
+## Page Features
+1. **Status Toggle**: "Mark as Done" / "Mark as Pending" button, persisted via `DataService.updateAssignmentStatus`.
+2. **Edit Modal**: edit title/course/date/time in place, saved via `DataService.updateAssignmentDetails`.
 
 ## Content Types
-The `details` property in the config object determines what is shown:
--   `type: "pdf"`: Embeds a PDF viewer (great for assignment specs).
--   `type: "text"`: Renders simple HTML text/instructions.
--   `type: "link"`: Provides a button to an external site (e.g., OnQ, Gradescope).
+The `details` property on the assignment object determines what's shown in the content area:
+- `type: "text"` — renders `content` as plain text/HTML.
+- `type: "pdf"` — embeds `url` in a PDF viewer (`<embed>`).
+- `type: "video"` — embeds `url` in an iframe.
+- `type: "link"` — shows a button linking out to `url` (e.g. OnQ, Gradescope), with optional `label`.
+
+An optional `images` array (list of URLs) renders as an "Attachments" section below the main content.

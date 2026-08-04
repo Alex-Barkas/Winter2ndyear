@@ -15,9 +15,30 @@ All local paths in this file are root-absolute (start with `/`) — they're rend
 
 ### `termRange`
 ```javascript
-termRange: { start: "2026-01-01", end: "2026-04-30" }
+termRange: {
+    start: "2026-01-01",
+    end: "2026-04-30",
+    classesStart: "2026-01-05",                          // optional
+    readingWeek: { start: "2026-02-16", end: "2026-02-22" }  // optional
+}
 ```
-The term's date bounds (used for filtering/display).
+`start`/`end` are the term's date bounds, used to scope which assignments each
+term's pages show.
+
+`classesStart` anchors the "Week N" labels on `{term}2026/assignments.html` — the
+first day of classes, which is usually a few days after `start`. Falls back to
+`start` when omitted.
+
+`readingWeek` marks a mid-term break: dates inside it are labelled "Reading Week"
+instead of a week number, and the weeks after it are numbered as if the break
+never happened. **Omit the key entirely** for terms with no reading week (Summer
+and Fall) — don't use a far-future placeholder date.
+
+> Note: each config file assigns directly onto `window.STUDENT_DATA` rather than
+> declaring a top-level `const`. `todo.html` loads all three term configs in
+> sequence, and a top-level `const` would make the second and third throw
+> "Identifier 'STUDENT_DATA' has already been declared" and never run. Keep the
+> `window.STUDENT_DATA = { ... }` form when adding a new term.
 
 ### `gradingSchemes`
 Keyed by course code (e.g. `"MTHE 281"`), powers the grade calculator on `{term}2026/grades.html`.

@@ -1,5 +1,12 @@
-const STUDENT_DATA = {
-    termRange: { start: "2026-05-01", end: "2026-08-15" },
+// See student-config-winter2026.js for why this is a direct window assignment
+// and not a top-level `const`.
+window.STUDENT_DATA = {
+    // No reading week in the summer term, so the key is simply omitted.
+    termRange: {
+        start: "2026-05-01",
+        end: "2026-08-15",
+        classesStart: "2026-05-04"
+    },
     gradingSchemes: {
         "APSC 221": {
             components: [
@@ -45,6 +52,4 @@ const STUDENT_DATA = {
     ]
 };
 
-// Expose globally for modules
-window.STUDENT_DATA = STUDENT_DATA;
-window.data = STUDENT_DATA; // Backwards compatibility if needed
+window.data = window.STUDENT_DATA; // Backwards compatibility if needed

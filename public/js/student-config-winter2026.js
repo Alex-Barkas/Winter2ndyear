@@ -1,5 +1,17 @@
-const STUDENT_DATA = {
-    termRange: { start: "2026-01-01", end: "2026-04-30" },
+// Assigned straight onto `window` rather than declared as a top-level `const`.
+// todo.html loads all three term configs back-to-back as classic scripts, and a
+// top-level `const STUDENT_DATA` creates a global lexical binding -- the second
+// and third files would throw "Identifier 'STUDENT_DATA' has already been
+// declared" and never run, leaving every term's course list showing Winter's.
+window.STUDENT_DATA = {
+    // classesStart anchors the "Week N" labels on the assignments page;
+    // readingWeek is optional (omit it for terms that don't have one).
+    termRange: {
+        start: "2026-01-01",
+        end: "2026-04-30",
+        classesStart: "2026-01-05",
+        readingWeek: { start: "2026-02-16", end: "2026-02-22" }
+    },
     gradingSchemes: {
         "MTHE 281": {
             components: [
@@ -182,6 +194,4 @@ const STUDENT_DATA = {
     ]
 };
 
-// Expose globally for modules
-window.STUDENT_DATA = STUDENT_DATA;
-window.data = STUDENT_DATA; // Backwards compatibility if needed
+window.data = window.STUDENT_DATA; // Backwards compatibility if needed

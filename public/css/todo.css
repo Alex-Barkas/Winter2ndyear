@@ -1,0 +1,385 @@
+/* ============================================================================
+   To-do list page.
+
+   Shared chrome (control bar, groups, progress, toasts) lives in list-ui.css.
+   This file only holds what is specific to to-do rows and the add form.
+
+   Note the `todo-` prefix on the row action buttons: style.css already defines a
+   global `.delete-btn` with `background/border: none !important`, which beats
+   anything declared here regardless of source order -- that is why the old
+   confirm-delete state's red border never actually rendered.
+   ========================================================================== */
+
+/* --------------------------------------------------------------- add form */
+
+.todo-input-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.input-field {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.7rem 0.75rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+select.input-field {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+select.input-field option,
+select.input-field optgroup {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.add-btn {
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.add-btn:hover {
+    opacity: 0.9;
+}
+
+/* ------------------------------------------------------------- todo rows */
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 0.9rem 1.1rem;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid transparent;
+}
+
+.todo-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Urgency accent stripe. Mirrors the category stripe on assignment cards. */
+.todo-item.urgency-5 { border-left-color: var(--color-danger); }
+.todo-item.urgency-4 { border-left-color: #ff9f43; }
+.todo-item.urgency-3 { border-left-color: rgba(161, 161, 170, 0.3); }
+.todo-item.urgency-2 { border-left-color: #60a5fa; }
+.todo-item.urgency-1 { border-left-color: rgba(161, 161, 170, 0.1); }
+
+.todo-item.is-overdue {
+    background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+}
+
+.todo-item.is-done {
+    opacity: 0.5;
+}
+
+.todo-item.is-done:hover {
+    opacity: 0.8;
+}
+
+/* Fires once on completion, then the class is removed. */
+.todo-item.glow-success {
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.3) 0%, rgba(255, 255, 255, 0.05) 70%);
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: scale(1.02);
+}
+
+.todo-check {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.todo-check:hover {
+    border-color: var(--accent-color);
+}
+
+.todo-check.checked {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.todo-check::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.75rem;
+    display: none;
+}
+
+.todo-check.checked::after {
+    display: block;
+}
+
+.todo-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.todo-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.todo-item.is-done .todo-title {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+.todo-meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.todo-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+}
+
+.todo-tag.is-personal {
+    background: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+}
+
+.todo-due {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    opacity: 0.75;
+}
+
+/* Replaces the old bare "(4)" / "(5)" text with a proper pill, using the same
+   badge recipe as .assign-category so both list pages agree. */
+.todo-urgency-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+}
+
+.todo-urgency-badge.level-5 {
+    background: color-mix(in srgb, var(--color-danger) 18%, transparent);
+    color: var(--color-danger);
+}
+
+.todo-urgency-badge.level-4 {
+    background: rgba(255, 159, 67, 0.18);
+    color: #ff9f43;
+}
+
+/* Status badges reuse the shared .status-* colours from style.css; these add
+   the outline treatment the to-do rows used to define inline. */
+.todo-item .assign-status {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* -------------------------------------------------------- row action buttons */
+
+.todo-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex-shrink: 0;
+}
+
+.todo-edit-btn,
+.todo-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.35rem;
+    opacity: 0.35;
+    transition: opacity 0.2s, color 0.2s, background 0.2s;
+}
+
+.todo-edit-btn {
+    font-size: 0.95rem;
+}
+
+.todo-delete-btn {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.todo-item:hover .todo-edit-btn,
+.todo-item:hover .todo-delete-btn,
+.todo-edit-btn:focus-visible,
+.todo-delete-btn:focus-visible {
+    opacity: 1;
+}
+
+.todo-edit-btn:hover {
+    color: var(--accent-color);
+}
+
+.todo-delete-btn:hover {
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+/* Two-step delete: the first click arms this state for 3s. */
+.todo-delete-btn.confirming {
+    opacity: 1;
+    color: var(--color-danger);
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--color-danger);
+    padding: 0.3rem 0.5rem;
+}
+
+/* ------------------------------------------------------------ inline edit */
+
+.todo-edit-form {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.todo-edit-form .input-field {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.todo-edit-save,
+.todo-edit-cancel {
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.todo-edit-save {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+.todo-edit-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------- density */
+
+.list-density-compact .todo-item {
+    padding: 0.5rem 0.85rem;
+}
+
+.list-density-compact .todo-title {
+    margin-bottom: 0.1rem;
+}
+
+/* Compact hides the secondary line entirely -- course and due date are already
+   encoded in the group headers most of the time. */
+.list-density-compact .todo-meta {
+    display: none;
+}
+
+.list-density-comfortable #todo-container.list-grid {
+    gap: 0.6rem;
+}
+
+.list-density-compact #todo-container.list-grid {
+    gap: 0.4rem;
+}
+
+/* ------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+    .todo-input-container {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* The title field spans the full width; the three selectors pair up below. */
+    .todo-input-container .input-field:first-child,
+    .todo-input-container .add-btn {
+        grid-column: 1 / -1;
+    }
+
+    .todo-edit-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .todo-input-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .todo-item {
+        align-items: flex-start;
+    }
+
+    .todo-check {
+        margin-top: 0.15rem;
+    }
+}

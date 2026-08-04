@@ -15,6 +15,17 @@
 
     --accent-color: #2e7d32;
     /* Dark nice green */
+
+    /* Semantic status colours. These consolidate hexes that were previously
+       written literally (and inconsistently) across style.css, todo.html and
+       the email script -- e.g. overdue red was #ef4444 in one place and
+       #ff4d4d in another. The values below are the ones already used by the
+       .status-* badges, so nothing changes visually; new code should reach for
+       the token rather than adding a fourth shade. */
+    --color-danger: #ef4444;
+    --color-warning: #f1c40f;
+    --color-success: #2ecc71;
+    --color-info: #40c4ff;
 }
 
 /* Removed local Latin Modern @font-face rules since we are switching to Charter (system/web stack) */
@@ -56,6 +67,26 @@ header {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+/* "← Back to Dashboard" appears in the header of 10 pages but had no rule
+   anywhere, so it rendered as a default blue underlined browser link on a
+   near-black background. Styled here to match the muted mono labels used
+   elsewhere in the header area. */
+.back-link {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    text-decoration: none;
+    opacity: 0.65;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.back-link:hover {
+    opacity: 1;
+    color: var(--text-primary);
 }
 
 /* Signature Badge (Absolute Top Right) */
@@ -1119,4 +1150,70 @@ footer p {
     color: var(--text-muted);
     opacity: 0.5;
     pointer-events: none;
+}
+
+
+/* ============================================================================
+   Small screens
+
+   The site was desktop-only: body carried a fixed 4rem/2rem padding and
+   .assignment-item was a non-wrapping flex row with a 1.5rem gap, so on a phone
+   the date column, title and status badge just squeezed into each other.
+   ========================================================================== */
+
+@media (max-width: 700px) {
+    body {
+        padding: 2rem 1rem;
+    }
+
+    header {
+        margin-bottom: 2.5rem;
+        gap: 1rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    /* Stack the date/details block above the time/status/toggle block instead
+       of fighting over one row's width. */
+    .assignment-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .assign-link-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .assign-left {
+        gap: 0.85rem;
+        align-items: flex-start;
+    }
+
+    .assign-date {
+        min-width: 52px;
+    }
+
+    /* Controls move to a single horizontal strip under the content. */
+    .assign-right {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        padding-left: calc(52px + 0.85rem);
+    }
+
+    #course-list {
+        grid-template-columns: 1fr;
+    }
+
+    .signature-badge {
+        position: static;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+    }
 }

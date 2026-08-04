@@ -1,0 +1,93 @@
+/* ============================================================================
+   Assignments list page.
+
+   Shared chrome (control bar, groups, progress, toasts) lives in list-ui.css.
+   This file only holds what is specific to assignment cards.
+   ========================================================================== */
+
+/* A category accent stripe, mirroring the urgency stripe on to-do rows so the
+   two list pages read as one system. The colour is set inline per card from the
+   existing .category-* palette. */
+.assignment-item {
+    border-left: 3px solid transparent;
+    position: relative;
+}
+
+/* Done rows recede rather than disappear -- same intent as .grade-row.excluded
+   on the grades page. */
+.assignment-item.is-done {
+    opacity: 0.5;
+}
+
+.assignment-item.is-done:hover {
+    opacity: 0.8;
+}
+
+/* Overdue is the one state worth pulling the eye, so it gets a tinted surface
+   on top of the stripe rather than just a badge. */
+.assignment-item.is-overdue {
+    background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+    border-color: color-mix(in srgb, var(--color-danger) 25%, var(--border-color));
+}
+
+.assign-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    display: block;
+}
+
+/* The week sub-label under the date was a hardcoded inline style on a <div>.
+   Named class now that grouping headers also show the week -- it's shown only
+   when the list is NOT grouped by week, to avoid saying it twice. */
+.assign-week-sub {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    margin-top: 2px;
+}
+
+/* "Sat, Mar 14 · in 3 days" */
+.assign-relative {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+/* ------------------------------------------------------------- density */
+
+/* Compact drops the vertical padding and hides the secondary meta line, so a
+   full term fits on one screen. */
+.list-density-compact .assignment-item {
+    padding: 0.55rem 0.85rem;
+}
+
+.list-density-compact .list-grid {
+    gap: 0.5rem;
+}
+
+.list-density-compact .assign-week-sub,
+.list-density-compact .assign-relative {
+    display: none;
+}
+
+.list-density-compact .assign-left {
+    gap: 1rem;
+}
+
+/* Comfortable keeps the original 1.5rem rhythm. */
+.list-density-comfortable .list-grid {
+    gap: 0.85rem;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 700px) {
+    .assignment-item {
+        border-left-width: 3px;
+    }
+
+    .assign-week-sub {
+        display: inline;
+        margin-left: 0.4rem;
+    }
+}

@@ -104,12 +104,18 @@ export const DataService = {
         }
     },
 
+    // Returns true on success, false if the write failed. The catch stays so no
+    // existing caller starts throwing; callers that care (the list pages, which
+    // show a toast and roll the row back) can now tell the two apart instead of
+    // a failed write looking identical to a successful one.
     async updateAssignmentStatus(id, newStatus) {
         try {
             const ref = doc(db, "assignments", id);
             await updateDoc(ref, { status: newStatus });
+            return true;
         } catch (e) {
             console.error("Error updating status: ", e);
+            return false;
         }
     },
 
@@ -144,19 +150,25 @@ export const DataService = {
 
     // --- TODOS ---
 
+    // Both return true/false so the to-do page can surface a failed write
+    // instead of silently pretending it worked. See updateAssignmentStatus.
     async saveTodoItem(todo) {
         try {
             await setDoc(doc(db, "todos", todo.id), todo);
+            return true;
         } catch (e) {
             console.error("Error saving todo: ", e);
+            return false;
         }
     },
 
     async deleteTodoItem(id) {
         try {
             await deleteDoc(doc(db, "todos", id));
+            return true;
         } catch (e) {
             console.error("Error deleting todo: ", e);
+            return false;
         }
     },
 

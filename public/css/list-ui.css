@@ -1,0 +1,507 @@
+/* ============================================================================
+   Shared list-page chrome: control bar, collapsible groups, progress meters,
+   summary banner, empty states, toasts.
+
+   Used by both the to-do list and the assignments list so the two pages read as
+   one system. The visual recipes are deliberately copied from grades.css (the
+   newest design direction in this app) under neutral names -- grades.css is only
+   loaded on the three grades pages, so referencing its .grade-* selectors from
+   here would leave everything unstyled.
+   ========================================================================== */
+
+/* ------------------------------------------------------------ summary bar */
+
+/* Big mono figure + a derived sentence, same shape as the grades page's
+   .final-grade-banner / .banner-avg-value pairing. */
+.list-summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.list-summary-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.list-summary-value {
+    font-family: var(--font-mono);
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.list-summary-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Pushed to the far edge and separated by a rule, mirroring
+   .final-grade-banner.single-course #banner-computed-avg. */
+.list-summary-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border-color);
+}
+
+.list-summary-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.2rem;
+}
+
+.list-summary-stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.list-summary-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.list-summary-stat.is-danger .list-summary-stat-value {
+    color: var(--color-danger);
+}
+
+.list-summary-stat.is-warning .list-summary-stat-value {
+    color: var(--color-warning);
+}
+
+.list-summary-stat.is-success .list-summary-stat-value {
+    color: var(--color-success);
+}
+
+/* ------------------------------------------------------------ control bar */
+
+/* Sticky so filters stay reachable partway down a long term's worth of items.
+   The blur + solid-ish background keeps rows legible as they scroll underneath. */
+.list-controls {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    margin-bottom: 1rem;
+    background: color-mix(in srgb, var(--bg-color) 88%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.list-search {
+    position: relative;
+    flex: 1 1 220px;
+    min-width: 180px;
+}
+
+.list-search input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.list-search input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.list-search input::placeholder {
+    color: var(--text-faint);
+}
+
+/* Clears the query without reaching for the keyboard. Hidden while empty. */
+.list-search-clear {
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.2rem 0.3rem;
+    opacity: 0.5;
+}
+
+.list-search-clear:hover {
+    opacity: 1;
+}
+
+.list-search-clear[hidden] {
+    display: none;
+}
+
+/* Segmented button groups reuse the dashboard's existing .view-switcher recipe
+   so status / density / sort controls look like something already in this app. */
+.list-segmented {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.list-segmented button {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+}
+
+.list-segmented button:hover {
+    color: var(--text-primary);
+}
+
+.list-segmented button.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* A labelled <select> pair (Sort by / Group by). */
+.list-select-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.list-select-group label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.list-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+}
+
+.list-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.list-select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+/* Course filter chips -- the .assign-category pill recipe, made interactive. */
+.list-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.list-chip {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.25rem;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.list-chip:hover {
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.list-chip.active {
+    background: color-mix(in srgb, var(--accent-color) 18%, transparent);
+    color: var(--accent-color);
+    border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+}
+
+/* Only rendered while at least one filter is narrowing the list. */
+.list-clear-filters {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+}
+
+.list-clear-filters:hover {
+    color: var(--color-danger);
+    border-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
+}
+
+/* --------------------------------------------------- collapsible groups */
+
+.list-group {
+    margin-bottom: 0.5rem;
+}
+
+.list-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.list-group-header:hover {
+    color: var(--text-primary);
+}
+
+.list-group-chevron {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    width: 1em;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.list-group-name {
+    font-weight: 600;
+    flex: 1;
+}
+
+.list-group-subtotal {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* Plain show/hide with no transition, matching this app's convention for
+   toggled UI (see .grade-group-rows.collapsed). */
+.list-group-body.collapsed {
+    display: none;
+}
+
+/* The parent .list-grid's gap only separates the groups from each other; the
+   rows inside a group need their own rhythm. */
+.list-group-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-top: 0.75rem;
+}
+
+.list-density-compact .list-group-body {
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+}
+
+/* ------------------------------------------------------------- progress */
+
+.list-progress-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.35rem;
+    height: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0 0.25rem;
+}
+
+.list-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent-color);
+    /* Width changes as items are checked off, so a short ease is warranted
+       here even though the collapse toggles above are deliberately instant. */
+    transition: width 0.2s;
+}
+
+.list-progress-fill.is-complete {
+    background: var(--color-success);
+}
+
+/* --------------------------------------------------------- empty states */
+
+.list-empty {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.list-empty-icon {
+    font-size: 1.75rem;
+    opacity: 0.35;
+    margin-bottom: 0.75rem;
+}
+
+.list-empty-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.list-empty-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.list-empty .list-clear-filters {
+    margin-top: 1rem;
+}
+
+/* ---------------------------------------------------------------- toasts */
+
+/* Writes to Firestore used to fail silently on these pages -- errors went to
+   console.error only, so a failed save was indistinguishable from a good one. */
+.toast-host {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 0.5rem;
+    background: #18181b;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    box-shadow: 0 8px 30px -12px rgba(0, 0, 0, 0.8);
+    max-width: 320px;
+    animation: toast-in 0.2s ease;
+}
+
+.toast-error {
+    border-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
+    color: var(--color-danger);
+}
+
+.toast-success {
+    border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
+}
+
+.toast-out {
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 700px) {
+    .list-summary {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .list-summary-stats {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        padding-top: 0.85rem;
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .list-summary-stat {
+        align-items: flex-start;
+    }
+
+    .list-controls {
+        gap: 0.5rem;
+        padding: 0.65rem 0;
+    }
+
+    .list-search {
+        flex: 1 1 100%;
+    }
+
+    /* Let the segmented groups scroll sideways rather than wrapping into a
+       tall stack that pushes the list off-screen. */
+    .list-segmented {
+        overflow-x: auto;
+        max-width: 100%;
+    }
+
+    .toast-host {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .toast {
+        max-width: none;
+    }
+}

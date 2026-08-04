@@ -16,7 +16,8 @@ import {
 
 const STORAGE_KEYS = {
     ASSIGNMENTS: 'dashboard_assignments',
-    TODOS: 'dashboard_todos'
+    TODOS: 'dashboard_todos',
+    GRADE_OVERRIDES: 'dashboard_grade_overrides'
 };
 
 export const DataService = {
@@ -184,6 +185,61 @@ export const DataService = {
             await setDoc(doc(db, "finalGrades", courseCode), { course: courseCode, grade });
         } catch (e) {
             console.error("Error saving final grade (kept in localStorage):", e);
+        }
+    },
+
+    // --- GRADE OVERRIDES (manual-entry scores + exclude/drop flags, cloud-synced) ---
+    // Doc id matches the existing manual-entry key format: `manual-${course}-${compIdx}-${i}`
+    // Doc shape: { id, course, componentName, index, score: number|null, excluded: true|false }
+    // NOTE: `excluded` being absent is a meaningful tri-state (see grading-renderer.js) —
+    // never default it to false when writing.
+
+    async getGradeOverrides() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "gradeOverrides"));
+            const overrides = [];
+            querySnapshot.forEach((doc) => {
+                overrides.push(doc.data());
+            });
+
+            // Sync to local storage for offline viewing/backup
+            localStorage.setItem(STORAGE_KEYS.GRADE_OVERRIDES, JSON.stringify(overrides));
+            return overrides;
+        } catch (e) {
+            console.warn("Firestore unavailable, checking LocalStorage:", e);
+            const local = localStorage.getItem(STORAGE_KEYS.GRADE_OVERRIDES);
+            if (local) return JSON.parse(local);
+
+            // Fallback to Config
+            if (typeof window.STUDENT_DATA !== 'undefined') {
+                return window.STUDENT_DATA.gradeOverrides || [];
+            }
+            return [];
+        }
+    },
+
+    async setGradeOverride(id, partial) {
+        // Mirror to localStorage, merging with any existing cached override for this id
+        try {
+            const local = localStorage.getItem(STORAGE_KEYS.GRADE_OVERRIDES);
+            const overrides = local ? JSON.parse(local) : [];
+            const idx = overrides.findIndex(o => o.id === id);
+            if (idx >= 0) {
+                overrides[idx] = { ...overrides[idx], ...partial, id };
+            } else {
+                overrides.push({ id, ...partial });
+            }
+            localStorage.setItem(STORAGE_KEYS.GRADE_OVERRIDES, JSON.stringify(overrides));
+        } catch (e) {
+            console.warn("Error mirroring grade override to LocalStorage:", e);
+        }
+
+        try {
+            // merge:true is mandatory: score and excluded are written independently
+            // (typing a score vs. clicking the exclude toggle) and must not clobber each other.
+            await setDoc(doc(db, "gradeOverrides", id), { id, ...partial }, { merge: true });
+        } catch (e) {
+            console.error("Error saving grade override (kept in localStorage):", e);
         }
     },
 

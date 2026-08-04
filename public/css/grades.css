@@ -1,0 +1,330 @@
+.grade-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.grade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.grade-course {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.grade-score {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.grade-score.pending {
+    color: var(--text-muted);
+    opacity: 0.5;
+    font-size: 1rem;
+}
+
+.grade-table-header {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.grade-row {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.grade-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    width: 60px;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.grade-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.grade-input.synced {
+    border-left: 2px solid var(--accent-color);
+}
+
+.loading-text {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Final Grade Banner */
+.final-grade-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.final-grade-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.final-grade-select {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 700;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-muted);
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+}
+
+.final-grade-select:focus {
+    outline: none;
+}
+
+/* --- Grade exclude / drop-lowest UI --- */
+
+/* Widen the row grid to fit the exclude toggle as a 5th column, without
+   touching the base .grade-table-header / .grade-row rules above. */
+.grade-table-header,
+.grade-row {
+    grid-template-columns: 3fr 1fr 1fr 1fr auto;
+}
+
+.grade-exclude-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: all 0.2s;
+    justify-self: end;
+}
+
+.grade-exclude-btn:hover {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+/* Deliberately NOT var(--accent-color) -- that color means "positive/done"
+   elsewhere in this app. Excluding a grade is a warning-toned action. */
+.grade-exclude-btn.checked {
+    background: #f87171;
+    color: #fff;
+    border-color: #f87171;
+}
+
+/* Same line-through/dim recipe as .done-text in style.css */
+.grade-row.excluded {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.grade-dropped-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-left: 0.4rem;
+    /* explicit drop: amber, same family as .status-pending */
+    background-color: rgba(255, 171, 0, 0.1);
+    color: #ffab00;
+}
+
+/* auto-drop: distinct indigo tone so users can tell "I dropped this"
+   from "the app auto-dropped this" at a glance */
+.grade-dropped-badge.auto {
+    background-color: rgba(129, 140, 248, 0.1);
+    color: #818cf8;
+}
+
+/* Step 2: Row grouping & badges */
+
+/* --- Collapsible component groups (e.g. "Quiz 1..5") --- */
+
+.grade-group {
+    margin-bottom: 0.25rem;
+}
+
+.grade-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.grade-group-header:hover {
+    color: var(--text-primary);
+}
+
+.grade-group-chevron {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    width: 1em;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.grade-group-name {
+    font-weight: 600;
+    flex: 1;
+}
+
+.grade-group-subtotal {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Plain show/hide, no transition/animation -- matches the rest of this app's
+   convention for toggled UI (e.g. classList.add('active') + display: none/block
+   in script.js's selectDate()). */
+.grade-group-rows.collapsed {
+    display: none;
+}
+
+/* --- Synced-vs-manual source badge --- */
+/* Same visual recipe as .grade-dropped-badge (mono font, small caps, pill-ish
+   padding), color-coded for data provenance instead of drop status. Designed to
+   sit next to .grade-dropped-badge on the same row without overlapping -- both
+   are inline-block spans with their own left margin. */
+.grade-source-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-left: 0.4rem;
+}
+
+/* accent-color = "this is real tracked data" is a positive association here,
+   distinct from the exclude-toggle's deliberate avoidance of accent color. */
+.grade-source-badge.synced {
+    background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+    color: var(--accent-color);
+}
+
+.grade-source-badge.manual {
+    background-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+/* Step 4: Banner projection layout */
+
+/* When a specific course is being viewed, the banner grows a right-hand
+   column showing the live computed average + what-if projection, next to
+   the existing label + letter-grade select on the left. */
+.final-grade-banner.single-course {
+    justify-content: flex-start;
+    gap: 1.5rem;
+}
+
+.final-grade-banner.single-course #banner-computed-avg {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--border-color);
+    text-align: right;
+}
+
+.banner-avg-value {
+    font-family: var(--font-mono);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.banner-projection-text {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.banner-projection-text strong {
+    color: var(--text-primary);
+}
+
+/* Step 3: Progress bar */
+
+/* Course-weight completion meter, sits directly under .grade-header. Track
+   background matches .grade-input's rgba(255,255,255,0.05) so it reads as a
+   natural sibling of this app's existing "recessed surface" convention rather
+   than a new pattern. Unlike .grade-group-rows.collapsed (deliberately no
+   transition, matches this app's plain show/hide convention), this bar's width
+   updates live as scores are entered, so a short transition is appropriate here. */
+.grade-progress-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.35rem;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.grade-progress-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.2s;
+}
+
+.grade-progress-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}

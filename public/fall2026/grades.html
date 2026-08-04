@@ -12,125 +12,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css?v=7">
-    <style>
-        .grade-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .grade-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .grade-course {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .grade-score {
-            font-family: var(--font-mono);
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .grade-score.pending {
-            color: var(--text-muted);
-            opacity: 0.5;
-            font-size: 1rem;
-        }
-
-        .grade-table-header {
-            display: grid;
-            grid-template-columns: 3fr 1fr 1fr 1fr;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .grade-row {
-            display: grid;
-            grid-template-columns: 3fr 1fr 1fr 1fr;
-            align-items: center;
-            padding: 0.5rem 0;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .grade-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            width: 60px;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-        }
-
-        .grade-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .grade-input.synced {
-            border-left: 2px solid var(--accent-color);
-        }
-
-        .loading-text {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
-        /* Final Grade Banner */
-        .final-grade-banner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .final-grade-label {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--text-muted);
-            opacity: 0.7;
-        }
-
-        .final-grade-select {
-            font-family: var(--font-mono);
-            font-size: 2rem;
-            font-weight: 700;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            color: var(--text-muted);
-            padding: 0.25rem 1rem;
-            cursor: pointer;
-        }
-
-        .final-grade-select:focus {
-            outline: none;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/grades.css?v=1">
 </head>
 
 <body>
@@ -159,6 +41,7 @@
                 <option value="D-">D-</option>
                 <option value="F">F</option>
             </select>
+            <span id="banner-computed-avg"></span>
         </div>
 
         <div id="grade-list">
@@ -170,72 +53,7 @@
     <!-- Load config for the schemes -->
     <script src="/js/student-config-fall2026.js"></script>
 
-    <script type="module">
-        import { GradingRenderer } from '/js/grading-renderer.js';
-        import { DataService } from '/js/data-service.js';
-
-        const FINAL_GRADE_COLORS = {
-            'A+': '#4ade80', 'A': '#4ade80', 'A-': '#4ade80',
-            'B+': '#facc15', 'B': '#facc15', 'B-': '#facc15',
-            'C+': '#fb923c', 'C': '#fb923c', 'C-': '#fb923c',
-            'D+': '#f87171', 'D': '#f87171', 'D-': '#f87171', 'F': '#f87171'
-        };
-
-        function updateFinalGradeColor(selectEl, grade) {
-            const color = FINAL_GRADE_COLORS[grade] || 'var(--text-muted)';
-            selectEl.style.color = color;
-            selectEl.style.borderColor = color;
-        }
-
-        async function initFinalGrade(courseCode) {
-            const banner = document.getElementById('final-grade-banner');
-            const select = document.getElementById('final-grade-select');
-            if (!courseCode) return;
-
-            banner.style.display = 'flex';
-            const currentGrade = await DataService.getFinalGrade(courseCode);
-            select.value = currentGrade || '';
-            updateFinalGradeColor(select, currentGrade);
-
-            select.addEventListener('change', async () => {
-                await DataService.setFinalGrade(courseCode, select.value);
-                updateFinalGradeColor(select, select.value);
-            });
-        }
-
-        async function init() {
-            try {
-                const container = document.getElementById('grade-list');
-                const urlParams = new URLSearchParams(window.location.search);
-                const courseCode = urlParams.get('course') ? decodeURIComponent(urlParams.get('course')) : null;
-
-                // Update Header
-                if (courseCode) {
-                    document.querySelector('h1').innerText = `${courseCode} Grades`;
-                    document.querySelector('.subtitle').innerText = `Current grade breakdown for ${courseCode}.`;
-                    document.title = `${courseCode} Grades`;
-                }
-
-                await initFinalGrade(courseCode);
-
-                const assignments = await DataService.getAllAssignments(); // Pre-fetch to pass explicitly
-
-                await GradingRenderer.render(container, courseCode, assignments);
-
-                // Re-render on update
-                window.addEventListener('gradeUpdated', async () => {
-                    const freshAssignments = await DataService.getAllAssignments();
-                    await GradingRenderer.render(container, courseCode, freshAssignments);
-                });
-
-            } catch (err) {
-                console.error("Error initializing dashboard:", err);
-                document.getElementById('grade-list').innerHTML = `<p style="color:red">Error loading data.</p>`;
-            }
-        }
-
-        init();
-    </script>
+    <script type="module" src="/js/grades-page.js"></script>
 </body>
 
 </html>

@@ -353,6 +353,46 @@ section {
     color: #00e676;
 }
 
+.status-overdue {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.status-today {
+    background-color: rgba(241, 196, 15, 0.15);
+    color: #f1c40f;
+}
+
+.status-tomorrow {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+}
+
+/* Week-group section divider for the assignments list -- same visual recipe
+   as todo.html's .section-header (label + trailing divider line), kept under
+   its own name since .section-header already has a different flex layout
+   elsewhere in this file. No vertical margin: it's a direct child of
+   .list-grid, a flex column that already applies a uniform 1.5rem gap
+   between all its children (headers and cards alike). */
+.week-group-header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.week-group-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+    opacity: 0.5;
+}
+
 /* New Course Card Design */
 .course-card {
     background: transparent;

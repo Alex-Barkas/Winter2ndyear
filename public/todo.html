@@ -18,11 +18,12 @@
     <script src="js/student-config-summer2026.js"></script>
     <script>window.__coursesSummer2026 = window.STUDENT_DATA.courses;</script>
     <script src="js/student-config-fall2026.js"></script>
+    <script>window.__coursesFall2026 = window.STUDENT_DATA.courses;</script>
     <script>
         window.STUDENT_DATA.courses = [
             ...window.__coursesWinter2026,
             ...window.__coursesSummer2026,
-            ...window.STUDENT_DATA.courses
+            ...window.__coursesFall2026
         ];
     </script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
@@ -210,6 +211,13 @@
             color: var(--text-muted);
         }
 
+        /* Urgency border-left: reuses the border-left stub above */
+        .todo-item.urgency-5 { border-left-color: #ff4d4d; }
+        .todo-item.urgency-4 { border-left-color: #ff9f43; }
+        .todo-item.urgency-3 { border-left-color: rgba(161, 161, 170, 0.3); }
+        .todo-item.urgency-2 { border-left-color: #60a5fa; }
+        .todo-item.urgency-1 { border-left-color: rgba(161, 161, 170, 0.1); }
+
         .todo-meta {
             display: flex;
             gap: 1rem;
@@ -256,16 +264,105 @@
             cursor: pointer;
             font-size: 1.2rem;
             padding: 0.5rem;
-            opacity: 0;
-            transition: opacity 0.2s;
+            opacity: 0.35;
+            transition: opacity 0.2s, color 0.2s;
         }
 
-        .todo-item:hover .delete-btn {
+        .todo-item:hover .delete-btn,
+        .delete-btn:focus-visible {
             opacity: 1;
         }
 
         .delete-btn:hover {
             color: #ef4444;
+        }
+
+        .delete-btn.confirming {
+            opacity: 1;
+            color: #ef4444;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid #ef4444;
+            border-radius: 0.25rem;
+            padding: 0.3rem 0.5rem;
+        }
+
+        .edit-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 0.5rem;
+            opacity: 0.35;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        .todo-item:hover .edit-btn,
+        .edit-btn:focus-visible {
+            opacity: 1;
+        }
+
+        .edit-btn:hover {
+            color: var(--accent-color);
+        }
+
+        /* Inline edit form (replaces .todo-content while editing) */
+        .todo-edit-form {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .todo-edit-form {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .todo-edit-form .input-field {
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .todo-edit-save,
+        .todo-edit-cancel {
+            border: none;
+            border-radius: 0.4rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .todo-edit-save {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .todo-edit-cancel {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+        }
+
+        /* Collapsible Completed section */
+        .section-header.collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-chevron {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+        }
+
+        .todo-completed-section.collapsed {
+            display: none;
         }
     </style>
 </head>
@@ -317,6 +414,12 @@
     <script type="module">
         import { DataService } from "./js/data-service.js?v=12";
 
+        // --- Module state ---
+        let currentTodos = [];       // last snapshot received from the real-time listener
+        let editingId = null;        // id of the todo currently showing its inline edit form
+        let deleteConfirmId = null;  // id of the todo whose delete button is in "confirm?" state
+        let completedCollapsed = true; // Completed section starts collapsed
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadCourses();
@@ -325,21 +428,37 @@
 
             window.addTodo = addTodo;
             window.toggleTodo = toggleTodo;
-            window.deleteTodo = deleteTodo;
+            window.handleDeleteClick = handleDeleteClick;
+            window.startEditTodo = startEditTodo;
+            window.cancelEditTodo = cancelEditTodo;
+            window.saveEditTodo = saveEditTodo;
+            window.toggleCompletedSection = toggleCompletedSection;
         });
 
         // syncData removed - Real-time sync enabled.
 
+        // Course <option>/<optgroup> markup shared by the add-form select and the
+        // per-row inline edit form, grouped by term so past/current/future courses
+        // aren't all dumped into one flat list.
+        function buildCourseOptgroupsHtml(selectedCode) {
+            const groups = [
+                { label: 'Winter 2026', courses: window.__coursesWinter2026 || [] },
+                { label: 'Summer 2026', courses: window.__coursesSummer2026 || [] },
+                { label: 'Fall 2026', courses: window.__coursesFall2026 || [] }
+            ];
+            return groups
+                .filter(g => g.courses.length > 0)
+                .map(g => {
+                    const opts = g.courses.map(c =>
+                        `<option value="${c.code}" ${c.code === selectedCode ? 'selected' : ''}>${c.code}</option>`
+                    ).join('');
+                    return `<optgroup label="${g.label}">${opts}</optgroup>`;
+                }).join('');
+        }
+
         function loadCourses() {
             const select = document.getElementById('task-course');
-            if (window.STUDENT_DATA && window.STUDENT_DATA.courses) {
-                window.STUDENT_DATA.courses.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.code;
-                    opt.textContent = c.code;
-                    select.appendChild(opt);
-                });
-            }
+            select.insertAdjacentHTML('beforeend', buildCourseOptgroupsHtml());
         }
 
         async function getTodos() {
@@ -408,6 +527,66 @@
             // renderTodos(); // Listener handles this
         }
 
+        // Two-step delete: first click arms a 3s "confirm?" state on that button,
+        // second click within that window actually deletes. Auto-reverts so a
+        // misclick doesn't leave the UI stuck in a confirm state.
+        function handleDeleteClick(id) {
+            if (deleteConfirmId === id) {
+                deleteConfirmId = null;
+                deleteTodo(id);
+                return;
+            }
+            deleteConfirmId = id;
+            renderTodos(currentTodos);
+            setTimeout(() => {
+                if (deleteConfirmId === id) {
+                    deleteConfirmId = null;
+                    renderTodos(currentTodos);
+                }
+            }, 3000);
+        }
+
+        // Inline edit is pure UI state (which row shows the edit form) -- no
+        // Firestore round trip needed to open/close it, so just re-render from
+        // the cached last snapshot, same pattern used elsewhere in this app for
+        // local-only UI toggles (e.g. the grade calculator's collapsible groups).
+        function startEditTodo(id) {
+            editingId = id;
+            renderTodos(currentTodos);
+        }
+
+        function cancelEditTodo() {
+            editingId = null;
+            renderTodos(currentTodos);
+        }
+
+        async function saveEditTodo(id) {
+            const todo = currentTodos.find(t => t.id === id);
+            if (!todo) return;
+
+            const title = document.getElementById(`edit-title-${id}`).value.trim();
+            if (!title) return;
+
+            const updated = {
+                ...todo,
+                title,
+                course: document.getElementById(`edit-course-${id}`).value,
+                urgency: parseInt(document.getElementById(`edit-urgency-${id}`).value, 10) || 3,
+                date: document.getElementById(`edit-date-${id}`).value || ""
+            };
+
+            await DataService.saveTodoItem(updated);
+            editingId = null;
+            // Optimistic render with the saved values while the real-time
+            // listener catches up with server truth a moment later.
+            renderTodos(currentTodos.map(t => t.id === id ? updated : t));
+        }
+
+        function toggleCompletedSection() {
+            completedCollapsed = !completedCollapsed;
+            renderTodos(currentTodos);
+        }
+
         function getUrgencyIcon(level) {
             // Text representation only for high urgency
             if (level >= 4) {
@@ -447,6 +626,7 @@
         function renderTodos(todos) {
             const container = document.getElementById('todo-container');
             // const todos = await getTodos(); // Data passed via subscription now
+            currentTodos = todos;
 
             if (todos.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:3rem;">No tasks yet. Add one above!</p>';
@@ -491,22 +671,33 @@
             }
 
             if (completed.length > 0) {
-                html += `<div class="section-header">Completed</div>`;
-                html += completed.map(t => renderItem(t)).join('');
+                const chevron = completedCollapsed ? '▸' : '▾';
+                const sectionClass = completedCollapsed ? 'todo-completed-section collapsed' : 'todo-completed-section';
+                html += `<div class="section-header collapsible" onclick="toggleCompletedSection()">
+                    <span class="section-chevron">${chevron}</span> Completed (${completed.length})
+                </div>`;
+                html += `<div class="${sectionClass}">${completed.map(t => renderItem(t)).join('')}</div>`;
             }
 
             container.innerHTML = html;
         }
 
         function renderItem(t) {
+            if (t.id === editingId) return renderEditForm(t);
+
             const uLevel = t.urgency || 3;
             const uIcon = getUrgencyIcon(uLevel);
             const uClass = `urgency-${uLevel}`;
 
             const statusBanner = (!t.completed && t.date) ? getStatusBanner(t.date) : '';
 
+            const isConfirming = deleteConfirmId === t.id;
+            const deleteBtnHtml = isConfirming
+                ? `<button class="delete-btn confirming" onclick="handleDeleteClick('${t.id}')">Confirm</button>`
+                : `<button class="delete-btn" onclick="handleDeleteClick('${t.id}')" title="Delete">×</button>`;
+
             return `
-                <div class="todo-item">
+                <div class="todo-item ${uClass}">
                     <div class="todo-check ${t.completed ? 'checked' : ''}" onclick="toggleTodo('${t.id}')"></div>
                     <div class="todo-content">
                         <span class="todo-title">
@@ -519,7 +710,33 @@
                             <span>${t.date ? 'Due: ' + t.date : 'Flexible'}</span>
                         </div>
                     </div>
-                    <button class="delete-btn" onclick="deleteTodo('${t.id}')">×</button>
+                    <button class="edit-btn" onclick="startEditTodo('${t.id}')" title="Edit">✎</button>
+                    ${deleteBtnHtml}
+                </div>
+            `;
+        }
+
+        function renderEditForm(t) {
+            const uLevel = t.urgency || 3;
+            return `
+                <div class="todo-item">
+                    <div class="todo-edit-form">
+                        <input type="text" id="edit-title-${t.id}" class="input-field" value="${t.title.replace(/"/g, '&quot;')}">
+                        <select id="edit-course-${t.id}" class="input-field">
+                            <option value="Personal" ${t.course === 'Personal' ? 'selected' : ''}>Personal</option>
+                            ${buildCourseOptgroupsHtml(t.course)}
+                        </select>
+                        <select id="edit-urgency-${t.id}" class="input-field">
+                            <option value="1" ${uLevel === 1 ? 'selected' : ''}>1 - Trivial</option>
+                            <option value="2" ${uLevel === 2 ? 'selected' : ''}>2 - Low</option>
+                            <option value="3" ${uLevel === 3 ? 'selected' : ''}>3 - Normal</option>
+                            <option value="4" ${uLevel === 4 ? 'selected' : ''}>4 - High</option>
+                            <option value="5" ${uLevel === 5 ? 'selected' : ''}>5 - Critical</option>
+                        </select>
+                        <input type="date" id="edit-date-${t.id}" class="input-field" value="${t.date || ''}">
+                        <button class="todo-edit-save" onclick="saveEditTodo('${t.id}')">Save</button>
+                        <button class="todo-edit-cancel" onclick="cancelEditTodo()">Cancel</button>
+                    </div>
                 </div>
             `;
         }

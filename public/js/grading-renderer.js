@@ -73,7 +73,6 @@ export const GradingRenderer = {
         const rows = [];
 
         scheme.components.forEach((comp, compIdx) => {
-            totalWeight += comp.weight;
             const count = comp.count || 1;
             const dropLowest = comp.dropLowest || 0;
             const compRows = [];
@@ -149,15 +148,27 @@ export const GradingRenderer = {
             }
 
             // effectiveUnitWeight: spread the component's weight across the rows that
-            // will actually remain after dropping the lowest N.
+            // will actually remain after dropping the lowest N. A manual drop beyond
+            // dropLowest (e.g. a waived assignment) permanently removes a row from
+            // consideration too, so it must widen the denominator the same way --
+            // otherwise its weight share never gets redistributed and instead sits
+            // stuck in totalWeight forever, showing up as un-droppable "unmarked" %.
+            const explicitlyExcludedCount = compRows.filter(r => r.explicitExcluded === true).length;
+            const denom = count - Math.max(dropLowest, explicitlyExcludedCount);
+
             let effectiveUnitWeight;
-            const denom = count - dropLowest;
+            let componentTotalWeight;
             if (denom <= 0) {
-                console.warn(`Grading config error: "${course}" component "${comp.name}" has dropLowest (${dropLowest}) >= count (${count}). Falling back to comp.weight / comp.count.`);
-                effectiveUnitWeight = comp.weight / count;
+                // Every row in this component ends up dropped -- the whole component
+                // drops out of the course rather than sitting in totalWeight as
+                // permanently-ungraded weight.
+                effectiveUnitWeight = 0;
+                componentTotalWeight = 0;
             } else {
                 effectiveUnitWeight = comp.weight / denom;
+                componentTotalWeight = comp.weight;
             }
+            totalWeight += componentTotalWeight;
 
             compRows.forEach(r => {
                 r.effectiveUnitWeight = effectiveUnitWeight;

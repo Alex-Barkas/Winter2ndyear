@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - Notes.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/maple_leaf_favicon.png">
+    <link rel="stylesheet" href="css/style.css?v=8">
+    <link rel="stylesheet" href="css/list-ui.css?v=1">
+    <link rel="stylesheet" href="css/modal.css?v=1">
+    <link rel="stylesheet" href="css/calendar.css?v=1">
+
+    <!-- Merge courses + termRanges across all terms. Each config assigns straight
+         onto window, so all three can load in sequence (see todo.html for the
+         origin of this pattern) -- termRange is stashed too, which todo.html's
+         version doesn't do, since this page needs per-term reading-week/week-label
+         context that todo.html never required. -->
+    <script src="js/student-config-winter2026.js?v=2"></script>
+    <script>
+        window.__coursesWinter2026 = window.STUDENT_DATA.courses;
+        window.__termRangeWinter2026 = window.STUDENT_DATA.termRange;
+    </script>
+    <script src="js/student-config-summer2026.js?v=2"></script>
+    <script>
+        window.__coursesSummer2026 = window.STUDENT_DATA.courses;
+        window.__termRangeSummer2026 = window.STUDENT_DATA.termRange;
+    </script>
+    <script src="js/student-config-fall2026.js?v=2"></script>
+    <script>
+        window.__coursesFall2026 = window.STUDENT_DATA.courses;
+        window.__termRangeFall2026 = window.STUDENT_DATA.termRange;
+    </script>
+    <script>
+        // courseCode -> term folder, built while the per-term arrays are still
+        // separate -- needed for correct /{term}2026/details.html links and for
+        // picking the right termRange (and therefore the right week-labeller)
+        // once courses are flattened into one merged array below.
+        window.__courseTermMap = {};
+        [
+            ['winter2026', window.__coursesWinter2026],
+            ['summer2026', window.__coursesSummer2026],
+            ['fall2026', window.__coursesFall2026]
+        ].forEach(([term, courses]) => {
+            (courses || []).forEach(c => { window.__courseTermMap[c.code] = term; });
+        });
+
+        window.__termRanges = {
+            winter2026: window.__termRangeWinter2026,
+            summer2026: window.__termRangeSummer2026,
+            fall2026: window.__termRangeFall2026
+        };
+
+        window.STUDENT_DATA.courses = [
+            ...window.__coursesWinter2026,
+            ...window.__coursesSummer2026,
+            ...window.__coursesFall2026
+        ];
+    </script>
+</head>
+
+<body>
+    <main class="container">
+        <header>
+            <a href="index.html" class="back-link">← Back to Dashboard</a>
+            <h1>Calendar</h1>
+            <p class="subtitle">Every course, every deadline, every to-do — one place.</p>
+        </header>
+
+        <div class="cal-toolbar">
+            <div id="cal-controls" class="list-controls"></div>
+            <button id="cal-add-btn" class="cal-add-btn" type="button">+ Add Event</button>
+        </div>
+
+        <div class="cal-page-layout">
+            <div class="cal-main-panel">
+                <div id="cal-month-view">
+                    <div class="cal-month-header">
+                        <button id="cal-prev-month" class="cal-nav-btn" type="button" aria-label="Previous month">&lt;</button>
+                        <h2 id="cal-month-label">—</h2>
+                        <button id="cal-next-month" class="cal-nav-btn" type="button" aria-label="Next month">&gt;</button>
+                    </div>
+                    <div class="cal-grid-header">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    <div id="cal-grid" class="cal-grid"></div>
+                </div>
+                <div id="cal-agenda-view" class="list-grid hidden"></div>
+            </div>
+
+            <aside class="cal-side-panel">
+                <div class="cal-side-card" id="cal-unscheduled-card" data-date="" data-tray="true">
+                    <h3>Unscheduled</h3>
+                    <div id="cal-tray-list" class="cal-tray-list"></div>
+                </div>
+                <div class="cal-side-card" id="cal-detail-card">
+                    <div id="cal-day-detail"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Add / Edit Event Modal -->
+    <div id="event-modal" class="modal-overlay" hidden>
+        <div class="modal-content">
+            <h3 id="event-modal-title">Add Event</h3>
+
+            <div class="input-group">
+                <label>Type</label>
+                <select id="event-type" class="input-field">
+                    <option value="assignment">Assignment / Exam</option>
+                    <option value="todo">To-do</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="event-title" class="input-field" placeholder="e.g. Lab 4 Report">
+            </div>
+            <div class="input-group">
+                <label>Course</label>
+                <select id="event-course" class="input-field">
+                    <option value="Personal">Personal</option>
+                    <!-- Course options injected per term -->
+                </select>
+            </div>
+            <div class="input-group" id="event-category-group">
+                <label>Category</label>
+                <select id="event-category" class="input-field">
+                    <option value="ASSIGNMENT">Assignment</option>
+                    <option value="LAB">Lab</option>
+                    <option value="TUTORIAL">Tutorial</option>
+                    <option value="QUIZ">Quiz</option>
+                    <option value="MIDTERM">Midterm</option>
+                    <option value="FINAL">Final</option>
+                    <option value="HOMEWORK">Homework</option>
+                    <option value="REMINDER">Reminder</option>
+                </select>
+            </div>
+            <div class="input-group" id="event-urgency-group">
+                <label>Urgency</label>
+                <select id="event-urgency" class="input-field">
+                    <option value="1">1 - Trivial</option>
+                    <option value="2">2 - Low</option>
+                    <option value="3" selected>3 - Normal</option>
+                    <option value="4">4 - High</option>
+                    <option value="5">5 - Critical</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="event-date" class="input-field">
+            </div>
+            <div class="input-group" id="event-time-group">
+                <label>Time</label>
+                <input type="time" id="event-time" class="input-field">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="event-delete-btn" class="danger hidden">Delete</button>
+                <button type="button" id="event-cancel-btn" class="secondary">Cancel</button>
+                <button type="button" id="event-save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/calendar-page.js?v=1"></script>
+</body>
+
+</html>

@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="/assets/maple_leaf_favicon.png">
     <link rel="stylesheet" href="/css/style.css?v=8">
+    <link rel="stylesheet" href="/css/modal.css?v=1">
     <meta name="description" content="Archive of course materials and notes from my undergraduate studies.">
 </head>
 
@@ -21,6 +22,7 @@
         <div class="nav-divider"></div>
         <nav class="side-nav">
             <a href="/index.html" class="nav-link">all semesters</a>
+            <a href="/calendar.html" class="nav-link">calendar</a>
             <a href="/todo.html" class="nav-link">to-do</a>
         </nav>
     </div>
@@ -53,43 +55,13 @@
             <section>
                 <div class="section-header">
                     <h2 class="section-label">SCHEDULE</h2>
-                    <div class="view-switcher">
-                        <button id="view-list-btn" class="view-btn active">List</button>
-                        <button id="view-calendar-btn" class="view-btn">Calendar</button>
-
-                    </div>
+                    <a href="/calendar.html" class="view-btn">Full Calendar →</a>
                 </div>
 
-                <!-- List View (Default) -->
+                <!-- List View -->
                 <div id="global-schedule">
                     <!-- Schedule injected via JS -->
                 </div>
-
-                <!-- Calendar View -->
-                <div id="calendar-view" class="hidden">
-                    <div class="calendar-layout-wrapper">
-                        <div class="calendar-main-panel">
-                            <div class="calendar-header">
-                                <button id="prev-month" class="nav-btn">&lt;</button>
-                                <h3 id="current-month-year">May 2026</h3>
-                                <button id="next-month" class="nav-btn">&gt;</button>
-                            </div>
-                            <div class="calendar-grid-header">
-                                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                            </div>
-                            <div id="calendar-days" class="calendar-grid">
-                                <!-- Days injected via JS -->
-                            </div>
-                        </div>
-                        <div class="calendar-side-panel">
-                            <div id="selected-day-details">
-                                <p class="subtitle" style="text-align: center; margin-top: 50%; opacity: 0.5;">Select a
-                                    date to view details.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
 
             </section>
 

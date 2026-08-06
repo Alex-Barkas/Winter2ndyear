@@ -1,0 +1,97 @@
+/* ============================================================================
+   Shared modal chrome: overlay, panel, labelled inputs, action row.
+
+   Extracted from winter2026/details.html's inline <style> block, which is
+   where this CSS previously lived -- but the dashboard's #add-modal (in
+   {term}2026/index.html) uses these exact class names and never loaded that
+   file's styles, so the "Add Assignment" modal rendered unstyled. One shared
+   file, linked from every page that has a modal, fixes that and gives the
+   calendar page's add/edit-event modal the same look for free.
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+/* The `hidden` attribute's UA-stylesheet `display:none` loses to this class's
+   own `display:grid` (author CSS always outranks UA CSS, regardless of
+   selector specificity or source order) -- without this override the modal
+   renders open on every page load. */
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.modal-actions button {
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+}
+
+.modal-actions button.secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.modal-actions button:not(.secondary) {
+    background: var(--text-primary);
+    color: #000;
+}
+
+.modal-actions button.danger {
+    background: transparent;
+    color: var(--color-danger);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 50%, transparent);
+    margin-right: auto;
+}

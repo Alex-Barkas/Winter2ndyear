@@ -1,25 +1,43 @@
 # Calendar & Schedule
 
-The scheduling system consolidates deadlines from all of a term's courses into a single view on `{term}2026/index.html`.
+There are two places deadlines show up:
+
+1. **`public/calendar.html`** — the unified calendar. A single, cross-term Month/Agenda view of every course's assignments *and* every to-do, across all three terms, with drag-and-drop rescheduling. This is the main way to see "what's due."
+2. **Each term dashboard's SCHEDULE section** (`{term}2026/index.html`) — a simple chronological list of that term's own deadlines only, rendered by `renderGlobalSchedule()` in `js/script.js`. It links out to the unified calendar via a "Full Calendar →" button rather than embedding its own grid (an earlier version had a small month-grid widget here too; it was removed in favor of one unified page once the schedule became easy enough to miss that it needed its own page).
 
 ## Data Source
-Events are seeded from the `assignments` array in `public/js/student-config-{term}2026.js`, then read/written through `DataService` (`js/data-service.js`), which is backed by Firebase Firestore.
-- **Properties**:
-  - `id`: unique identifier (used for routing to `{term}2026/details.html?id=...`).
-  - `date` / `time`: `YYYY-MM-DD` / 24-hour `HH:MM`.
-  - `category`: determines color/icon (`LAB`, `MIDTERM`, `QUIZ`, `ASSIGNMENT`, `REMINDER`, etc.).
-  - `status`: `PENDING`, `DONE`, `UPCOMING`.
 
-## Calendar View
-- **Render Logic**: `js/script.js` → `renderCalendar()`.
-- **Visuals**: dots indicate a deadline exists on that day.
+Both assignments and to-dos are read/written through `DataService` (`js/data-service.js`), backed by Firebase Firestore. Assignments are a single global collection across all terms; to-dos likewise. Per-term pages scope assignments to their own term client-side (by date range, via `js/ui-utils.js`'s `makeTermScope`); the unified calendar does not scope at all by default (it shows everything, with an optional term filter).
 
-## List View
-- **Render Logic**: `js/script.js` → `renderGlobalSchedule()` and `renderAssignments()`.
-- **Grouping**: grouped for easy scanning by course/date.
+**Assignment fields**: `id`, `course`, `category` (`LAB`, `TUTORIAL`, `MIDTERM`, `QUIZ`, `ASSIGNMENT`, `HOMEWORK`, `FINAL`, `REMINDER`), `title`, `date` (`YYYY-MM-DD` or `"TBD"` for unscheduled), `time` (`HH:MM`, 24hr), `status` (`PENDING`, `DONE`, `UPCOMING`), `score`, `details: {type, url|content}`.
+
+**To-do fields**: `id`, `title`, `course` (a course code, or `"Personal"`), `urgency` (1–5), `date` (`YYYY-MM-DD` or `""` for unscheduled — to-dos have no `"TBD"` sentinel, no `time` field), `completed`, `createdAt`.
+
+## Unified Calendar (`calendar.html` / `js/calendar-page.js`)
+
+- **Cross-term loading**: loads all three `student-config-{term}2026.js` files in sequence (same pattern as `todo.html`), and additionally stashes each term's `termRange` (not just its `courses`) into `window.__termRanges`, plus a `window.__courseTermMap` (course code → term folder) built while merging — needed so an item can be linked back to the right term's `details.html` and reading-week context.
+- **Views**: Month grid (real title chips, not just dots — clicking a day expands it in the side panel) and an Agenda/List view grouped by date, toggled via the same `.list-segmented` control used on `todo.html`/`assignments.html`.
+- **Filters**: term, course, and category, using the shared `.list-chips` chrome from `css/list-ui.css`.
+- **Unscheduled tray**: a sidebar list of undated to-dos (`date: ""`) and TBD assignments (`date: "TBD"`) — drag one onto a day to schedule it, or drag a scheduled item back onto the tray to clear its date.
+- **Drag-and-drop**: hand-built with Pointer Events (no library), supporting both mouse and touch (long-press to start on touch). Dragging an assignment calls `DataService.updateAssignmentDetails(id, {date})`; dragging a to-do resends the full object via `DataService.saveTodoItem` (to-dos have no partial-update method). Both roll back and show an error toast if the write fails.
+- **Course colors**: no `color` field exists on course config objects, so `calendar-page.js` derives one deterministically by hashing the course code into a fixed palette (`hashCourseColor` in `js/calendar-page.js`). Assignment chips are colored by category instead (matching `assignments-page.js`'s `CATEGORY_COLORS`), since category is more informative than course for coursework.
+- **Reading week**: read from each term's own `termRange.readingWeek` via `js/ui-utils.js`'s `makeWeekLabeller` — never hardcoded (the old per-term calendar had reading-week dates hardcoded in two different places that disagreed with the config; this doesn't repeat that).
+- **Add/Edit/Delete**: a shared modal (`css/modal.css`, also linked from the term dashboards — see below) handles both assignments and to-dos, branching on a Type selector.
+
+## Term Dashboard List View
+
+- **Render logic**: `js/script.js` → `renderGlobalSchedule()`, using `createAssignmentCard`/`createTodoScheduleCard` and `getSemesterWeek()` for week labels (this function still has hardcoded reading-week dates — out of scope to fix here since only the unified calendar reads `termRange.readingWeek` properly).
+- **Grouping**: active items first (sorted by date), then done items.
+
+## Shared Modal (`css/modal.css`)
+
+`.modal-overlay`/`.modal-content`/`.input-group`/`.modal-actions` used to live only in `details.html`'s inline `<style>` block, which meant the dashboard's own "Add Assignment" modal (`#add-modal` in `{term}2026/index.html`) rendered completely unstyled — it used those class names but never loaded any CSS defining them. Extracting this into one shared file, linked from both the term dashboards and `calendar.html`, fixed that as a side effect of building the calendar's own add/edit modal.
 
 ## How to Add an Item
-Add an object to the `assignments` array in the relevant `student-config-{term}2026.js`:
+
+Preferred: use the unified calendar's "+ Add Event" button, or a term dashboard's "Add Assignment" modal — both write straight to Firestore via `DataService`.
+
+To seed one directly in config instead, add an object to the `assignments` array in the relevant `student-config-{term}2026.js`:
 ```javascript
 {
     id: "unique-id",
@@ -33,4 +51,3 @@ Add an object to the `assignments` array in the relevant `student-config-{term}2
     details: { type: "text", content: "Details..." }
 }
 ```
-Items can also be added directly from the dashboard UI (Add button); those are written straight to Firestore via `DataService.addAssignment`, not into the config file.

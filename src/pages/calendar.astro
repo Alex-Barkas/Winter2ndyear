@@ -1,71 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import terms from '../data/terms.js';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar - Notes.</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/maple_leaf_favicon.png">
-    <link rel="stylesheet" href="css/style.css?v=8">
-    <link rel="stylesheet" href="css/list-ui.css?v=1">
-    <link rel="stylesheet" href="css/modal.css?v=1">
-    <link rel="stylesheet" href="css/calendar.css?v=1">
+// Replaces the old runtime multi-<script>-tag merge in calendar.html: build
+// the courseCode -> term map and per-term termRanges server-side, then merge
+// courses the same way todo.astro does (fall2026's other fields + flattened
+// cross-term courses array), matching today's behavior exactly.
+const courseTermMap: Record<string, string> = {};
+for (const [term, data] of Object.entries(terms)) {
+    for (const course of data.courses || []) {
+        courseTermMap[course.code] = term;
+    }
+}
 
-    <!-- Merge courses + termRanges across all terms. Each config assigns straight
-         onto window, so all three can load in sequence (see todo.html for the
-         origin of this pattern) -- termRange is stashed too, which todo.html's
-         version doesn't do, since this page needs per-term reading-week/week-label
-         context that todo.html never required. -->
-    <script src="js/student-config-winter2026.js?v=2"></script>
-    <script>
-        window.__coursesWinter2026 = window.STUDENT_DATA.courses;
-        window.__termRangeWinter2026 = window.STUDENT_DATA.termRange;
-    </script>
-    <script src="js/student-config-summer2026.js?v=2"></script>
-    <script>
-        window.__coursesSummer2026 = window.STUDENT_DATA.courses;
-        window.__termRangeSummer2026 = window.STUDENT_DATA.termRange;
-    </script>
-    <script src="js/student-config-fall2026.js?v=2"></script>
-    <script>
-        window.__coursesFall2026 = window.STUDENT_DATA.courses;
-        window.__termRangeFall2026 = window.STUDENT_DATA.termRange;
-    </script>
-    <script>
-        // courseCode -> term folder, built while the per-term arrays are still
-        // separate -- needed for correct /{term}2026/details.html links and for
-        // picking the right termRange (and therefore the right week-labeller)
-        // once courses are flattened into one merged array below.
-        window.__courseTermMap = {};
-        [
-            ['winter2026', window.__coursesWinter2026],
-            ['summer2026', window.__coursesSummer2026],
-            ['fall2026', window.__coursesFall2026]
-        ].forEach(([term, courses]) => {
-            (courses || []).forEach(c => { window.__courseTermMap[c.code] = term; });
-        });
+const termRanges = {
+    winter2026: terms.winter2026.termRange,
+    summer2026: terms.summer2026.termRange,
+    fall2026: terms.fall2026.termRange,
+};
 
-        window.__termRanges = {
-            winter2026: window.__termRangeWinter2026,
-            summer2026: window.__termRangeSummer2026,
-            fall2026: window.__termRangeFall2026
-        };
+const mergedCourses = [
+    ...terms.winter2026.courses,
+    ...terms.summer2026.courses,
+    ...terms.fall2026.courses,
+];
+const studentData = { ...terms.fall2026, courses: mergedCourses };
 
-        window.STUDENT_DATA.courses = [
-            ...window.__coursesWinter2026,
-            ...window.__coursesSummer2026,
-            ...window.__coursesFall2026
-        ];
-    </script>
-</head>
+// calendar-page.js's buildCourseOptgroupsHtml() builds the event modal's
+// course dropdown from these three globals directly, same as todo-page.js.
+const coursesWinter2026 = terms.winter2026.courses;
+const coursesSummer2026 = terms.summer2026.courses;
+const coursesFall2026 = terms.fall2026.courses;
+---
 
-<body>
+<BaseLayout
+    title="Calendar - Notes."
+    favicon="/assets/maple_leaf_favicon.png"
+    extraCss={["/css/list-ui.css?v=1", "/css/modal.css?v=1", "/css/calendar.css?v=1"]}
+>
+    <Fragment slot="head">
+        <script is:inline define:vars={{ studentData, courseTermMap, termRanges, coursesWinter2026, coursesSummer2026, coursesFall2026 }}>
+            window.STUDENT_DATA = studentData;
+            window.__courseTermMap = courseTermMap;
+            window.__termRanges = termRanges;
+            window.__coursesWinter2026 = coursesWinter2026;
+            window.__coursesSummer2026 = coursesSummer2026;
+            window.__coursesFall2026 = coursesFall2026;
+        </script>
+    </Fragment>
+
     <main class="container">
         <header>
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
+            <a href="/" class="back-link">← Back to Dashboard</a>
             <h1>Calendar</h1>
             <p class="subtitle">Every course, every deadline, every to-do — one place.</p>
         </header>
@@ -166,7 +152,5 @@
         </div>
     </div>
 
-    <script type="module" src="js/calendar-page.js?v=1"></script>
-</body>
-
-</html>
+    <script type="module" src="/js/calendar-page.js?v=1" is:inline></script>
+</BaseLayout>

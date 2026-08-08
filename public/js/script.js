@@ -241,7 +241,7 @@ function createAssignmentCard(item) {
     return `
         <div class="assignment-item ${isToday ? 'highlight-today' : ''}" style="position: relative; view-transition-name: assign-${item.id.replace(/[^a-zA-Z0-9-_]/g, '')};">
             ${todayBanner}
-            <a href="${termPage('details.html')}?id=${item.id}" class="assign-link-wrapper">
+            <a href="${termPage('details')}?id=${item.id}" class="assign-link-wrapper">
                 <div class="assign-left">
                     <span class="assign-date">
                         ${day}
@@ -399,7 +399,7 @@ function createCourseCard(course) {
                 <a href="${course.assignments}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Assignments</span>
                 </a>
-                <a href="${termPage('grades.html')}?course=${course.code}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
+                <a href="${termPage('grades')}?course=${course.code}" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">
                     <span>Grades</span>
                 </a>
                 <a href="${syllabusUrl}" target="_blank" class="action-btn secondary" style="${course.image ? 'background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); border-color: rgba(255,255,255,0.15);' : ''}">

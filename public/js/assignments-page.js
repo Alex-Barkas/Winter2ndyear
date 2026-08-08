@@ -448,7 +448,7 @@ function card(item) {
     return `
         <div class="assignment-item ${status.done ? 'is-done' : ''} ${status.label === 'OVERDUE' ? 'is-overdue' : ''}"
              style="border-left-color:${accent}" data-id="${escapeHtml(item.id)}">
-            <a href="${prefix}/details.html?id=${encodeURIComponent(item.id)}" class="assign-link-wrapper">
+            <a href="${prefix}/details?id=${encodeURIComponent(item.id)}" class="assign-link-wrapper">
                 <div class="assign-left">
                     <span class="assign-date">
                         ${dayCell}

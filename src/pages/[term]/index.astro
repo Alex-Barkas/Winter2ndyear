@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SignatureNav from '../../components/SignatureNav.astro';
+import AddAssignmentModal from '../../components/AddAssignmentModal.astro';
+import terms from '../../data/terms.js';
+import termMeta from '../../data/term-meta.js';
+
+export function getStaticPaths() {
+    return Object.keys(terms).map((term) => ({
+        params: { term },
+        props: { term, studentData: terms[term], meta: termMeta[term] },
+    }));
+}
+
+const { term, studentData, meta } = Astro.props;
+---
+
+<BaseLayout
+    title={`${meta.label} - Alex's Dashboard`}
+    description="Archive of course materials and notes from my undergraduate studies."
+    favicon="/assets/maple_leaf_favicon.png"
+    extraCss={["/css/modal.css?v=1"]}
+>
+    <SignatureNav />
+
+    <main class="container">
+        <header>
+            <div class="header-titling">
+                <h1>Alex Barkas' Dashboard</h1>
+            </div>
+        </header>
+
+        <div class="content-stack">
+            <section>
+                <h2 class="section-label">{meta.heading}</h2>
+                <div id="course-list" class="list-grid">
+                    <!-- Courses injected via JS -->
+                </div>
+            </section>
+
+            <section>
+                <div class="section-header">
+                    <h2 class="section-label">SCHEDULE</h2>
+                    <a href="/calendar" class="view-btn">Full Calendar →</a>
+                </div>
+
+                <div id="global-schedule">
+                    <!-- Schedule injected via JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <AddAssignmentModal coursePlaceholder={meta.coursePlaceholder} />
+
+    <script is:inline define:vars={{ term, studentData }}>
+        window.TERM_PREFIX = term;
+        window.STUDENT_DATA = studentData;
+    </script>
+    <script type="module" src="/js/data-service.js?v=12" is:inline></script>
+    <script type="module" src="/js/script.js?v=12" is:inline></script>
+</BaseLayout>

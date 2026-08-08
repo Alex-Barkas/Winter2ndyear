@@ -1,11 +1,6 @@
-// Assigned straight onto `window` rather than declared as a top-level `const`.
-// todo.html loads all three term configs back-to-back as classic scripts, and a
-// top-level `const STUDENT_DATA` creates a global lexical binding -- the second
-// and third files would throw "Identifier 'STUDENT_DATA' has already been
-// declared" and never run, leaving every term's course list showing Winter's.
-window.STUDENT_DATA = {
-    // classesStart anchors the "Week N" labels on the assignments page;
-    // readingWeek is optional (omit it for terms that don't have one).
+// classesStart anchors the "Week N" labels on the assignments page;
+// readingWeek is optional (omit it for terms that don't have one).
+export default {
     termRange: {
         start: "2026-01-01",
         end: "2026-04-30",
@@ -60,7 +55,7 @@ window.STUDENT_DATA = {
             notes: "https://drive.google.com/file/d/1y7jHLLebL2k7jrH9ZtfrYzh006xu3Gp2/view",
             textbook: "/textbooks/MTHE 281 Abbott - Understanding Analysis.pdf",
             solutions: "/textbooks/MTHE 281 Understanding Analysis Solutions.pdf",
-            assignments: "/winter2026/assignments.html?course=MTHE 281",
+            assignments: "/winter2026/assignments?course=MTHE 281",
             image: "/course_images/mthe281.png"
         },
         {
@@ -69,21 +64,21 @@ window.STUDENT_DATA = {
             notes: "https://drive.google.com/file/d/1eMrAt7o6aUSZgd3wJR2YhXkbRvBdazPn/view",
             textbook: "/textbooks/LADR4e.pdf",
             solutions: "/textbooks/MTHE212-Textbook-Solutions.pdf",
-            assignments: "/winter2026/assignments.html?course=MTHE 212",
+            assignments: "/winter2026/assignments?course=MTHE 212",
             image: "/course_images/mthe212.png"
         },
         {
             code: "MREN 230",
             name: "Thermodynamics",
             notes: "https://drive.google.com/file/d/1OrM-Drq0OBAF3WQIGSY55KmHxygYt-sF/view",
-            assignments: "/winter2026/assignments.html?course=MREN 230",
+            assignments: "/winter2026/assignments?course=MREN 230",
             image: "/course_images/mren230.png"
         },
         {
             code: "MECH 210",
             name: "Circuits",
             notes: "https://drive.google.com/file/d/12C3rud5o0KoWcUNGl0hZ1TxdCPE6trTH/view",
-            assignments: "/winter2026/assignments.html?course=MECH 210",
+            assignments: "/winter2026/assignments?course=MECH 210",
             image: "/course_images/mech210.png"
         },
         {
@@ -91,7 +86,7 @@ window.STUDENT_DATA = {
             name: "Mechanics",
             notes: "https://drive.google.com/file/d/1n-zqAfJS_mg_nCCy0crXwi0Yi2BOBZHh/view",
             textbook: "https://api.pageplace.de/preview/DT0400.9781292088785_A26856513/preview-9781292088785_A26856513.pdf",
-            assignments: "/winter2026/assignments.html?course=ENPH 225",
+            assignments: "/winter2026/assignments?course=ENPH 225",
             image: "/course_images/enph225.png"
         }
     ],
@@ -193,5 +188,3 @@ window.STUDENT_DATA = {
         }
     ]
 };
-
-window.data = window.STUDENT_DATA; // Backwards compatibility if needed

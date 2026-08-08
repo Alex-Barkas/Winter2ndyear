@@ -1,17 +1,17 @@
 # How to Customize This Dashboard
 
-Each term's data lives in its own file: `public/js/student-config-winter2026.js`, `student-config-summer2026.js`, `student-config-fall2026.js`. Edit the one for the term you want to change.
+Each term's data lives in its own file: `src/data/winter2026.js`, `summer2026.js`, `fall2026.js`. Edit the one for the term you want to change.
 
 ## Quick Start
 
-1. **Open** the `student-config-{term}2026.js` file for the term.
-2. **Edit** the `STUDENT_DATA` object (see fields below).
+1. **Open** the `src/data/{term}2026.js` file for the term.
+2. **Edit** the default-exported object (see fields below).
 3. **Add** any new PDFs to `public/pdfs/`, `public/textbooks/`, or `public/assignments/` and reference them by root-absolute path (e.g. `/pdfs/MYFILE.pdf`).
 4. **Add** a course thumbnail to `public/course_images/` and reference it via `image` (e.g. `/course_images/mycourse.png`).
 
-All local paths in this file are root-absolute (start with `/`) — they're rendered on pages nested inside `public/{term}2026/`, so a plain relative path like `pdfs/x.pdf` would break.
+All local paths in this file are root-absolute (start with `/`) — they're rendered on pages nested at `/{term}2026/...`, so a plain relative path like `pdfs/x.pdf` would break.
 
-## `STUDENT_DATA` fields
+## Data file fields
 
 ### `termRange`
 ```javascript
@@ -25,7 +25,7 @@ termRange: {
 `start`/`end` are the term's date bounds, used to scope which assignments each
 term's pages show.
 
-`classesStart` anchors the "Week N" labels on `{term}2026/assignments.html` — the
+`classesStart` anchors the "Week N" labels on `/{term}2026/assignments` — the
 first day of classes, which is usually a few days after `start`. Falls back to
 `start` when omitted.
 
@@ -34,14 +34,8 @@ instead of a week number, and the weeks after it are numbered as if the break
 never happened. **Omit the key entirely** for terms with no reading week (Summer
 and Fall) — don't use a far-future placeholder date.
 
-> Note: each config file assigns directly onto `window.STUDENT_DATA` rather than
-> declaring a top-level `const`. `todo.html` loads all three term configs in
-> sequence, and a top-level `const` would make the second and third throw
-> "Identifier 'STUDENT_DATA' has already been declared" and never run. Keep the
-> `window.STUDENT_DATA = { ... }` form when adding a new term.
-
 ### `gradingSchemes`
-Keyed by course code (e.g. `"MTHE 281"`), powers the grade calculator on `{term}2026/grades.html`.
+Keyed by course code (e.g. `"MTHE 281"`), powers the grade calculator on `/{term}2026/grades`.
 ```javascript
 "COURSE CODE": {
     components: [
@@ -63,7 +57,7 @@ Populates the course cards on the term dashboard.
     notes: "https://drive.google.com/...",       // link to lecture notes (URL or local path)
     textbook: "/textbooks/MTHE 281 ....pdf",      // optional, root-absolute local path or URL
     solutions: "/textbooks/MTHE 281 ... Solutions.pdf", // optional
-    assignments: "/winter2026/assignments.html?course=MTHE 281",
+    assignments: "/winter2026/assignments?course=MTHE 281",
     image: "/course_images/mthe281.png"
 }
 ```
@@ -85,7 +79,7 @@ The master schedule — powers the calendar, assignment lists, and details pages
 }
 ```
 
-Assignments added/edited/deleted through the dashboard UI (Add button, delete icon) are written to Firebase Firestore via `js/data-service.js`, not back into this file — the config file is your seed data.
+Assignments added/edited/deleted through the dashboard UI (Add button, delete icon) are written to Firebase Firestore via `public/js/data-service.js`, not back into this file — the config file is your seed data.
 
 ## Styles
 

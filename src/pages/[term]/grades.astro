@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GradeDashboard from '../../components/GradeDashboard.svelte';
+import terms from '../../data/terms.js';
+
+export function getStaticPaths() {
+    return Object.keys(terms).map((term) => ({
+        params: { term },
+        props: { term, schemes: terms[term].gradingSchemes },
+    }));
+}
+
+const { term, schemes } = Astro.props;
+---
+
+<BaseLayout title="Grade Dashboard - Notes." extraCss={["/css/grades.css?v=1"]}>
+    <main class="container">
+        <header>
+            <a href={`/${term}`} class="back-link">← Back to Dashboard</a>
+            <h1>Grade Dashboard</h1>
+            <p class="subtitle">Track your academic performance across all courses.</p>
+        </header>
+
+        <div id="grade-list">
+            <GradeDashboard client:load schemes={schemes} />
+        </div>
+    </main>
+</BaseLayout>

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SignatureNav from '../../components/SignatureNav.astro';
+import terms from '../../data/terms.js';
+import termMeta from '../../data/term-meta.js';
+
+export function getStaticPaths() {
+    return Object.keys(terms).map((term) => ({
+        params: { term },
+        props: { term, studentData: terms[term], meta: termMeta[term] },
+    }));
+}
+
+const { term, studentData, meta } = Astro.props;
+const termPrefixWithSlash = `/${term}`;
+---
+
+<BaseLayout
+    title="Assignments - Notes."
+    extraCss={["/css/list-ui.css?v=1", "/css/assignments.css?v=1"]}
+    bodyAttrs={{ 'data-term-name': meta.label }}
+>
+    <SignatureNav />
+
+    <main class="container">
+        <header>
+            <a href={`/${term}`} class="back-link">← Back to Dashboard</a>
+            <h1 id="course-title">Assignments</h1>
+            <p id="course-subtitle" class="subtitle">Upcoming deliverables and deadlines.</p>
+        </header>
+
+        <div class="content-stack">
+            <section id="assignments-view">
+                <div id="assignment-summary"></div>
+                <div id="assignment-controls" class="list-controls"></div>
+                <div id="assignment-list" class="list-grid">
+                    <p style="opacity:0.5; font-size: 0.8rem; padding: 2rem;">Loading data...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script is:inline define:vars={{ termPrefixWithSlash, studentData }}>
+        window.TERM_PREFIX = termPrefixWithSlash;
+        window.STUDENT_DATA = studentData;
+    </script>
+    <script type="module" src="/js/assignments-page.js?v=1" is:inline></script>
+</BaseLayout>

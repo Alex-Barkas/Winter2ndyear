@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import terms from '../data/terms.js';
+
+// Replaces the old runtime multi-<script>-tag merge in todo.html: merge all
+// three terms' courses server-side instead. Matches today's behavior exactly --
+// the merged STUDENT_DATA carries fall2026's other fields (termRange, etc.)
+// since that was the last config loaded before the merge ran, with only
+// `courses` replaced by the flattened cross-term array.
+const mergedCourses = [
+    ...terms.winter2026.courses,
+    ...terms.summer2026.courses,
+    ...terms.fall2026.courses,
+];
+const studentData = { ...terms.fall2026, courses: mergedCourses };
+
+// todo-page.js builds the course dropdown's per-term <optgroup>s from these
+// three globals directly (not from the merged studentData.courses above) --
+// same split todo.html's original per-config <script> tags produced.
+const coursesWinter2026 = terms.winter2026.courses;
+const coursesSummer2026 = terms.summer2026.courses;
+const coursesFall2026 = terms.fall2026.courses;
+---
+
+<BaseLayout
+    title="To-Do List - Notes."
+    favicon="/assets/maple_leaf_favicon.png"
+    extraCss={["/css/list-ui.css?v=1", "/css/todo.css?v=1"]}
+>
+    <Fragment slot="head">
+        <script is:inline define:vars={{ studentData, coursesWinter2026, coursesSummer2026, coursesFall2026 }}>
+            window.STUDENT_DATA = studentData;
+            window.__coursesWinter2026 = coursesWinter2026;
+            window.__coursesSummer2026 = coursesSummer2026;
+            window.__coursesFall2026 = coursesFall2026;
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js" is:inline></script>
+    </Fragment>
+
+    <main class="container">
+        <header>
+            <a href="/" class="back-link">← Back to Dashboard</a>
+            <h1>To-Do List</h1>
+            <p class="subtitle">Manage everything. Prioritize what matters.</p>
+        </header>
+
+        <!-- Add form -->
+        <div class="todo-input-container">
+            <input type="text" id="task-title" class="input-field" placeholder="What needs to be done?">
+
+            <select id="task-course" class="input-field">
+                <option value="Personal">Personal</option>
+                <!-- Course optgroups injected per term -->
+            </select>
+
+            <select id="task-urgency" class="input-field" title="Urgency Level">
+                <option value="1">1 - Trivial</option>
+                <option value="2">2 - Low</option>
+                <option value="3" selected>3 - Normal</option>
+                <option value="4">4 - High</option>
+                <option value="5">5 - Critical</option>
+            </select>
+
+            <input type="date" id="task-date" class="input-field" title="Optional Due Date">
+
+            <button id="add-btn" class="add-btn">Add</button>
+        </div>
+
+        <div id="todo-summary"></div>
+        <div id="todo-controls" class="list-controls"></div>
+        <div id="todo-container" class="list-grid"></div>
+    </main>
+
+    <script type="module" src="/js/todo-page.js?v=1" is:inline></script>
+</BaseLayout>

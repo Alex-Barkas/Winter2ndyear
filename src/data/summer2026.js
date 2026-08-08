@@ -1,6 +1,4 @@
-// See student-config-winter2026.js for why this is a direct window assignment
-// and not a top-level `const`.
-window.STUDENT_DATA = {
+export default {
     // No reading week in the summer term, so the key is simply omitted.
     termRange: {
         start: "2026-05-01",
@@ -23,7 +21,7 @@ window.STUDENT_DATA = {
             code: "APSC 221",
             name: "Economics and Business Practices in Engineering",
             notes: "/syllabus/APSC 221 - Syllabus S26 - V3.pdf",
-            assignments: "/summer2026/assignments.html?course=APSC 221",
+            assignments: "/summer2026/assignments?course=APSC 221",
             image: "/course_images/apsc221_modern_economics.png"
         }
     ],
@@ -51,5 +49,3 @@ window.STUDENT_DATA = {
         { id: "apsc221-final", course: "APSC 221", category: "FINAL", title: "Final Exam", date: "2026-08-07", time: "09:00", status: "UPCOMING", score: null, details: { type: "text", content: "Placeholder date - actual date/time set by OUR Exams Office. Closed-book, covers all course material." } }
     ]
 };
-
-window.data = window.STUDENT_DATA; // Backwards compatibility if needed

@@ -1,0 +1,19 @@
+---
+export interface Props {
+    showAllSemesters?: boolean;
+}
+
+const { showAllSemesters = true } = Astro.props;
+---
+
+<div class="signature-badge">
+    <div class="signature-row">
+        <span class="signature-text">alex barkas 2026</span>
+    </div>
+    <div class="nav-divider"></div>
+    <nav class="side-nav">
+        {showAllSemesters && <a href="/" class="nav-link">all semesters</a>}
+        <a href="/calendar" class="nav-link">calendar</a>
+        <a href="/todo" class="nav-link">to-do</a>
+    </nav>
+</div>

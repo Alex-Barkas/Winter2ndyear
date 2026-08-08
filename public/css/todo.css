@@ -379,7 +379,31 @@ select.input-field optgroup {
         align-items: flex-start;
     }
 
+    /* Sized up from 1.25rem -- a 20px circle is well under the ~44px touch
+       target guideline and this is the primary interaction on the page. */
     .todo-check {
-        margin-top: 0.15rem;
+        width: 1.75rem;
+        height: 1.75rem;
+        margin-top: 0.1rem;
+    }
+
+    .todo-check::after {
+        font-size: 0.95rem;
+    }
+
+    .todo-edit-btn,
+    .todo-delete-btn {
+        padding: 0.55rem 0.6rem;
+    }
+}
+
+/* .todo-edit-btn/.todo-delete-btn are only visible on :hover, which touch
+   input never triggers -- without this they'd sit at 0.35 opacity forever
+   on a phone. Keyed on hover capability, not viewport width, since a
+   touch-only device at any width has the same problem. */
+@media (hover: none) {
+    .todo-edit-btn,
+    .todo-delete-btn {
+        opacity: 0.7;
     }
 }

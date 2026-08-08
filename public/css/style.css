@@ -26,6 +26,11 @@
     --color-warning: #f1c40f;
     --color-success: #2ecc71;
     --color-info: #40c4ff;
+
+    /* Height of the fixed bottom tab bar the nav becomes below 700px (see the
+       responsive section at the end of this file). Other stylesheets that need
+       to sit above it (list-ui.css's toast host) read this same variable. */
+    --mobile-nav-height: 64px;
 }
 
 /* Removed local Latin Modern @font-face rules since we are switching to Charter (system/web stack) */
@@ -900,6 +905,8 @@ footer p {
 @media (max-width: 700px) {
     body {
         padding: 2rem 1rem;
+        /* Room for the fixed bottom tab bar so page content never sits under it. */
+        padding-bottom: calc(var(--mobile-nav-height) + 1.5rem + env(safe-area-inset-bottom, 0px));
     }
 
     header {
@@ -947,9 +954,48 @@ footer p {
         grid-template-columns: 1fr;
     }
 
+    /* The corner badge becomes a fixed, app-like bottom tab bar on mobile --
+       thumb-reachable instead of a small top-corner target. The signature
+       text/gif and divider are dropped; there's no room for them in a bar and
+       they're not navigational. */
     .signature-badge {
-        position: static;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        height: var(--mobile-nav-height);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: color-mix(in srgb, var(--bg-color) 92%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .signature-row,
+    .nav-divider {
+        display: none;
+    }
+
+    .side-nav {
+        flex: 1;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        gap: 0;
+        text-align: center;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        height: 100%;
+        font-size: 0.8rem;
     }
 }

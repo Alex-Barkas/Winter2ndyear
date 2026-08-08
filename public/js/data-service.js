@@ -32,9 +32,20 @@ export const DataService = {
                 assignments.push(doc.data());
             });
 
+            // CRITICAL: merge in any local-only assignments Firestore doesn't have yet.
+            // addAssignment()'s setDoc doesn't block navigation, so a write can still be
+            // in flight when the next page load's getDocs() runs here -- a plain
+            // overwrite would silently drop it (not just when the cloud is totally
+            // empty; the far more common case is one missing id among many). Cloud
+            // wins per id since it reflects the latest state once a write does land.
+            const local = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
+            const localAssignments = local ? JSON.parse(local) : [];
+            const cloudIds = new Set(assignments.map(a => a.id));
+            const merged = [...assignments, ...localAssignments.filter(a => !cloudIds.has(a.id))];
+
             // Sync to local storage for offline viewing/backup
-            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(assignments));
-            return assignments;
+            localStorage.setItem(STORAGE_KEYS.ASSIGNMENTS, JSON.stringify(merged));
+            return merged;
         } catch (e) {
             console.warn("Firestore unavailable, checking LocalStorage:", e);
             const local = localStorage.getItem(STORAGE_KEYS.ASSIGNMENTS);
@@ -214,9 +225,21 @@ export const DataService = {
                 overrides.push(doc.data());
             });
 
+            // CRITICAL: merge in any local-only overrides Firestore doesn't have yet.
+            // setGradeOverride()'s setDoc doesn't block navigation, so leaving the grades
+            // page right after typing a score can cut that write off mid-flight -- the
+            // next load's getDocs() would otherwise return a result missing just that one
+            // score (not the whole collection empty, which a length-only check would miss)
+            // and erase it from localStorage. Cloud wins per id since it reflects the
+            // latest state once a write does land.
+            const local = localStorage.getItem(STORAGE_KEYS.GRADE_OVERRIDES);
+            const localOverrides = local ? JSON.parse(local) : [];
+            const cloudIds = new Set(overrides.map(o => o.id));
+            const merged = [...overrides, ...localOverrides.filter(o => !cloudIds.has(o.id))];
+
             // Sync to local storage for offline viewing/backup
-            localStorage.setItem(STORAGE_KEYS.GRADE_OVERRIDES, JSON.stringify(overrides));
-            return overrides;
+            localStorage.setItem(STORAGE_KEYS.GRADE_OVERRIDES, JSON.stringify(merged));
+            return merged;
         } catch (e) {
             console.warn("Firestore unavailable, checking LocalStorage:", e);
             const local = localStorage.getItem(STORAGE_KEYS.GRADE_OVERRIDES);

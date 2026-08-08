@@ -15,7 +15,9 @@
     background: rgba(0, 0, 0, 0.7);
     display: grid;
     place-items: center;
-    z-index: 1000;
+    /* Above the fixed bottom tab bar (z-index: 1000, see style.css) so the
+       modal always covers it rather than tying and losing on DOM order. */
+    z-index: 1100;
     backdrop-filter: blur(4px);
 }
 
@@ -94,4 +96,39 @@
     color: var(--color-danger);
     border: 1px solid color-mix(in srgb, var(--color-danger) 50%, transparent);
     margin-right: auto;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+/* Below 700px the centered 400px card becomes a full-width bottom sheet --
+   easier to reach one-handed and gives form fields room to breathe instead
+   of being squeezed into a small floating box. */
+@media (max-width: 700px) {
+    .modal-overlay {
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        max-height: calc(85vh - env(safe-area-inset-bottom, 0px));
+        overflow-y: auto;
+        border-radius: 1rem 1rem 0 0;
+        padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+        gap: 0.6rem;
+    }
+
+    .modal-actions button {
+        width: 100%;
+        padding: 0.85rem 1.2rem;
+    }
+
+    .modal-actions button.danger {
+        margin-right: 0;
+    }
 }

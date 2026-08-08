@@ -81,7 +81,8 @@ const { term } = Astro.params;
                 background: rgba(0, 0, 0, 0.7);
                 display: grid;
                 place-items: center;
-                z-index: 1000;
+                /* Above the fixed bottom tab bar (z-index: 1000, see style.css). */
+                z-index: 1100;
                 backdrop-filter: blur(4px);
             }
 
@@ -146,6 +147,53 @@ const { term } = Astro.params;
                 background: var(--text-primary);
                 color: #000;
             }
+
+            /* -------------------------------------------------- responsive */
+
+            @media (max-width: 700px) {
+                .modal-overlay {
+                    align-items: flex-end;
+                }
+
+                .modal-content {
+                    width: 100%;
+                    max-width: none;
+                    max-height: calc(85vh - env(safe-area-inset-bottom, 0px));
+                    overflow-y: auto;
+                    border-radius: 1rem 1rem 0 0;
+                    padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+                    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+                }
+
+                .modal-actions {
+                    flex-direction: column-reverse;
+                    gap: 0.6rem;
+                }
+
+                .modal-actions button {
+                    width: 100%;
+                    padding: 0.85rem 1.2rem;
+                }
+
+                .details-meta {
+                    flex-wrap: wrap;
+                }
+
+                .header-top-row {
+                    flex-direction: column;
+                    gap: 0.75rem;
+                }
+
+                .details-status-row {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                    gap: 0.75rem;
+                }
+
+                .details-content {
+                    padding: 1.25rem;
+                }
+            }
         </style>
     </Fragment>
 
@@ -168,7 +216,8 @@ const { term } = Astro.params;
 
                 <h1 id="detail-title" style="margin-bottom: 1rem;"></h1>
 
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem;">
+                <div class="details-status-row"
+                    style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem;">
                     <span id="detail-category" class="assign-category"></span>
 
                     <div id="status-container" style="display: flex; align-items: center; gap: 1rem;">

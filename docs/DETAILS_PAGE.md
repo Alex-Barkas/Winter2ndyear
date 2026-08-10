@@ -1,9 +1,9 @@
 # Item Detail Pages
 
-`{term}2026/details.html` is a generic template that renders content for any schedule item based on its ID, fetched from Firestore.
+`src/pages/[term]/details.astro` is a generic template (route: `/{term}/details`) that renders content for any schedule item based on its ID, fetched from Firestore. The page shell is static; all content is filled in client-side.
 
 ## Query Parameter Routing
-When you click an item on the dashboard, you go to `{term}2026/details.html?id=some-id`.
+When you click an item on the dashboard, you go to `/{term}/details?id=some-id`.
 - `js/details.js` reads the `id` query param.
 - It fetches the matching item via `DataService.getAssignmentById(id)`.
 - It injects the title, date, category, and content into the DOM (`renderDetails()`).

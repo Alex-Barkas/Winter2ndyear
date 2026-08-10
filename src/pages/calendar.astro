@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SignatureNav from '../components/SignatureNav.astro';
 import terms from '../data/terms.js';
 
 // Replaces the old runtime multi-<script>-tag merge in calendar.html: build
@@ -48,6 +49,8 @@ const coursesFall2026 = terms.fall2026.courses;
             window.__coursesFall2026 = coursesFall2026;
         </script>
     </Fragment>
+
+    <SignatureNav />
 
     <main class="container">
         <header>

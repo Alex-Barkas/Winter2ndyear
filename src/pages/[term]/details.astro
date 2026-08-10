@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SignatureNav from '../../components/SignatureNav.astro';
 import terms from '../../data/terms.js';
 
 export function getStaticPaths() {
@@ -196,6 +197,8 @@ const { term } = Astro.params;
             }
         </style>
     </Fragment>
+
+    <SignatureNav />
 
     <main class="container">
         <header><a href={`/${term}`} class="back-link">← Back to Dashboard</a></header>

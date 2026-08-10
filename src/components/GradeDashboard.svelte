@@ -186,7 +186,7 @@
                 <option value={letter}>{letter}</option>
             {/each}
         </select>
-        <span>
+        <span class="banner-computed-avg">
             {#if bannerAvg}
                 <span class="banner-avg-value" style={`color:${bannerAvg.color}`}>{bannerAvg.text}</span>
             {/if}

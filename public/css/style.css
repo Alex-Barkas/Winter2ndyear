@@ -683,6 +683,16 @@ footer p {
     background: rgba(239, 68, 68, 0.1) !important;
 }
 
+/* .delete-btn is only visible on :hover, which touch input never triggers --
+   without this it sits at 0.2 opacity forever on a phone. Keyed on hover
+   capability, not viewport width, same fix already applied to
+   .todo-edit-btn/.todo-delete-btn in todo.css. */
+@media (hover: none) {
+    .delete-btn {
+        opacity: 0.7;
+    }
+}
+
 
 .assign-category {
     font-size: 0.65rem;

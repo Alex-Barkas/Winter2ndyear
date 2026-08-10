@@ -377,16 +377,19 @@
 
     /* No room for title text at this width -- collapse chips to small dots,
        same visual weight as the old widget's dot-only cells, and push the
-       actual titles into the tap-to-open day detail instead. */
+       actual titles into the tap-to-open day detail instead. Sized at 9px
+       (up from an earlier 6px) since each dot is still a real tap target --
+       it opens its item directly, per onPointerUp's plain-tap branch in
+       calendar-page.js -- and 6px was too small to hit reliably by finger. */
     .cal-chips {
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 3px;
+        gap: 4px;
     }
 
     .cal-chip {
-        width: 6px;
-        height: 6px;
+        width: 9px;
+        height: 9px;
         padding: 0;
         border-radius: 50%;
         border-left: none;

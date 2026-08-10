@@ -273,7 +273,7 @@
     gap: 1.5rem;
 }
 
-.final-grade-banner.single-course #banner-computed-avg {
+.final-grade-banner.single-course .banner-computed-avg {
     margin-left: auto;
     display: flex;
     flex-direction: column;
@@ -327,4 +327,63 @@
     font-size: 0.7rem;
     color: var(--text-muted);
     margin-bottom: 0.75rem;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+/* The 3fr/1fr/1fr/1fr/auto grid (grade-table-header, grade-row above) works
+   on desktop but is too cramped on a phone. Column labels lose their meaning
+   once a row wraps, so the header just hides; each row becomes a 2-line card
+   instead -- name on its own line, then weight/score/contribution/exclude in
+   a strip below. Targeting children by position (not new classes) since
+   grade-table-header/grade-row are rendered as flat, unlabeled children in
+   GradeDashboard.svelte in this fixed order. */
+@media (max-width: 700px) {
+    .grade-table-header {
+        display: none;
+    }
+
+    .grade-row {
+        grid-template-columns: 1fr auto auto auto;
+        grid-template-areas:
+            "name name name name"
+            "weight score contrib exclude";
+        row-gap: 0.35rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .grade-row > *:nth-child(1) { grid-area: name; }
+    .grade-row > *:nth-child(2) { grid-area: weight; font-size: 0.8rem; }
+    .grade-row > *:nth-child(3) { grid-area: score; }
+    .grade-row > *:nth-child(4) { grid-area: contrib; font-size: 0.8rem; }
+    .grade-row > *:nth-child(5) { grid-area: exclude; }
+
+    .grade-input {
+        width: 100%;
+    }
+
+    .final-grade-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .final-grade-select {
+        font-size: 1.25rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .final-grade-banner.single-course {
+        gap: 0.5rem;
+    }
+
+    .final-grade-banner.single-course .banner-computed-avg {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        align-items: flex-start;
+        text-align: left;
+    }
 }

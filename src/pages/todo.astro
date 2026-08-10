@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SignatureNav from '../components/SignatureNav.astro';
 import terms from '../data/terms.js';
 
 // Replaces the old runtime multi-<script>-tag merge in todo.html: merge all
@@ -36,6 +37,8 @@ const coursesFall2026 = terms.fall2026.courses;
         </script>
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js" is:inline></script>
     </Fragment>
+
+    <SignatureNav />
 
     <main class="container">
         <header>

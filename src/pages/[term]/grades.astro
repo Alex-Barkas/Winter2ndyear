@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SignatureNav from '../../components/SignatureNav.astro';
 import GradeDashboard from '../../components/GradeDashboard.svelte';
 import terms from '../../data/terms.js';
 
@@ -14,6 +15,8 @@ const { term, schemes } = Astro.props;
 ---
 
 <BaseLayout title="Grade Dashboard - Notes." extraCss={["/css/grades.css?v=1"]}>
+    <SignatureNav />
+
     <main class="container">
         <header>
             <a href={`/${term}`} class="back-link">← Back to Dashboard</a>

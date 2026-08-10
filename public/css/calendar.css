@@ -43,6 +43,28 @@
     opacity: 0.85;
 }
 
+/* Always-visible color key, near the toolbar so it's in view while scanning
+   the grid -- unlike the side panel's .cal-legend, which only shows before a
+   day is selected and disappears once you pick one. Row/dot markup mirrors
+   .cal-legend-row/.cal-legend-dot but laid out horizontally and compact. */
+.cal-legend-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cal-legend-strip-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
 .cal-page-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -398,8 +420,14 @@
         overflow: visible;
     }
 
+    /* Was `display: none` -- but the button is real data (there are N more
+       items today) and its click handler already works on touch (delegated
+       #cal-grid listener, not pointer-type-specific). Hiding it just made
+       overflow items vanish silently instead of being reachable. Shrunk
+       slightly here so it doesn't crowd the 9px chip dots in a 64px cell. */
     .cal-day-more {
-        display: none;
+        font-size: 0.6rem;
+        padding: 0.05rem 0.25rem;
     }
 
     .cal-tray-list {

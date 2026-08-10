@@ -214,3 +214,18 @@ export function makeTermScope(termRange, knownCourseCodes) {
         return d >= range.start && d <= range.end;
     };
 }
+
+/* ------------------------------------------------------------- course color */
+
+// No `color` field exists on course config objects, and adding one means
+// hand-editing 3 config files per course -- instead, hash each course code
+// deterministically into a fixed palette. Shared so a course's color is the
+// same wherever it shows up (calendar chips, assignment-list course groups).
+export const COURSE_PALETTE = ['#60a5fa', '#4ade80', '#facc15', '#f87171', '#c084fc', '#2dd4bf', '#fb923c', '#818cf8', '#f472b6', '#a3e635'];
+
+export function hashCourseColor(code) {
+    let h = 0;
+    const str = String(code || '');
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return COURSE_PALETTE[h % COURSE_PALETTE.length];
+}

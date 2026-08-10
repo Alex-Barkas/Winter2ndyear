@@ -18,7 +18,9 @@ import {
     urgencyStatus,
     makeWeekLabeller,
     Prefs,
-    toast
+    toast,
+    hashCourseColor,
+    COURSE_PALETTE
 } from '/js/ui-utils.js?v=1';
 
 const PREFS_KEY = 'ui_prefs_calendar';
@@ -38,17 +40,10 @@ const CATEGORY_COLORS = {
 };
 const TODO_COLOR = '#fb923c';
 
-// No `color` field exists on course config objects, and adding one means
-// hand-editing 3 config files per course -- instead, hash each course code
-// deterministically into a fixed palette. To-dos have no category, so this is
-// what colors their chips (assignments use CATEGORY_COLORS instead, above).
-const COURSE_PALETTE = ['#60a5fa', '#4ade80', '#facc15', '#f87171', '#c084fc', '#2dd4bf', '#fb923c', '#818cf8', '#f472b6', '#a3e635'];
-function hashCourseColor(code) {
-    let h = 0;
-    const str = String(code || '');
-    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-    return COURSE_PALETTE[h % COURSE_PALETTE.length];
-}
+// hashCourseColor/COURSE_PALETTE now live in ui-utils.js (shared with
+// assignments-page.js's course-grouped section headers) -- to-dos have no
+// category, so this is what colors their chips (assignments use
+// CATEGORY_COLORS instead, above).
 
 function chipColor(item) {
     if (item.__type === 'assignment') return CATEGORY_COLORS[(item.category || '').toUpperCase()] || 'var(--text-muted)';
@@ -101,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.prefs.view === 'agenda') agendaNeedsScroll = true;
 
     populateEventCourseSelect();
+    renderLegendStrip();
     wireControls();
     wireGrid();
     wireModal();
@@ -424,16 +420,36 @@ function renderDetailRow(item) {
              </div>`;
 }
 
-function renderLegend() {
-    const rows = Object.entries(CATEGORY_COLORS)
+// Shared by the side-panel legend (renderLegend, only visible before a day is
+// selected) and the always-visible toolbar strip (renderLegendStrip) -- one
+// source of labels/colors for both, so they can't drift out of sync.
+function legendEntries() {
+    const entries = Object.entries(CATEGORY_COLORS)
         .filter(([cat]) => cat !== 'TUTORIAL') // shares REMINDER's color, redundant in a legend
-        .map(([cat, color]) => `<div class="cal-legend-row"><span class="cal-legend-dot" style="background:${color};"></span>${escapeHtml(cat)}</div>`)
+        .map(([cat, color]) => [cat, color]);
+    entries.push(['TO-DO (personal)', TODO_COLOR]);
+    entries.push(['TO-DO (by course)', COURSE_PALETTE[0]]);
+    return entries;
+}
+
+function legendRowsHtml(className) {
+    return legendEntries()
+        .map(([label, color]) => `<div class="${className}"><span class="cal-legend-dot" style="background:${color};"></span>${escapeHtml(label)}</div>`)
         .join('');
-    return `<h3 style="margin-top:0;">Legend</h3><div class="cal-legend">${rows}
-        <div class="cal-legend-row"><span class="cal-legend-dot" style="background:${TODO_COLOR};"></span>TO-DO (personal)</div>
-        <div class="cal-legend-row"><span class="cal-legend-dot" style="background:${COURSE_PALETTE[0]};"></span>TO-DO (by course)</div>
-    </div>
+}
+
+function renderLegend() {
+    return `<h3 style="margin-top:0;">Legend</h3><div class="cal-legend">${legendRowsHtml('cal-legend-row')}</div>
     <p class="cal-detail-empty" style="padding:0.75rem 0 0;">Click a day to see what's due.</p>`;
+}
+
+// Always-visible compact key near the toolbar -- renderLegend()'s version
+// only shows in the side panel before any day is selected, and disappears the
+// moment you pick one, so there's otherwise no color key while scanning the grid.
+function renderLegendStrip() {
+    const host = document.getElementById('cal-legend-strip');
+    if (!host) return;
+    host.innerHTML = legendRowsHtml('cal-legend-strip-row');
 }
 
 /* ------------------------------------------------------------------ modal */

@@ -21,7 +21,8 @@ import {
     makeWeekLabeller,
     makeTermScope,
     Prefs,
-    toast
+    toast,
+    hashCourseColor
 } from '/js/ui-utils.js?v=1';
 
 const PREFS_KEY = 'ui_prefs_assignments';
@@ -74,6 +75,14 @@ async function init() {
     if (urlCourses) {
         urlCourses.split(',').map(c => decodeURIComponent(c).trim()).filter(Boolean)
             .forEach(c => selectedCourses.add(c));
+    }
+
+    // All-courses view reads better grouped by course than by week -- but only
+    // as a first-visit default, same guard calendar-page.js uses for its
+    // Agenda-on-phone default: once the user has saved any preference here,
+    // their choice wins even if they never touched groupBy specifically.
+    if (!Prefs.get(PREFS_KEY, null) && selectedCourses.size !== 1) {
+        prefs.groupBy = 'course';
     }
 
     try {
@@ -345,12 +354,15 @@ function render() {
         const total = group.items.length;
         const pct = total ? Math.round((done / total) * 100) : 0;
         const isCollapsed = collapsedGroups.has(group.key);
+        // Course groups get the same course-color identity as the calendar's
+        // chips for that course; other groupings (week/category/due) stay neutral.
+        const accentColor = prefs.groupBy === 'course' ? hashCourseColor(group.key) : '';
 
         return `
-            <div class="list-group">
+            <div class="list-group" style="${accentColor ? `border-left: 3px solid ${accentColor}; padding-left: 0.6rem;` : ''}">
                 <div class="list-group-header" data-action="toggle-group" data-key="${escapeHtml(group.key)}">
                     <span class="list-group-chevron">${isCollapsed ? '▸' : '▾'}</span>
-                    <span class="list-group-name">${escapeHtml(group.label)}</span>
+                    <span class="list-group-name" style="${accentColor ? `color:${accentColor};` : ''}">${escapeHtml(group.label)}</span>
                     <span class="list-group-subtotal">${done} / ${total} done</span>
                 </div>
                 <div class="list-progress-track">

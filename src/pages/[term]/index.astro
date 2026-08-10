@@ -32,7 +32,10 @@ const { term, studentData, meta } = Astro.props;
 
         <div class="content-stack">
             <section>
-                <h2 class="section-label">{meta.heading}</h2>
+                <div class="section-header">
+                    <h2 class="section-label">{meta.heading}</h2>
+                    <a href={`/${term}/assignments`} class="view-btn">All Deliverables →</a>
+                </div>
                 <div id="course-list" class="list-grid">
                     <!-- Courses injected via JS -->
                 </div>

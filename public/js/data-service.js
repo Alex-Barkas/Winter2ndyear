@@ -214,7 +214,7 @@ export const DataService = {
     // --- GRADE OVERRIDES (manual-entry scores + exclude/drop flags, cloud-synced) ---
     // Doc id matches the existing manual-entry key format: `manual-${course}-${compIdx}-${i}`
     // Doc shape: { id, course, componentName, index, score: number|null, excluded: true|false }
-    // NOTE: `excluded` being absent is a meaningful tri-state (see grading-renderer.js) —
+    // NOTE: `excluded` being absent is a meaningful tri-state (see src/lib/grade-math.js) —
     // never default it to false when writing.
 
     async getGradeOverrides() {

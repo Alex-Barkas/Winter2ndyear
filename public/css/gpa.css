@@ -1,0 +1,171 @@
+/* GPA calculator page. Reuses list-ui.css's .list-summary recipe for the
+   cumulative banner; everything below is specific to the per-term tables. */
+
+.gpa-term {
+    margin-bottom: 2.5rem;
+}
+
+.gpa-term-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.gpa-term-header h2 {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.gpa-term-status {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+.gpa-term-status.status-complete {
+    background: rgba(46, 204, 113, 0.12);
+    color: var(--color-success);
+}
+
+.gpa-term-status.status-in-progress {
+    background: rgba(64, 196, 255, 0.12);
+    color: var(--color-info);
+}
+
+.gpa-term-status.status-upcoming {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+}
+
+.gpa-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 120px 90px;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.gpa-row-head {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    opacity: 0.6;
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+.gpa-course {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.gpa-course-code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-primary);
+}
+
+.gpa-course-name {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.gpa-units,
+.gpa-grade,
+.gpa-points {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.gpa-points {
+    text-align: right;
+    color: var(--text-muted);
+}
+
+.gpa-grade-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+}
+
+.gpa-units-input,
+.gpa-grade-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 0.35rem 0.4rem;
+    border-radius: 0.4rem;
+}
+
+.gpa-units-input:focus,
+.gpa-grade-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.gpa-grade-select option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.gpa-term-footer {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.75rem 0.25rem 0;
+    margin-top: 0.25rem;
+}
+
+.gpa-term-gpa-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.gpa-term-gpa-value {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.gpa-term-units {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-left: auto;
+}
+
+@media (max-width: 640px) {
+    .gpa-row {
+        grid-template-columns: 1fr 72px 90px 64px;
+        gap: 0.5rem;
+    }
+
+    .gpa-course-name {
+        display: none;
+    }
+}

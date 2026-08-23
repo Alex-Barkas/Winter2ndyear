@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SignatureNav from '../components/SignatureNav.astro';
-import { transcript, GRADE_POINTS } from '../data/transcript.js';
+import { transcript, GRADE_POINTS, GRADE_POINTS_4 } from '../data/transcript.js';
 ---
 
 <BaseLayout
@@ -10,9 +10,10 @@ import { transcript, GRADE_POINTS } from '../data/transcript.js';
     extraCss={["/css/list-ui.css?v=1", "/css/gpa.css?v=1"]}
 >
     <Fragment slot="head">
-        <script is:inline define:vars={{ transcript, GRADE_POINTS }}>
+        <script is:inline define:vars={{ transcript, GRADE_POINTS, GRADE_POINTS_4 }}>
             window.__TRANSCRIPT = transcript;
             window.__GRADE_POINTS = GRADE_POINTS;
+            window.__GRADE_POINTS_4 = GRADE_POINTS_4;
         </script>
     </Fragment>
 

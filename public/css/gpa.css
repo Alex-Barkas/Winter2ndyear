@@ -196,6 +196,15 @@
     color: var(--text-primary);
 }
 
+/* Secondary, muted -- the 4.3-scale value above is the primary reading;
+   this is just a reference conversion alongside it. */
+.gpa-term-gpa4 {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
 .gpa-term-units {
     font-family: var(--font-mono);
     font-size: 0.72rem;

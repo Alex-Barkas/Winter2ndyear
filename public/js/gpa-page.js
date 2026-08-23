@@ -9,6 +9,7 @@ import { Prefs, escapeHtml } from './ui-utils.js';
 
 const TRANSCRIPT = window.__TRANSCRIPT || [];
 const GRADE_POINTS = window.__GRADE_POINTS || {};
+const GRADE_POINTS_4 = window.__GRADE_POINTS_4 || {};
 const GRADE_OPTIONS = Object.keys(GRADE_POINTS);
 
 const OVERRIDES_KEY = 'gpa_overrides';
@@ -49,10 +50,13 @@ function fmtGpa(points, units) {
 }
 
 // Sums only rows that are actually graded -- an ungraded course contributes
-// to neither the numerator nor the denominator (it is not a zero).
+// to neither the numerator nor the denominator (it is not a zero). Tracks
+// both the native 4.3-scale points and the 4.0-scale (A+ capped) points in
+// the same pass, since they share the same units/attempted totals.
 function sumTerm(term) {
     let units = 0;
     let points = 0;
+    let points4 = 0;
     let attemptedUnits = 0;
     term.courses.forEach((course) => {
         const { units: u, grade } = effective(course);
@@ -61,9 +65,10 @@ function sumTerm(term) {
         if (grade && GRADE_POINTS[grade] !== undefined && unitsNum && unitsNum > 0) {
             units += unitsNum;
             points += unitsNum * GRADE_POINTS[grade];
+            points4 += unitsNum * GRADE_POINTS_4[grade];
         }
     });
-    return { units, points, attemptedUnits };
+    return { units, points, points4, attemptedUnits };
 }
 
 function renderTerm(term) {
@@ -113,6 +118,7 @@ function renderTerm(term) {
             <div class="gpa-term-footer">
                 <span class="gpa-term-gpa-label">Term GPA</span>
                 <span class="gpa-term-gpa-value" data-term-gpa="${term.term}">—</span>
+                <span class="gpa-term-gpa4" data-term-gpa4="${term.term}"></span>
                 <span class="gpa-term-units" data-term-units="${term.term}"></span>
             </div>
         </section>`;
@@ -128,18 +134,22 @@ function pointsLabel(course) {
 function recompute() {
     let cumUnits = 0;
     let cumPoints = 0;
+    let cumPoints4 = 0;
     let cumAttempted = 0;
     let termsWithGrades = 0;
 
     TRANSCRIPT.forEach((term) => {
-        const { units, points, attemptedUnits } = sumTerm(term);
+        const { units, points, points4, attemptedUnits } = sumTerm(term);
         cumUnits += units;
         cumPoints += points;
+        cumPoints4 += points4;
         cumAttempted += attemptedUnits;
         if (units > 0) termsWithGrades += 1;
 
         const gpaEl = document.querySelector(`[data-term-gpa="${term.term}"]`);
         if (gpaEl) gpaEl.textContent = fmtGpa(points, units);
+        const gpa4El = document.querySelector(`[data-term-gpa4="${term.term}"]`);
+        if (gpa4El) gpa4El.textContent = units > 0 ? `${fmtGpa(points4, units)} / 4.0` : '';
         const unitsEl = document.querySelector(`[data-term-units="${term.term}"]`);
         if (unitsEl) unitsEl.textContent = units > 0 ? `${units.toFixed(2)} GPA units · ${points.toFixed(1)} pts` : '';
 
@@ -151,6 +161,8 @@ function recompute() {
 
     const cumGpaEl = document.getElementById('cumulative-gpa-value');
     if (cumGpaEl) cumGpaEl.textContent = fmtGpa(cumPoints, cumUnits);
+    const cumGpa4El = document.getElementById('cumulative-gpa4-value');
+    if (cumGpa4El) cumGpa4El.textContent = fmtGpa(cumPoints4, cumUnits);
     const cumUnitsEl = document.getElementById('cumulative-units-value');
     if (cumUnitsEl) cumUnitsEl.textContent = cumUnits.toFixed(2);
     const cumPointsEl = document.getElementById('cumulative-points-value');
@@ -167,6 +179,10 @@ function renderSummary() {
             <span class="list-summary-label">Cumulative GPA</span>
         </div>
         <div class="list-summary-stats">
+            <div class="list-summary-stat">
+                <span class="list-summary-stat-value" id="cumulative-gpa4-value">—</span>
+                <span class="list-summary-stat-label">4.0 Scale</span>
+            </div>
             <div class="list-summary-stat">
                 <span class="list-summary-stat-value" id="cumulative-units-value">0.00</span>
                 <span class="list-summary-stat-label">GPA Units</span>

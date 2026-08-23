@@ -15,6 +15,15 @@ export const GRADE_POINTS = {
     'F': 0.0,
 };
 
+// Standard 4.0-scale grade points (matches UofT's published scale, among
+// other schools) for comparing against a plain out-of-4.0 GPA. Identical to
+// the 4.3 scale above except A+ caps at 4.0 instead of 4.3 -- every other
+// grade already sits at or below 4.0, so nothing else moves.
+export const GRADE_POINTS_4 = {
+    ...GRADE_POINTS,
+    'A+': 4.0,
+};
+
 // `grade: null` means ungraded (in progress or not yet started) and is
 // excluded from every GPA calculation -- it is NOT the same as a 0.
 // `units: null` means the transcript doesn't list a credit weight yet

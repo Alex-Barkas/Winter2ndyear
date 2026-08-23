@@ -55,6 +55,11 @@ let prefs = Prefs.get(PREFS_KEY, DEFAULT_PREFS);
 let collapsedGroups = new Set(prefs.collapsed || []);
 let selectedCourses = new Set(); // empty = all courses
 let searchQuery = '';
+// Whether the mobile "Sort & filter" disclosure is expanded. Module-level, not
+// DOM state, so it survives the full buildControls() rebuilds that every
+// filter change triggers -- otherwise the panel would slam shut the moment
+// you tapped a chip inside it. Ignored entirely on desktop (see list-ui.css).
+let filtersOpen = false;
 let weekLabel = () => '';
 let termName = '';
 
@@ -263,6 +268,14 @@ function buildControls() {
                      class="${prefs.status === v ? 'active' : ''}">${l}</button>`).join('')}
         </div>` : '';
 
+    // Sort/Group/density/course-chips are stacked into a disclosure that is
+    // collapsed by default on phones -- five full-width control rows pushed
+    // the first actual assignment about a screen and a half down the page.
+    // On desktop .list-more is `display: contents` (see list-ui.css), so its
+    // children stay direct flex children of .list-controls and the layout is
+    // exactly as before; only the narrow breakpoint collapses it.
+    const secondaryCount = countSecondaryFilters();
+
     host.innerHTML = `
         <div class="list-search">
             <input type="search" id="assign-search" placeholder="Search assignments..."
@@ -272,36 +285,54 @@ function buildControls() {
 
         ${statusHtml}
 
-        <div class="list-select-group">
-            <label for="assign-sort">Sort</label>
-            <select id="assign-sort" class="list-select" data-action="sort">
-                <option value="date" ${prefs.sort === 'date' ? 'selected' : ''}>Due date</option>
-                <option value="course" ${prefs.sort === 'course' ? 'selected' : ''}>Course</option>
-                <option value="category" ${prefs.sort === 'category' ? 'selected' : ''}>Category</option>
-                <option value="title" ${prefs.sort === 'title' ? 'selected' : ''}>Title</option>
-            </select>
-        </div>
+        <button type="button" class="list-filters-toggle ${filtersOpen ? 'is-open' : ''}"
+                data-action="toggle-filters" aria-expanded="${filtersOpen}">
+            <span class="list-filters-toggle-chevron">${filtersOpen ? '▾' : '▸'}</span>
+            Sort &amp; filter${secondaryCount ? ` <span class="list-filters-count">${secondaryCount}</span>` : ''}
+        </button>
 
-        <div class="list-select-group">
-            <label for="assign-group">Group</label>
-            <select id="assign-group" class="list-select" data-action="group">
-                <option value="week" ${prefs.groupBy === 'week' ? 'selected' : ''}>Week</option>
-                <option value="due" ${prefs.groupBy === 'due' ? 'selected' : ''}>Due</option>
-                <option value="course" ${prefs.groupBy === 'course' ? 'selected' : ''}>Course</option>
-                <option value="category" ${prefs.groupBy === 'category' ? 'selected' : ''}>Category</option>
-                <option value="none" ${prefs.groupBy === 'none' ? 'selected' : ''}>None</option>
-            </select>
-        </div>
+        <div class="list-more ${filtersOpen ? 'is-open' : ''}">
+            <div class="list-select-group">
+                <label for="assign-sort">Sort</label>
+                <select id="assign-sort" class="list-select" data-action="sort">
+                    <option value="date" ${prefs.sort === 'date' ? 'selected' : ''}>Due date</option>
+                    <option value="course" ${prefs.sort === 'course' ? 'selected' : ''}>Course</option>
+                    <option value="category" ${prefs.sort === 'category' ? 'selected' : ''}>Category</option>
+                    <option value="title" ${prefs.sort === 'title' ? 'selected' : ''}>Title</option>
+                </select>
+            </div>
 
-        <div class="list-segmented" data-control="density">
-            <button data-action="density" data-value="comfortable"
-                    class="${prefs.density === 'comfortable' ? 'active' : ''}">Comfy</button>
-            <button data-action="density" data-value="compact"
-                    class="${prefs.density === 'compact' ? 'active' : ''}">Compact</button>
-        </div>
+            <div class="list-select-group">
+                <label for="assign-group">Group</label>
+                <select id="assign-group" class="list-select" data-action="group">
+                    <option value="week" ${prefs.groupBy === 'week' ? 'selected' : ''}>Week</option>
+                    <option value="due" ${prefs.groupBy === 'due' ? 'selected' : ''}>Due</option>
+                    <option value="course" ${prefs.groupBy === 'course' ? 'selected' : ''}>Course</option>
+                    <option value="category" ${prefs.groupBy === 'category' ? 'selected' : ''}>Category</option>
+                    <option value="none" ${prefs.groupBy === 'none' ? 'selected' : ''}>None</option>
+                </select>
+            </div>
 
-        ${chipsHtml}
+            <div class="list-segmented" data-control="density">
+                <button data-action="density" data-value="comfortable"
+                        class="${prefs.density === 'comfortable' ? 'active' : ''}">Comfy</button>
+                <button data-action="density" data-value="compact"
+                        class="${prefs.density === 'compact' ? 'active' : ''}">Compact</button>
+            </div>
+
+            ${chipsHtml}
+        </div>
     `;
+}
+
+// How many of the collapsed controls are currently doing something -- shown
+// as a badge on the toggle so an active course filter or a non-default
+// sort/grouping is still visible while the panel is shut.
+function countSecondaryFilters() {
+    let n = selectedCourses.size;
+    if (prefs.sort !== DEFAULT_PREFS.sort) n += 1;
+    if (prefs.groupBy !== DEFAULT_PREFS.groupBy) n += 1;
+    return n;
 }
 
 function filtersActive() {
@@ -448,6 +479,11 @@ function card(item) {
     const weekSub = (prefs.groupBy !== 'week' && !undated)
         ? `<div class="assign-week-sub">${escapeHtml(weekLabel(item.date))}</div>` : '';
 
+    // Same reasoning as weekSub above, for the course code: inside an
+    // "ENPH 225" group every row saying "ENPH 225" is pure repetition.
+    const courseTag = prefs.groupBy !== 'course'
+        ? `<span class="assign-course">${escapeHtml(item.course || 'Unknown Course')}</span>` : '';
+
     // PENDING/UPCOMING are the default states of most items; badging them adds
     // noise without information, so only exceptional states get a badge.
     const showBadge = !['PENDING', 'UPCOMING'].includes(status.label);
@@ -468,7 +504,7 @@ function card(item) {
                     </span>
                     <div class="assign-details">
                         <div class="assign-meta">
-                            <span class="assign-course">${escapeHtml(item.course || 'Unknown Course')}</span>
+                            ${courseTag}
                             <span class="assign-category category-${escapeHtml(category.toLowerCase())}">${escapeHtml(category)}</span>
                         </div>
                         <span class="assign-title ${status.done ? 'done-text' : ''}">${escapeHtml(item.title || 'Untitled Assignment')}</span>
@@ -533,6 +569,19 @@ function onControlClick(e) {
         if (input) input.value = '';
         btn.hidden = true;
         render();
+        return;
+    }
+
+    if (action === 'toggle-filters') {
+        filtersOpen = !filtersOpen;
+        // Toggle in place rather than re-rendering -- a rebuild here would
+        // drop focus out of the search box.
+        btn.classList.toggle('is-open', filtersOpen);
+        btn.setAttribute('aria-expanded', String(filtersOpen));
+        const chevron = btn.querySelector('.list-filters-toggle-chevron');
+        if (chevron) chevron.textContent = filtersOpen ? '▾' : '▸';
+        const panel = document.querySelector('#assignment-controls .list-more');
+        if (panel) panel.classList.toggle('is-open', filtersOpen);
         return;
     }
 

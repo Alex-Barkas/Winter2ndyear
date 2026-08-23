@@ -231,6 +231,20 @@
     color: #fff;
 }
 
+/* --- Collapsible secondary controls (mobile only) ---------------------- */
+
+/* On desktop the wrapper is transparent: `display: contents` drops it out of
+   the box tree so Sort/Group/density/chips stay direct flex children of
+   .list-controls and lay out exactly as they did before this wrapper existed.
+   The toggle button is hidden. The mobile block below overrides both. */
+.list-more {
+    display: contents;
+}
+
+.list-filters-toggle {
+    display: none;
+}
+
 /* Course filter chips -- the .assign-category pill recipe, made interactive. */
 .list-chips {
     display: flex;
@@ -515,6 +529,74 @@
 
     .list-select {
         min-height: 38px;
+    }
+
+    /* Collapse Sort/Group/density/course-chips behind one toggle. Left
+       expanded, these are five full-width rows -- roughly a screen and a
+       half of chrome before the first actual list row. Search and the
+       status tabs stay out in the open as the primary triage controls. */
+    .list-filters-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        min-height: 38px;
+        padding: 0 0.85rem;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .list-filters-toggle.is-open {
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .list-filters-toggle-chevron {
+        font-size: 0.65rem;
+    }
+
+    /* Count of collapsed controls that are currently active, so a course
+       filter or non-default sort stays visible while the panel is shut. */
+    .list-filters-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.25em;
+        height: 1.25em;
+        padding: 0 0.3em;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent-color) 22%, transparent);
+        color: var(--accent-color);
+        font-size: 0.68rem;
+        font-weight: 700;
+    }
+
+    .list-more {
+        display: none;
+    }
+
+    .list-more.is-open {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+    }
+
+    /* One horizontally-scrollable row rather than a wrapping bank that grows
+       a line per four courses. */
+    .list-more .list-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 0.2rem;
+    }
+
+    .list-more .list-chip {
+        flex: 0 0 auto;
     }
 
     .toast-host {

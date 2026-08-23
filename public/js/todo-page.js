@@ -44,6 +44,9 @@ let prefs = Prefs.get(PREFS_KEY, DEFAULT_PREFS);
 let collapsedGroups = new Set(prefs.collapsed || []);
 let selectedCourses = new Set();
 let searchQuery = '';
+// Mobile "Sort & filter" disclosure state -- module-level so it survives the
+// control-bar rebuilds that filter changes and snapshot updates trigger.
+let filtersOpen = false;
 let editingId = null;           // row currently showing its inline edit form
 let deleteConfirmId = null;     // row whose delete button is armed
 let glowId = null;              // row that just got completed, for the one-shot glow
@@ -224,37 +227,54 @@ function buildControls() {
 
         ${statusHtml}
 
-        <div class="list-select-group">
-            <label for="todo-sort">Sort</label>
-            <select id="todo-sort" class="list-select" data-action="sort">
-                <option value="date" ${prefs.sort === 'date' ? 'selected' : ''}>Due date</option>
-                <option value="urgency" ${prefs.sort === 'urgency' ? 'selected' : ''}>Urgency</option>
-                <option value="course" ${prefs.sort === 'course' ? 'selected' : ''}>Course</option>
-                <option value="created" ${prefs.sort === 'created' ? 'selected' : ''}>Recently added</option>
-                <option value="title" ${prefs.sort === 'title' ? 'selected' : ''}>Title</option>
-            </select>
-        </div>
+        <button type="button" class="list-filters-toggle ${filtersOpen ? 'is-open' : ''}"
+                data-action="toggle-filters" aria-expanded="${filtersOpen}">
+            <span class="list-filters-toggle-chevron">${filtersOpen ? '▾' : '▸'}</span>
+            Sort &amp; filter${countSecondaryFilters() ? ` <span class="list-filters-count">${countSecondaryFilters()}</span>` : ''}
+        </button>
 
-        <div class="list-select-group">
-            <label for="todo-group">Group</label>
-            <select id="todo-group" class="list-select" data-action="group">
-                <option value="status" ${prefs.groupBy === 'status' ? 'selected' : ''}>Status</option>
-                <option value="due" ${prefs.groupBy === 'due' ? 'selected' : ''}>Due</option>
-                <option value="course" ${prefs.groupBy === 'course' ? 'selected' : ''}>Course</option>
-                <option value="urgency" ${prefs.groupBy === 'urgency' ? 'selected' : ''}>Urgency</option>
-                <option value="none" ${prefs.groupBy === 'none' ? 'selected' : ''}>None</option>
-            </select>
-        </div>
+        <div class="list-more ${filtersOpen ? 'is-open' : ''}">
+            <div class="list-select-group">
+                <label for="todo-sort">Sort</label>
+                <select id="todo-sort" class="list-select" data-action="sort">
+                    <option value="date" ${prefs.sort === 'date' ? 'selected' : ''}>Due date</option>
+                    <option value="urgency" ${prefs.sort === 'urgency' ? 'selected' : ''}>Urgency</option>
+                    <option value="course" ${prefs.sort === 'course' ? 'selected' : ''}>Course</option>
+                    <option value="created" ${prefs.sort === 'created' ? 'selected' : ''}>Recently added</option>
+                    <option value="title" ${prefs.sort === 'title' ? 'selected' : ''}>Title</option>
+                </select>
+            </div>
 
-        <div class="list-segmented">
-            <button data-action="density" data-value="comfortable"
-                    class="${prefs.density === 'comfortable' ? 'active' : ''}">Comfy</button>
-            <button data-action="density" data-value="compact"
-                    class="${prefs.density === 'compact' ? 'active' : ''}">Compact</button>
-        </div>
+            <div class="list-select-group">
+                <label for="todo-group">Group</label>
+                <select id="todo-group" class="list-select" data-action="group">
+                    <option value="status" ${prefs.groupBy === 'status' ? 'selected' : ''}>Status</option>
+                    <option value="due" ${prefs.groupBy === 'due' ? 'selected' : ''}>Due</option>
+                    <option value="course" ${prefs.groupBy === 'course' ? 'selected' : ''}>Course</option>
+                    <option value="urgency" ${prefs.groupBy === 'urgency' ? 'selected' : ''}>Urgency</option>
+                    <option value="none" ${prefs.groupBy === 'none' ? 'selected' : ''}>None</option>
+                </select>
+            </div>
 
-        ${chipsHtml}
+            <div class="list-segmented">
+                <button data-action="density" data-value="comfortable"
+                        class="${prefs.density === 'comfortable' ? 'active' : ''}">Comfy</button>
+                <button data-action="density" data-value="compact"
+                        class="${prefs.density === 'compact' ? 'active' : ''}">Compact</button>
+            </div>
+
+            ${chipsHtml}
+        </div>
     `;
+}
+
+// See assignments-page.js: badge on the collapsed toggle so an active course
+// filter or non-default sort/grouping stays visible while the panel is shut.
+function countSecondaryFilters() {
+    let n = selectedCourses.size;
+    if (prefs.sort !== DEFAULT_PREFS.sort) n += 1;
+    if (prefs.groupBy !== DEFAULT_PREFS.groupBy) n += 1;
+    return n;
 }
 
 function filtersActive() {
@@ -607,6 +627,18 @@ function onControlClick(e) {
         if (input) input.value = '';
         btn.hidden = true;
         render();
+        return;
+    }
+
+    if (action === 'toggle-filters') {
+        filtersOpen = !filtersOpen;
+        // Toggle in place; a rebuild here would drop search focus.
+        btn.classList.toggle('is-open', filtersOpen);
+        btn.setAttribute('aria-expanded', String(filtersOpen));
+        const chevron = btn.querySelector('.list-filters-toggle-chevron');
+        if (chevron) chevron.textContent = filtersOpen ? '▾' : '▸';
+        const panel = document.querySelector('#todo-controls .list-more');
+        if (panel) panel.classList.toggle('is-open', filtersOpen);
         return;
     }
 

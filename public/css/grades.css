@@ -333,50 +333,128 @@
 
 /* The 3fr/1fr/1fr/1fr/auto grid (grade-table-header, grade-row above) works
    on desktop but is too cramped on a phone. Column labels lose their meaning
-   once a row wraps, so the header just hides; each row becomes a 2-line card
-   instead -- name on its own line, then weight/score/contribution/exclude in
-   a strip below. Targeting children by position (not new classes) since
-   grade-table-header/grade-row are rendered as flat, unlabeled children in
-   GradeDashboard.svelte in this fixed order. */
+   once a row wraps, so the header hides; each row becomes its own breathable
+   card instead -- name+badges on top, then weight/score/contribution/exclude
+   spread across a line below with real gaps instead of touching each other.
+   Targeting children by position (not new classes) since grade-table-header/
+   grade-row are rendered as flat, unlabeled children in GradeDashboard.svelte
+   in this fixed order. */
 @media (max-width: 700px) {
+    .grade-card {
+        padding: 1.1rem 1rem;
+        margin-bottom: 1.1rem;
+        border-radius: 0.85rem;
+    }
+
+    .grade-header {
+        margin-bottom: 1rem;
+    }
+
+    .grade-course {
+        font-size: 1.05rem;
+    }
+
+    .grade-score {
+        font-size: 1.2rem;
+    }
+
+    .grade-progress-label {
+        margin-bottom: 1.1rem;
+    }
+
     .grade-table-header {
         display: none;
     }
 
     .grade-row {
-        grid-template-columns: 1fr auto auto auto;
-        grid-template-areas:
-            "name name name name"
-            "weight score contrib exclude";
-        row-gap: 0.35rem;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        row-gap: 0.85rem;
+        column-gap: 0.6rem;
+        padding: 1rem 0.9rem;
+        margin: 0 0 0.65rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 0.65rem;
     }
 
-    .grade-row > *:nth-child(1) { grid-area: name; }
-    .grade-row > *:nth-child(2) { grid-area: weight; font-size: 0.8rem; }
-    .grade-row > *:nth-child(3) { grid-area: score; }
-    .grade-row > *:nth-child(4) { grid-area: contrib; font-size: 0.8rem; }
-    .grade-row > *:nth-child(5) { grid-area: exclude; }
+    .grade-row:last-child {
+        margin-bottom: 0;
+    }
 
-    .grade-input {
-        width: 100%;
+    .grade-row.excluded {
+        background: rgba(248, 113, 113, 0.04);
+    }
+
+    /* name+badges: full-width first line */
+    .grade-row > *:nth-child(1) {
+        flex: 1 1 100%;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* weight: pinned left on the second line, with an inline label since
+       the column header is gone */
+    .grade-row > *:nth-child(2) {
+        font-size: 0.78rem;
+        color: var(--text-faint);
+    }
+
+    .grade-row > *:nth-child(2)::before {
+        content: "Weight ";
+    }
+
+    /* score input + contribution + exclude button cluster together and get
+       pushed to the right, away from the weight label, via the input's
+       auto left-margin absorbing the row's leftover space */
+    .grade-row > *:nth-child(3) {
+        margin-left: auto;
+        width: 68px;
+        min-height: 38px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .grade-row > *:nth-child(4) {
+        font-size: 0.88rem;
+        font-weight: 600;
+    }
+
+    .grade-row > *:nth-child(4)::before {
+        content: "→ ";
+        color: var(--text-faint);
+        font-weight: 400;
+    }
+
+    .grade-row > *:nth-child(5) {
+        width: 30px;
+        height: 30px;
+    }
+
+    .grade-group-header {
+        font-size: 0.85rem;
+        padding: 0.75rem 0;
+    }
+
+    .grade-group-rows {
+        padding-top: 0.5rem;
     }
 
     .final-grade-banner {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-        padding: 1.25rem 1.5rem;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1.4rem 1.25rem;
     }
 
     .final-grade-select {
-        font-size: 1.25rem;
-        padding: 0.25rem 0.75rem;
+        font-size: 1.5rem;
+        width: 100%;
     }
 
     .final-grade-banner.single-course {
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .final-grade-banner.single-course .banner-computed-avg {
@@ -385,5 +463,9 @@
         border-left: none;
         align-items: flex-start;
         text-align: left;
+    }
+
+    .banner-avg-value {
+        font-size: 1.4rem;
     }
 }

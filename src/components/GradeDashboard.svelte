@@ -111,7 +111,20 @@
         await DataService.setFinalGrade(courseCode, value);
     }
 
-    async function handleScoreChange(row, course, value) {
+    async function handleScoreChange(row, course, value, inputEl) {
+        const originalVal = row.score !== null && row.score !== undefined ? String(row.score) : '';
+
+        // Guard against misclicks/accidental edits: require explicit confirmation
+        // before any score change is persisted. Cancelling reverts the input to
+        // its last saved value instead of silently discarding the keystroke.
+        if (value !== originalVal) {
+            const confirmed = window.confirm('Are you sure you want to change this grade?');
+            if (!confirmed) {
+                inputEl.value = originalVal;
+                return;
+            }
+        }
+
         const newScore = value === '' ? null : parseFloat(value);
 
         if (row.isSynced) {
@@ -252,7 +265,7 @@
                                     value={row.score !== null ? row.score : ''}
                                     style={scoreColor ? `color:${scoreColor}` : ''}
                                     placeholder="-"
-                                    onchange={(e) => handleScoreChange(row, course, e.target.value)}>
+                                    onchange={(e) => handleScoreChange(row, course, e.target.value, e.target)}>
                                 <span style={scoreColor ? `color:${scoreColor}` : ''}>{contribStr}</span>
                                 <button type="button" class={`grade-exclude-btn ${row.isExcluded ? 'checked' : ''}`}
                                     title={row.isExcluded ? 'Include in average' : 'Exclude from average'}
@@ -287,7 +300,7 @@
                                             value={row.score !== null ? row.score : ''}
                                             style={scoreColor ? `color:${scoreColor}` : ''}
                                             placeholder="-"
-                                            onchange={(e) => handleScoreChange(row, course, e.target.value)}>
+                                            onchange={(e) => handleScoreChange(row, course, e.target.value, e.target)}>
                                         <span style={scoreColor ? `color:${scoreColor}` : ''}>{contribStr}</span>
                                         <button type="button" class={`grade-exclude-btn ${row.isExcluded ? 'checked' : ''}`}
                                             title={row.isExcluded ? 'Include in average' : 'Exclude from average'}

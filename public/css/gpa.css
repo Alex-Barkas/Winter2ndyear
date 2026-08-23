@@ -10,6 +10,12 @@
     align-items: baseline;
     gap: 0.75rem;
     margin-bottom: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.gpa-term-header:hover h2 {
+    color: var(--accent-color);
 }
 
 .gpa-term-header h2 {
@@ -17,6 +23,21 @@
     font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: -0.02em;
+}
+
+.gpa-term-chevron {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    width: 1em;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+/* Plain show/hide, no transition -- matches this app's convention for
+   toggled UI (e.g. .grade-group-rows.collapsed in grades.css). */
+.gpa-term-body.collapsed {
+    display: none;
 }
 
 .gpa-term-status {
@@ -82,6 +103,30 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* A completed term's course was edited away from its official transcript
+   value. Amber, same family as the grade calculator's DROPPED badge --
+   this app's existing convention for "you changed this, not the source
+   data." */
+.gpa-override-badge {
+    display: inline-block;
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background-color: rgba(255, 171, 0, 0.1);
+    color: #ffab00;
+    width: fit-content;
+}
+
+.gpa-row.overridden .gpa-units-input,
+.gpa-row.overridden .gpa-grade-select {
+    border-color: #ffab00;
 }
 
 .gpa-units,

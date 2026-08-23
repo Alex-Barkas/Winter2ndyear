@@ -1,6 +1,10 @@
-// GPA calculator page. Renders the transcript data once, then recomputes
-// every displayed number in place on input change -- never rebuilds the DOM
-// mid-edit, so a select/input never loses focus while typing.
+// GPA calculator page. Renders the transcript data once. Edits commit on
+// the "change" event (blur for the units input, selection for the grade
+// select) rather than "input" -- each commit needs a confirm() gate, and
+// gating every keystroke would pop a dialog per character typed. Term
+// collapse/expand rebuilds the term list too (pure UI state, cheap to
+// re-render from TRANSCRIPT + overrides), which is safe here precisely
+// because "change" only fires once editing is already done.
 import { Prefs, escapeHtml } from './ui-utils.js';
 
 const TRANSCRIPT = window.__TRANSCRIPT || [];
@@ -11,8 +15,22 @@ const OVERRIDES_KEY = 'gpa_overrides';
 // { [courseCode]: { units: number|null, grade: string|null } }
 let overrides = Prefs.get(OVERRIDES_KEY, {});
 
+// Collapsed-by-default for completed terms (the ones you're unlikely to be
+// actively editing) so the page opens as a scannable summary; in-progress
+// and upcoming terms start expanded since those are what you're filling in.
+// Not persisted -- purely this page-load's UI state.
+let collapsedTerms = new Set(TRANSCRIPT.filter((t) => t.status === 'complete').map((t) => t.term));
+
 function saveOverrides() {
     Prefs.set(OVERRIDES_KEY, overrides);
+}
+
+function findCourseAndTerm(code) {
+    for (const term of TRANSCRIPT) {
+        const course = term.courses.find((c) => c.code === code);
+        if (course) return { course, term };
+    }
+    return {};
 }
 
 // Effective units/grade for a course: an override always wins over the
@@ -49,24 +67,23 @@ function sumTerm(term) {
 }
 
 function renderTerm(term) {
+    const isLocked = term.status === 'complete';
     const rows = term.courses.map((course) => {
         const { units, grade } = effective(course);
-        const editable = term.status !== 'complete';
-        const unitsCell = editable
-            ? `<input type="number" class="gpa-units-input" data-code="${escapeHtml(course.code)}" value="${units === null || units === undefined ? '' : units}" step="0.05" min="0" placeholder="units">`
-            : `<span>${units.toFixed(2)}</span>`;
-        const gradeCell = editable
-            ? `<select class="gpa-grade-select" data-code="${escapeHtml(course.code)}">
+        const isOverridden = isLocked && overrides[course.code] !== undefined;
+
+        const unitsCell = `<input type="number" class="gpa-units-input" data-code="${escapeHtml(course.code)}" value="${units === null || units === undefined ? '' : units}" step="0.05" min="0" placeholder="units">`;
+        const gradeCell = `<select class="gpa-grade-select" data-code="${escapeHtml(course.code)}">
                     <option value="">—</option>
                     ${GRADE_OPTIONS.map((g) => `<option value="${g}" ${g === grade ? 'selected' : ''}>${g}</option>`).join('')}
-               </select>`
-            : `<span class="gpa-grade-badge">${escapeHtml(grade || '—')}</span>`;
+               </select>`;
 
         return `
-            <div class="gpa-row" data-code="${escapeHtml(course.code)}">
+            <div class="gpa-row${isOverridden ? ' overridden' : ''}" data-code="${escapeHtml(course.code)}">
                 <div class="gpa-course">
                     <span class="gpa-course-code">${escapeHtml(course.code)}</span>
                     <span class="gpa-course-name">${escapeHtml(course.name)}</span>
+                    ${isOverridden ? '<span class="gpa-override-badge" title="Changed from your official transcript">OVERRIDDEN</span>' : ''}
                 </div>
                 <div class="gpa-units">${unitsCell}</div>
                 <div class="gpa-grade">${gradeCell}</div>
@@ -75,20 +92,24 @@ function renderTerm(term) {
     }).join('');
 
     const statusLabel = term.status === 'complete' ? 'Completed' : term.status === 'in-progress' ? 'In Progress' : 'Upcoming';
+    const isCollapsed = collapsedTerms.has(term.term);
 
     return `
         <section class="gpa-term" data-term="${term.term}">
-            <div class="gpa-term-header">
+            <div class="gpa-term-header" data-term-toggle="${term.term}">
+                <span class="gpa-term-chevron">${isCollapsed ? '▸' : '▾'}</span>
                 <h2>${escapeHtml(term.label)}</h2>
                 <span class="gpa-term-status status-${term.status}">${statusLabel}</span>
             </div>
-            <div class="gpa-row gpa-row-head">
-                <div class="gpa-course">Course</div>
-                <div class="gpa-units">Units</div>
-                <div class="gpa-grade">Grade</div>
-                <div class="gpa-points">Points</div>
+            <div class="gpa-term-body${isCollapsed ? ' collapsed' : ''}">
+                <div class="gpa-row gpa-row-head">
+                    <div class="gpa-course">Course</div>
+                    <div class="gpa-units">Units</div>
+                    <div class="gpa-grade">Grade</div>
+                    <div class="gpa-points">Points</div>
+                </div>
+                ${rows}
             </div>
-            ${rows}
             <div class="gpa-term-footer">
                 <span class="gpa-term-gpa-label">Term GPA</span>
                 <span class="gpa-term-gpa-value" data-term-gpa="${term.term}">—</span>
@@ -161,30 +182,73 @@ function renderSummary() {
         </div>`;
 }
 
+function renderTerms() {
+    document.getElementById('gpa-terms').innerHTML = TRANSCRIPT.map(renderTerm).join('');
+}
+
 function attachListeners() {
-    document.getElementById('gpa-terms').addEventListener('input', (e) => {
+    const container = document.getElementById('gpa-terms');
+
+    container.addEventListener('click', (e) => {
+        const header = e.target.closest('[data-term-toggle]');
+        if (!header) return;
+        const termKey = header.dataset.termToggle;
+        if (collapsedTerms.has(termKey)) collapsedTerms.delete(termKey);
+        else collapsedTerms.add(termKey);
+        renderTerms();
+        recompute();
+    });
+
+    container.addEventListener('change', (e) => {
         const target = e.target;
         const code = target.dataset.code;
         if (!code) return;
 
+        const isUnits = target.classList.contains('gpa-units-input');
+        const isGrade = target.classList.contains('gpa-grade-select');
+        if (!isUnits && !isGrade) return;
+
+        const { course, term } = findCourseAndTerm(code);
+        const { units: prevUnits, grade: prevGrade } = effective(course);
+        const prevValue = isUnits
+            ? (prevUnits === null || prevUnits === undefined ? '' : String(prevUnits))
+            : (prevGrade || '');
+        const newValue = target.value;
+
+        // Guard against misclicks/accidental edits -- and make clear that
+        // touching a completed term overrides its official transcript value,
+        // not just a working estimate.
+        if (newValue !== prevValue) {
+            const message = term && term.status === 'complete'
+                ? 'This overrides your official transcript grade. Are you sure you want to change it?'
+                : 'Are you sure you want to change this grade?';
+            if (!window.confirm(message)) {
+                target.value = prevValue;
+                return;
+            }
+        }
+
         if (!overrides[code]) overrides[code] = {};
 
-        if (target.classList.contains('gpa-units-input')) {
-            overrides[code].units = target.value === '' ? null : parseFloat(target.value);
-        } else if (target.classList.contains('gpa-grade-select')) {
-            overrides[code].grade = target.value === '' ? null : target.value;
+        if (isUnits) {
+            overrides[code].units = newValue === '' ? null : parseFloat(newValue);
         } else {
-            return;
+            overrides[code].grade = newValue === '' ? null : newValue;
         }
 
         saveOverrides();
+
+        // Re-render so a completed-term row's OVERRIDDEN badge (re)appears --
+        // safe here (unlike on every keystroke) because "change" only fires
+        // once editing has already committed.
+        renderTerms();
         recompute();
     });
 }
 
 function init() {
     renderSummary();
-    document.getElementById('gpa-terms').innerHTML = TRANSCRIPT.map(renderTerm).join('');
+    renderTerms();
     attachListeners();
     recompute();
 }

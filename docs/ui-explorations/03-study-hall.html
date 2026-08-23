@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Study Hall — Winter 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAF7F2; --card:#FFFFFF; --sunk:#F3EFE8;
+  --line:#E7E0D5; --line-2:#D9D0C1;
+  --ink:#242019; --ink-2:#6B6357; --ink-3:#9A9184;
+  --green:#2F6B4F; --green-soft:#E4EFE8;
+  --red:#B4423C; --red-soft:#FAE9E7;
+  --amber:#B07A1E; --amber-soft:#FBF0DC;
+  --blue:#3A6491; --blue-soft:#E7EEF6;
+  --violet:#6D5399; --violet-soft:#EFEAF7;
+  --rose:#A4456B; --rose-soft:#FAE8EE;
+  --serif:'Fraunces',Charter,Georgia,serif;
+  --shadow:0 1px 2px rgba(60,50,35,.05), 0 4px 14px rgba(60,50,35,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:Inter,-apple-system,sans-serif;font-size:14.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+
+/* top nav */
+.topnav{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.topinner{max-width:1160px;margin:0 auto;padding:0 32px;height:62px;display:flex;align-items:center;gap:32px}
+.logo{font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.015em;display:flex;align-items:center;gap:10px}
+.leaf{width:26px;height:26px;border-radius:8px;background:var(--green);display:grid;place-items:center;color:#fff;font-size:13px}
+.tabs{display:flex;gap:2px;margin-left:8px}
+.tab{padding:7px 13px;border-radius:8px;font-size:13.5px;font-weight:450;color:var(--ink-2);text-decoration:none}
+.tab:hover{background:var(--sunk);color:var(--ink)}
+.tab.on{background:var(--green-soft);color:var(--green);font-weight:550}
+.tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+.termsel{display:flex;align-items:center;gap:7px;border:1px solid var(--line-2);background:var(--card);border-radius:9px;padding:6.5px 12px;font-size:13px;color:var(--ink-2)}
+.add{background:var(--green);color:#fff;border:none;border-radius:9px;padding:8px 15px;font-size:13.5px;font-weight:550;font-family:inherit;display:flex;align-items:center;gap:6px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--amber-soft);color:var(--amber);display:grid;place-items:center;font-weight:600;font-size:12.5px;border:1px solid var(--line)}
+
+.wrap{max-width:1160px;margin:0 auto;padding:40px 32px 80px}
+
+/* header */
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:var(--serif);font-size:36px;font-weight:500;letter-spacing:-.022em;line-height:1.15;margin-top:10px}
+.lede{color:var(--ink-2);font-size:16px;margin-top:10px;max-width:560px}
+
+/* hero split */
+.hero{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-top:28px}
+.next{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.next .lbl{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.next h3{font-family:var(--serif);font-size:25px;font-weight:500;letter-spacing:-.018em;margin-top:10px;line-height:1.2}
+.next .meta{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13.5px;color:var(--ink-2)}
+.next .foot{margin-top:auto;padding-top:22px;display:flex;align-items:center;gap:12px}
+.cta{background:var(--ink);color:var(--paper);border:none;border-radius:9px;padding:9px 16px;font-size:13.5px;font-weight:550;font-family:inherit}
+.cta.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--line-2)}
+.countdown{margin-left:auto;text-align:right}
+.countdown b{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--amber);display:block;letter-spacing:-.02em;line-height:1}
+.countdown span{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+
+.tiles{display:grid;grid-template-rows:repeat(2,1fr);gap:16px}
+.tilerow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.tile .k{font-size:11.5px;font-weight:550;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.tile .v{font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:-.025em;margin-top:6px;line-height:1}
+.tile .v small{font-size:15px;color:var(--ink-3);font-weight:400}
+.tile .m{font-size:12px;color:var(--ink-3);margin-top:6px}
+.tile.bad{background:var(--red-soft);border-color:#F0D6D3}
+.tile.bad .k,.tile.bad .m{color:var(--red)}
+.tile.bad .v{color:var(--red)}
+.ring{height:5px;border-radius:3px;background:var(--sunk);margin-top:10px;overflow:hidden}
+.ring i{display:block;height:100%;border-radius:3px;background:var(--green)}
+
+/* sections */
+.sechead{display:flex;align-items:baseline;justify-content:space-between;margin:52px 0 18px}
+.sechead h2{font-family:var(--serif);font-size:22px;font-weight:500;letter-spacing:-.015em}
+.sechead a{font-size:13.5px;color:var(--green);text-decoration:none;font-weight:500}
+
+/* courses */
+.courses{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.course{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow)}
+.course:hover{border-color:var(--line-2)}
+.chead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.cbadge{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.04em;padding:4px 9px;border-radius:7px;background:var(--cs);color:var(--c)}
+.cmark{font-family:var(--serif);font-size:23px;font-weight:500;letter-spacing:-.02em}
+.cmark span{display:block;font-family:Inter,sans-serif;font-size:10.5px;font-weight:550;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);text-align:right}
+.ctitle{font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:-.015em;margin-top:13px;line-height:1.25}
+.cprog{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-top:14px}
+.cbar{height:5px;border-radius:3px;background:var(--sunk);margin-top:7px;overflow:hidden}
+.cbar i{display:block;height:100%;border-radius:3px;background:var(--c)}
+.cnote{margin-top:14px;font-size:12.5px;padding:7px 11px;border-radius:8px;background:var(--sunk);color:var(--ink-2)}
+.cnote.hot{background:var(--amber-soft);color:var(--amber);font-weight:500}
+.cnote.bad{background:var(--red-soft);color:var(--red);font-weight:500}
+.clinks{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;padding-top:15px;border-top:1px solid var(--line)}
+.clink{font-size:12.5px;color:var(--ink-2);background:var(--sunk);border-radius:8px;padding:5px 11px;text-decoration:none}
+.clink:hover{background:var(--line);color:var(--ink)}
+
+/* agenda */
+.agenda{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.agroup{padding:15px 24px 10px;background:var(--sunk);border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px}
+.agroup b{font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:-.01em}
+.agroup span{font-size:12px;color:var(--ink-3)}
+.agroup.warn{background:var(--red-soft);border-color:#F0D6D3}
+.agroup.warn b{color:var(--red)}
+.arow{display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--line)}
+.arow:last-child{border-bottom:none}
+.arow:hover{background:#FDFCFA}
+.box{width:19px;height:19px;border-radius:6px;border:1.6px solid var(--line-2);flex:none;background:var(--card)}
+.arow.done .box{background:var(--green);border-color:var(--green);position:relative}
+.arow.done .box::after{content:'';position:absolute;left:6px;top:2.5px;width:4.5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg)}
+.abody{flex:1;min-width:0}
+.abody .t{font-size:15px;font-weight:500;letter-spacing:-.008em}
+.arow.done .t{color:var(--ink-3);text-decoration:line-through}
+.abody .m{display:flex;align-items:center;gap:9px;margin-top:4px;font-size:12.5px;color:var(--ink-3)}
+.ctag{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;padding:2.5px 7px;border-radius:6px;background:var(--cs);color:var(--c)}
+.aright{flex:none;display:flex;align-items:center;gap:18px}
+.atime{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink-3);width:96px;text-align:right}
+.pill{font-size:12px;font-weight:550;border-radius:20px;padding:4px 13px;width:100px;text-align:center}
+.p-over{background:var(--red-soft);color:var(--red)}
+.p-soon{background:var(--amber-soft);color:var(--amber)}
+.p-later{background:var(--sunk);color:var(--ink-3)}
+.p-done{background:var(--green-soft);color:var(--green)}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topinner">
+    <div class="logo"><span class="leaf">🍁</span>Alex&rsquo;s Dashboard</div>
+    <div class="tabs">
+      <a class="tab on" href="#">Overview</a>
+      <a class="tab" href="#">Deliverables</a>
+      <a class="tab" href="#">Calendar</a>
+      <a class="tab" href="#">To-do</a>
+      <a class="tab" href="#">Grades</a>
+    </div>
+    <div class="tools">
+      <div class="termsel">Winter 2026 <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6l4 4 4-4"/></svg></div>
+      <button class="add"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>Add</button>
+      <div class="avatar">AB</div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow">Week 8 of 14 · Wednesday, February 25</div>
+  <h1>Good morning, Alex.</h1>
+  <p class="lede">Four deliverables land in the next seven days, and one is already past due. Nothing else is urgent until March 13.</p>
+
+  <div class="hero">
+    <div class="next">
+      <div class="lbl">Next up</div>
+      <h3>Quiz 3 — Inner product spaces</h3>
+      <div class="meta"><span class="ctag" style="--c:var(--violet);--cs:var(--violet-soft)">MTHE 212</span> In-class quiz · 50 minutes · worth 8% of the final grade</div>
+      <div class="foot">
+        <button class="cta">Open course notes</button>
+        <button class="cta ghost">Mark complete</button>
+        <div class="countdown"><b>2 days</b><span>FRI 10:30 AM</span></div>
+      </div>
+    </div>
+
+    <div class="tiles">
+      <div class="tilerow">
+        <div class="tile bad"><div class="k">Overdue</div><div class="v">1</div><div class="m">MECH 210 Lab 3</div></div>
+        <div class="tile"><div class="k">This week</div><div class="v">4</div><div class="m">Across 3 courses</div></div>
+      </div>
+      <div class="tilerow">
+        <div class="tile"><div class="k">Completed</div><div class="v">23<small>/54</small></div><div class="ring"><i style="width:43%"></i></div></div>
+        <div class="tile"><div class="k">Average</div><div class="v">82<small>%</small></div><div class="m">+3.1 since midterms</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sechead"><h2>Your courses</h2><a href="#">Open grade calculator →</a></div>
+  <div class="courses">
+    <div class="course" style="--c:var(--blue);--cs:var(--blue-soft)">
+      <div class="chead"><span class="cbadge">MTHE 281</span><div class="cmark">86%<span>A</span></div></div>
+      <div class="ctitle">Introduction to Real Analysis</div>
+      <div class="cprog"><span>10 of 22 complete</span><span>45%</span></div>
+      <div class="cbar"><i style="width:45%"></i></div>
+      <div class="cnote">Homework 5 due Friday</div>
+      <div class="clinks"><a class="clink" href="#">Notes</a><a class="clink" href="#">Textbook</a><a class="clink" href="#">Solutions</a><a class="clink" href="#">Syllabus</a></div>
+    </div>
+
+    <div class="course" style="--c:var(--violet);--cs:var(--violet-soft)">
+      <div class="chead"><span class="cbadge">MTHE 212</span><div class="cmark">79%<span>B+</span></div></div>
+      <div class="ctitle">Linear Algebra II</div>
+      <div class="cprog"><span>4 of 6 complete</span><span>67%</span></div>
+      <div class="cbar"><i style="width:67%"></i></div>
+      <div class="cnote hot">Quiz 3 on Friday · 10:30</div>
+      <div class="clinks"><a class="clink" href="#">Notes</a><a class="clink" href="#">Textbook</a><a class="clink" href="#">Solutions</a></div>
+    </div>
+
+    <div class="course" style="--c:var(--amber);--cs:var(--amber-soft)">
+      <div class="chead"><span class="cbadge">MREN 230</span><div class="cmark">74%<span>B</span></div></div>
+      <div class="ctitle">Thermodynamics</div>
+      <div class="cprog"><span>6 of 15 complete</span><span>40%</span></div>
+      <div class="cbar"><i style="width:40%"></i></div>
+      <div class="cnote">Next: In-class Test 2, Mar 13</div>
+      <div class="clinks"><a class="clink" href="#">Notes</a><a class="clink" href="#">Syllabus</a></div>
+    </div>
+
+    <div class="course" style="--c:var(--rose);--cs:var(--rose-soft)">
+      <div class="chead"><span class="cbadge">MECH 210</span><div class="cmark">81%<span>A−</span></div></div>
+      <div class="ctitle">Circuits</div>
+      <div class="cprog"><span>3 of 23 complete</span><span>13%</span></div>
+      <div class="cbar"><i style="width:13%"></i></div>
+      <div class="cnote bad">Lab 3 is 2 days overdue</div>
+      <div class="clinks"><a class="clink" href="#">Notes</a><a class="clink" href="#">Syllabus</a></div>
+    </div>
+
+    <div class="course" style="--c:var(--green);--cs:var(--green-soft)">
+      <div class="chead"><span class="cbadge">ENPH 225</span><div class="cmark">88%<span>A</span></div></div>
+      <div class="ctitle">Mechanics</div>
+      <div class="cprog"><span>7 of 11 complete</span><span>64%</span></div>
+      <div class="cbar"><i style="width:64%"></i></div>
+      <div class="cnote">Assignment 6 due Mar 4</div>
+      <div class="clinks"><a class="clink" href="#">Notes</a><a class="clink" href="#">Textbook</a></div>
+    </div>
+  </div>
+
+  <div class="sechead"><h2>What&rsquo;s coming up</h2><a href="#">See all 54 →</a></div>
+  <div class="agenda">
+    <div class="agroup warn"><b>Overdue</b><span>Deal with this first</span></div>
+    <div class="arow">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Lab Assignment 3 — Operational Amplifiers</div>
+        <div class="m"><span class="ctag" style="--c:var(--rose);--cs:var(--rose-soft)">MECH 210</span> Lab · 5% of final grade</div></div>
+      <div class="aright"><span class="atime">Feb 23 · 23:59</span><span class="pill p-over">2 days late</span></div>
+    </div>
+
+    <div class="agroup"><b>Friday, February 27</b><span>2 items</span></div>
+    <div class="arow">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Quiz 3 — Inner product spaces</div>
+        <div class="m"><span class="ctag" style="--c:var(--violet);--cs:var(--violet-soft)">MTHE 212</span> Quiz · in class, 50 minutes</div></div>
+      <div class="aright"><span class="atime">10:30</span><span class="pill p-soon">In 2 days</span></div>
+    </div>
+    <div class="arow">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Homework 5 — Sequences and series</div>
+        <div class="m"><span class="ctag" style="--c:var(--blue);--cs:var(--blue-soft)">MTHE 281</span> Homework · PDF submission</div></div>
+      <div class="aright"><span class="atime">23:59</span><span class="pill p-soon">In 2 days</span></div>
+    </div>
+
+    <div class="agroup"><b>Next week</b><span>March 2 – 6</span></div>
+    <div class="arow">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Assignment 6 — Rigid body dynamics</div>
+        <div class="m"><span class="ctag" style="--c:var(--green);--cs:var(--green-soft)">ENPH 225</span> Assignment · best 6 of 8 count</div></div>
+      <div class="aright"><span class="atime">Mar 4 · 16:30</span><span class="pill p-later">In 7 days</span></div>
+    </div>
+    <div class="arow">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Homework 6 — Continuity</div>
+        <div class="m"><span class="ctag" style="--c:var(--blue);--cs:var(--blue-soft)">MTHE 281</span> Homework · PDF submission</div></div>
+      <div class="aright"><span class="atime">Mar 6 · 23:59</span><span class="pill p-later">In 9 days</span></div>
+    </div>
+
+    <div class="agroup"><b>Recently completed</b><span>2 items</span></div>
+    <div class="arow done">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Quiz 2 — Work and energy</div>
+        <div class="m"><span class="ctag" style="--c:var(--green);--cs:var(--green-soft)">ENPH 225</span> Quiz</div></div>
+      <div class="aright"><span class="atime">Feb 13</span><span class="pill p-done">Scored 91%</span></div>
+    </div>
+    <div class="arow done">
+      <div class="box"></div>
+      <div class="abody"><div class="t">Midterm 1</div>
+        <div class="m"><span class="ctag" style="--c:var(--blue);--cs:var(--blue-soft)">MTHE 281</span> Midterm · no calculators</div></div>
+      <div class="aright"><span class="atime">Feb 11</span><span class="pill p-done">Scored 84%</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

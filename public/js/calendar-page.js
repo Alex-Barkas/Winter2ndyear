@@ -68,7 +68,14 @@ const state = {
 
     editingItem: null,   // {type, id} | null -- item the modal currently represents
     gesture: null,        // in-flight pointer gesture (see drag section)
-    pendingTodoSnapshot: null
+    pendingTodoSnapshot: null,
+
+    // The calendar draws itself before any data arrives (see init), so the
+    // empty views must be able to tell "still fetching" from "genuinely
+    // nothing here" -- otherwise Agenda claims "Nothing scheduled" during a
+    // slow load, which is worse than saying nothing at all.
+    assignmentsLoaded: false,
+    todosLoaded: false
 };
 
 for (const term of Object.keys(state.termRanges)) {
@@ -101,9 +108,26 @@ document.addEventListener('DOMContentLoaded', () => {
     wireGrid();
     wireModal();
 
+    // Draw the calendar immediately, before any data arrives. The month grid,
+    // the Month/Agenda toggle and the month arrows are all pure functions of
+    // state.cursor -- they don't need assignments or to-dos to be useful. This
+    // used to run only inside the two callbacks below, so on a phone with
+    // flaky reception (or any failed/hanging Firestore call) the page stayed
+    // completely blank: no grid, no controls, and therefore no way to even
+    // switch views. Data simply fills chips in on the next render.
+    renderAll();
+
     DataService.getAllAssignments().then(list => {
         state.assignments = list;
+        state.assignmentsLoaded = true;
         renderAll();
+    }).catch(err => {
+        // Keep the (already-rendered) empty calendar usable rather than
+        // leaving it frozen mid-load.
+        console.error('Could not load assignments:', err);
+        state.assignmentsLoaded = true;
+        renderAll();
+        toast('Could not load assignments — showing an empty calendar.', 'error');
     });
 
     DataService.subscribeToTodos(snapshot => {
@@ -112,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         state.todos = snapshot;
+        state.todosLoaded = true;
         renderAll();
     });
 });
@@ -173,6 +198,11 @@ function scopedItems() {
 
 function scheduledItems() { return scopedItems().filter(i => !isUnscheduled(i)); }
 function unscheduledItems() { return scopedItems().filter(isUnscheduled); }
+
+// True until both data sources have reported in at least once. Used only to
+// pick the wording of the empty states -- an empty calendar mid-fetch should
+// say "Loading", not assert that there's nothing there.
+function isStillLoading() { return !state.assignmentsLoaded || !state.todosLoaded; }
 
 function allCourseCodes() {
     return [...new Set(allItems().map(i => i.course || 'Personal'))].sort();
@@ -312,9 +342,13 @@ function renderAgendaView() {
     const host = document.getElementById('cal-agenda-view');
 
     if (items.length === 0) {
-        host.innerHTML = `<div class="list-empty"><div class="list-empty-icon">∅</div>
-            <div class="list-empty-title">Nothing scheduled</div>
-            <div class="list-empty-hint">Try a different term or clear your filters.</div></div>`;
+        host.innerHTML = isStillLoading()
+            ? `<div class="list-empty"><div class="list-empty-icon">⋯</div>
+                <div class="list-empty-title">Loading…</div>
+                <div class="list-empty-hint">Fetching your assignments and to-dos.</div></div>`
+            : `<div class="list-empty"><div class="list-empty-icon">∅</div>
+                <div class="list-empty-title">Nothing scheduled</div>
+                <div class="list-empty-hint">Try a different term or clear your filters.</div></div>`;
         return;
     }
 
@@ -384,7 +418,9 @@ function renderTray() {
     const items = unscheduledItems();
     host.innerHTML = items.length
         ? items.map(renderTrayChip).join('')
-        : '<div class="cal-tray-empty">Nothing unscheduled. Drag an item here to clear its date.</div>';
+        : `<div class="cal-tray-empty">${isStillLoading()
+            ? 'Loading…'
+            : 'Nothing unscheduled. Drag an item here to clear its date.'}</div>`;
 }
 
 function renderTrayChip(item) {

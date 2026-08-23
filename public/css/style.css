@@ -968,6 +968,40 @@ footer p {
        thumb-reachable instead of a small top-corner target. The signature
        text/gif and divider are dropped; there's no room for them in a bar and
        they're not navigational. */
+    /* Finger-sized controls, same rationale as list-ui.css's mobile block:
+       these are 18-30px at desktop sizing, fine for a cursor but under what
+       a thumb reliably hits. The round toggles keep their drawn size -- an
+       invisible centred ::after grows only the hit area, so the button looks
+       identical but is a 40px target. */
+    .status-toggle-btn,
+    .delete-btn {
+        position: relative;
+    }
+
+    .status-toggle-btn::after,
+    .delete-btn::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        transform: translate(-50%, -50%);
+    }
+
+    .view-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+    }
+
     .signature-badge {
         position: fixed;
         top: auto;
@@ -1007,5 +1041,19 @@ footer p {
         flex: 1;
         height: 100%;
         font-size: 0.8rem;
+        /* "all semesters" is long enough to wrap onto a second line in a
+           quarter of a phone-width bar, which knocks it out of alignment
+           with the other three labels. */
+        white-space: nowrap;
+        padding: 0 0.15rem;
+    }
+
+    /* Narrow phones (iPhone SE and similar) can't fit "all semesters" at
+       0.8rem even unwrapped -- step the whole bar down together so the
+       labels stay one line and optically consistent. */
+    @media (max-width: 380px) {
+        .nav-link {
+            font-size: 0.7rem;
+        }
     }
 }

@@ -430,6 +430,19 @@
     .grade-row > *:nth-child(5) {
         width: 30px;
         height: 30px;
+        /* Drawn at 30px but given a 40px hit area via an invisible centred
+           ::after -- a thumb needs more than the circle itself. */
+        position: relative;
+    }
+
+    .grade-row > *:nth-child(5)::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        transform: translate(-50%, -50%);
     }
 
     .grade-group-header {

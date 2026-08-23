@@ -222,4 +222,17 @@
     .gpa-course-name {
         display: none;
     }
+
+    /* Finger-sized: these are ~28-30px tall at desktop sizing, and they sit
+       in tightly-stacked rows where a mis-tap lands on the row above. */
+    .gpa-units-input,
+    .gpa-grade-select {
+        min-height: 38px;
+    }
+
+    /* The term header is the collapse/expand control for the whole term --
+       give it a real hit area rather than just the text's line box. */
+    .gpa-term-header {
+        padding: 0.35rem 0;
+    }
 }

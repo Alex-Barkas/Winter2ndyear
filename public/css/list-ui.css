@@ -495,6 +495,28 @@
         max-width: 100%;
     }
 
+    /* Finger-sized controls. At desktop sizes these are 22-25px tall, which
+       is a comfortable mouse target but well under the ~44px a thumb needs --
+       the filter chips in particular sit in dense multi-row banks where
+       mis-taps hit the neighbouring chip. Grown via min-height + centred
+       flex so only the hit area changes, not the type scale. */
+    .list-segmented button,
+    .list-chip,
+    .list-clear-filters {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+    }
+
+    .list-chip {
+        padding: 0.25rem 0.7rem;
+    }
+
+    .list-select {
+        min-height: 38px;
+    }
+
     .toast-host {
         left: 1rem;
         right: 1rem;

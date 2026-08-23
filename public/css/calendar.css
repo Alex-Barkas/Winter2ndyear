@@ -90,6 +90,14 @@
     position: sticky;
     top: 5.5rem;
     /* sits below the sticky .list-controls bar rather than under it */
+
+    /* Same reason as .cal-main-panel above: a grid item defaults to
+       min-width:auto, so its min-content size becomes the floor for the
+       track. The Unscheduled tray's chips are `white-space: nowrap`, which
+       made that floor wider than a phone screen -- blowing the single-column
+       `1fr` track (and with it the month grid, which merely stretches to
+       fill the track) out past the viewport. */
+    min-width: 0;
 }
 
 .cal-side-card {

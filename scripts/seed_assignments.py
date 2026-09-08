@@ -1,10 +1,11 @@
 """
-Push a term's assignments (from public/js/student-config-<term>.js) into the live
-Firestore 'assignments' collection, so they actually show up on the site.
+Push a term's assignments (from src/data/<term>.js) into the live Firestore
+'assignments' collection, so they actually show up on the site.
 
-Why this exists: the site reads assignment data from Firestore first (student-config-*.js
-is only an offline/error fallback - see data-service.js getAllAssignments()). Editing the
-config file alone does NOT make new assignments appear until they're written to Firestore.
+Why this exists: the site reads assignment data from Firestore first (src/data/<term>.js
+is only an offline/error fallback - see public/js/data-service.js getAllAssignments()).
+Editing the data file alone does NOT make new assignments appear until they're written
+to Firestore.
 
 Safety: by default only creates documents that don't already exist - never overwrites an
 existing doc, so it can't clobber scores/status you've already entered through the UI.
@@ -49,17 +50,25 @@ def get_access_token():
 
 
 def load_assignments_from_config(term):
-    config_path = os.path.join(REPO_ROOT, "public", "js", f"student-config-{term}.js")
+    config_path = os.path.join(REPO_ROOT, "src", "data", f"{term}.js")
     if not os.path.exists(config_path):
-        raise SystemExit(f"No config file found at {config_path}")
+        raise SystemExit(f"No data file found at {config_path}")
 
-    # Evaluate the config file in a minimal sandbox via Node so we read the exact
-    # same data the site uses, instead of re-parsing/duplicating it in Python.
+    # The data file is an ES module (`export default {...}`). Node's -e runs as
+    # CommonJS, so rewrite the export to module.exports and require() it from a
+    # temp file - reads the exact same data the site uses, instead of
+    # re-parsing/duplicating it in Python.
     node_script = f"""
-        const window = {{}};
         const fs = require('fs');
-        eval(fs.readFileSync({json.dumps(config_path)}, 'utf8'));
-        process.stdout.write(JSON.stringify(window.STUDENT_DATA.assignments || []));
+        const os = require('os');
+        const path = require('path');
+        const src = fs.readFileSync({json.dumps(config_path)}, 'utf8')
+            .replace('export default', 'module.exports =');
+        const tmpPath = path.join(os.tmpdir(), 'seed_assignments_' + Date.now() + '.cjs');
+        fs.writeFileSync(tmpPath, src);
+        const data = require(tmpPath);
+        fs.unlinkSync(tmpPath);
+        process.stdout.write(JSON.stringify(data.assignments || []));
     """
     result = subprocess.run(["node", "-e", node_script], capture_output=True, text=True, check=True)
     return json.loads(result.stdout)
@@ -125,7 +134,7 @@ def main():
             update_fields = a.split("=", 1)[1].split(",")
 
     assignments = load_assignments_from_config(term)
-    print(f"Loaded {len(assignments)} assignments from student-config-{term}.js")
+    print(f"Loaded {len(assignments)} assignments from src/data/{term}.js")
 
     token = get_access_token()
     headers = {"Authorization": f"Bearer {token}"}

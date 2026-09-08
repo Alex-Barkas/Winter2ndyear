@@ -230,10 +230,17 @@ function groupItems(items) {
     }
 
     const unscheduled = groups.filter(g => g.key === 'Unscheduled');
-    if (unscheduled.length) {
-        return [...groups.filter(g => g.key !== 'Unscheduled'), ...unscheduled];
+    const ordered = unscheduled.length
+        ? [...groups.filter(g => g.key !== 'Unscheduled'), ...unscheduled]
+        : groups;
+
+    // A single group (e.g. "group by course" while already filtered to one
+    // course) has nothing to distinguish itself from -- the collapsible header
+    // is just dead chrome wrapping the whole list, so fall back to flat.
+    if (ordered.length <= 1) {
+        return [{ key: 'all', label: '', items }];
     }
-    return groups;
+    return ordered;
 }
 
 /* --------------------------------------------------------------- controls */

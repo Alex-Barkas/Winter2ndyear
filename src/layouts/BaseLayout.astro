@@ -27,7 +27,7 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="icon" type={faviconType} href={favicon}>
+    <link rel="icon" type={faviconType} href={`${favicon}?v=2`}>
     <link rel="stylesheet" href="/css/style.css?v=8">
     {extraCss.map((href) => <link rel="stylesheet" href={href} />)}
     {description && <meta name="description" content={description} />}

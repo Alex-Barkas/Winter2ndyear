@@ -1,4 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+import os
+import subprocess
+
+# Optimized Queen's University / Engineering SVG Favicon
+# Built with pure scalable vector geometry for ultra-crisp display at 16px, 32px, 64px, and retina sizes.
+svg_content = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
   <defs>
     <!-- Queen's Official Palette Gradients -->
     <linearGradient id="qGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -100,4 +105,17 @@
              C 40 43, 37.5 44.5, 36 47 Z"
           fill="url(#qGoldGrad)"/>
   </g>
-</svg>
+</svg>"""
+
+out_svg = os.path.abspath("public/assets/queens_favicon.svg")
+with open(out_svg, "w", encoding="utf-8") as f:
+    f.write(svg_content)
+
+print(f"Written: {out_svg}")
+
+# Render to 256x256 PNG preview using Chrome
+chrome = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+out_png = os.path.abspath("public/assets/preview_queens_favicon.png")
+url = "http://localhost:4321/assets/queens_favicon.svg"
+subprocess.run([chrome, "--headless", "--disable-gpu", f"--screenshot={out_png}", "--window-size=256,256", url], check=True)
+print(f"Rendered preview: {out_png}")

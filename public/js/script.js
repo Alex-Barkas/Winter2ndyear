@@ -387,7 +387,7 @@ function createCourseCard(course) {
         : '';
 
     return `
-        <div class="course-card" style="${bgStyle}">
+        <div class="course-card${course.image ? ' has-image' : ''}" style="${bgStyle}">
             <div class="course-header">
                 <span class="course-code" style="${course.image ? 'color: rgba(255,255,255,0.7); text-shadow: 0 1px 2px rgba(0,0,0,0.5);' : ''}">${course.code}</span>
                 <span class="course-title" style="${course.image ? 'text-shadow: 0 2px 4px rgba(0,0,0,0.8);' : ''}">${course.name}</span>

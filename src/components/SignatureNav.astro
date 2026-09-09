@@ -4,17 +4,44 @@ export interface Props {
 }
 
 const { showAllSemesters = true } = Astro.props;
+
+// Term pages (/fall2026, /fall2026/assignments, ...) all fall under "all
+// semesters" for nav purposes -- only calendar/to-do/gpa get an exact match,
+// since those are the only other top-level destinations this nav links to.
+const path = Astro.url.pathname;
+const isActive = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
+
+const links = [
+    ...(showAllSemesters ? [{ href: '/', label: 'all semesters' }] : []),
+    { href: '/calendar', label: 'calendar' },
+    { href: '/todo', label: 'to-do' },
+    { href: '/gpa', label: 'gpa' },
+];
 ---
 
-<div class="signature-badge">
-    <div class="signature-row">
-        <span class="signature-text">alex barkas 2026</span>
+<header class="site-nav">
+    <div class="site-nav-inner">
+        <nav class="site-nav-links">
+            {links.map(({ href, label }) => (
+                <a href={href} class={`nav-link ${isActive(href) ? 'active' : ''}`}>{label}</a>
+            ))}
+            <button type="button" class="theme-toggle" aria-label="Switch between light and dark theme">
+                <svg class="icon-sun" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg class="icon-moon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span class="theme-toggle-label">theme</span>
+            </button>
+        </nav>
     </div>
-    <div class="nav-divider"></div>
-    <nav class="side-nav">
-        {showAllSemesters && <a href="/" class="nav-link">all semesters</a>}
-        <a href="/calendar" class="nav-link">calendar</a>
-        <a href="/todo" class="nav-link">to-do</a>
-        <a href="/gpa" class="nav-link">gpa</a>
-    </nav>
-</div>
+</header>

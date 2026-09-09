@@ -13,7 +13,7 @@
 /* --------------------------------------------------------------- add form */
 
 .todo-input-container {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-1);
     border: 1px solid var(--border-color);
     border-radius: 1rem;
     padding: 1.25rem;
@@ -25,7 +25,7 @@
 }
 
 .input-field {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--input-bg);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 0.7rem 0.75rem;
@@ -47,8 +47,8 @@ select.input-field {
 
 select.input-field option,
 select.input-field optgroup {
-    background: #1a1a1a;
-    color: #fff;
+    background: var(--select-bg);
+    color: var(--select-text);
 }
 
 .add-btn {
@@ -72,7 +72,7 @@ select.input-field optgroup {
 .todo-item {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface-1);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 0.9rem 1.1rem;
@@ -83,16 +83,16 @@ select.input-field optgroup {
 }
 
 .todo-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--surface-2);
+    border-color: var(--border-strong);
 }
 
 /* Urgency accent stripe. Mirrors the category stripe on assignment cards. */
 .todo-item.urgency-5 { border-left-color: var(--color-danger); }
-.todo-item.urgency-4 { border-left-color: #ff9f43; }
-.todo-item.urgency-3 { border-left-color: rgba(161, 161, 170, 0.3); }
-.todo-item.urgency-2 { border-left-color: #60a5fa; }
-.todo-item.urgency-1 { border-left-color: rgba(161, 161, 170, 0.1); }
+.todo-item.urgency-4 { border-left-color: var(--color-orange); }
+.todo-item.urgency-3 { border-left-color: color-mix(in srgb, var(--text-muted) 30%, transparent); }
+.todo-item.urgency-2 { border-left-color: var(--cat-blue); }
+.todo-item.urgency-1 { border-left-color: color-mix(in srgb, var(--text-muted) 10%, transparent); }
 
 .todo-item.is-overdue {
     background: color-mix(in srgb, var(--color-danger) 6%, transparent);
@@ -184,13 +184,13 @@ select.input-field optgroup {
     letter-spacing: 0.05em;
     padding: 0.15rem 0.4rem;
     border-radius: 0.25rem;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-3);
     color: var(--text-muted);
 }
 
 .todo-tag.is-personal {
-    background: rgba(251, 146, 60, 0.15);
-    color: #fb923c;
+    background: color-mix(in srgb, var(--color-orange) 15%, transparent);
+    color: var(--color-orange);
 }
 
 .todo-due {
@@ -217,8 +217,8 @@ select.input-field optgroup {
 }
 
 .todo-urgency-badge.level-4 {
-    background: rgba(255, 159, 67, 0.18);
-    color: #ff9f43;
+    background: color-mix(in srgb, var(--color-orange) 18%, transparent);
+    color: var(--color-orange);
 }
 
 /* Status badges reuse the shared .status-* colours from style.css; these add
@@ -323,7 +323,7 @@ select.input-field optgroup {
 }
 
 .todo-edit-cancel {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-3);
     color: var(--text-muted);
 }
 

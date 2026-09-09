@@ -27,7 +27,7 @@ const { term } = Astro.params;
             }
 
             .details-content {
-                background: rgba(255, 255, 255, 0.03);
+                background: var(--surface-1);
                 padding: 2rem;
                 border-radius: 0.75rem;
                 border: 1px solid var(--border-color);
@@ -60,7 +60,7 @@ const { term } = Astro.params;
             .btn-link {
                 display: inline-block;
                 background: var(--text-primary);
-                color: #000;
+                color: var(--bg-color);
                 padding: 0.75rem 1.5rem;
                 border-radius: 0.5rem;
                 text-decoration: none;
@@ -79,6 +79,8 @@ const { term } = Astro.params;
                 left: 0;
                 width: 100%;
                 height: 100%;
+                /* Deliberately a fixed black scrim, not a theme token -- dims
+                   whatever's behind it regardless of page theme. */
                 background: rgba(0, 0, 0, 0.7);
                 display: grid;
                 place-items: center;
@@ -88,13 +90,13 @@ const { term } = Astro.params;
             }
 
             .modal-content {
-                background: #1a1a1a;
+                background: var(--surface-solid);
                 border: 1px solid var(--border-color);
                 padding: 2rem;
                 border-radius: 1rem;
                 width: 90%;
                 max-width: 400px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 10px 25px var(--shadow-strong);
             }
 
             .modal-content h3 {
@@ -116,7 +118,7 @@ const { term } = Astro.params;
             .input-field {
                 width: 100%;
                 padding: 0.75rem;
-                background: rgba(255, 255, 255, 0.05);
+                background: var(--surface-2);
                 border: 1px solid var(--border-color);
                 border-radius: 0.5rem;
                 color: var(--text-primary);
@@ -146,7 +148,7 @@ const { term } = Astro.params;
 
             .modal-actions button:not(.secondary) {
                 background: var(--text-primary);
-                color: #000;
+                color: var(--bg-color);
             }
 
             /* -------------------------------------------------- responsive */
@@ -163,7 +165,7 @@ const { term } = Astro.params;
                     overflow-y: auto;
                     border-radius: 1rem 1rem 0 0;
                     padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-                    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+                    box-shadow: 0 -10px 25px var(--shadow-strong);
                 }
 
                 .modal-actions {

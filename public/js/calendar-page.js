@@ -20,34 +20,25 @@ import {
     Prefs,
     toast,
     hashCourseColor,
-    COURSE_PALETTE
-} from '/js/ui-utils.js?v=1';
+    categoryColor,
+    categoryEntries,
+    todoColor,
+    isLightTheme,
+    COURSE_PALETTE,
+    COURSE_PALETTE_LIGHT
+} from '/js/ui-utils.js?v=2';
 
 const PREFS_KEY = 'ui_prefs_calendar';
 const DEFAULT_PREFS = { view: 'month', term: 'all' };
 
-// Mirrors assignments-page.js's CATEGORY_COLORS / style.css's .category-*
-// palette, so a category means the same color here as on the List/Agenda pages.
-const CATEGORY_COLORS = {
-    ASSIGNMENT: '#60a5fa',
-    LAB: '#4ade80',
-    QUIZ: '#facc15',
-    MIDTERM: '#f87171',
-    FINAL: '#ef4444',
-    HOMEWORK: '#2dd4bf',
-    REMINDER: '#c084fc',
-    TUTORIAL: '#c084fc'
-};
-const TODO_COLOR = '#fb923c';
-
-// hashCourseColor/COURSE_PALETTE now live in ui-utils.js (shared with
-// assignments-page.js's course-grouped section headers) -- to-dos have no
-// category, so this is what colors their chips (assignments use
-// CATEGORY_COLORS instead, above).
+// categoryColor()/hashCourseColor() live in ui-utils.js, shared with
+// assignments-page.js's course-grouped section headers -- to-dos have no
+// category, so hashCourseColor is what colors their chips (assignments use
+// categoryColor instead).
 
 function chipColor(item) {
-    if (item.__type === 'assignment') return CATEGORY_COLORS[(item.category || '').toUpperCase()] || 'var(--text-muted)';
-    return item.course && item.course !== 'Personal' ? hashCourseColor(item.course) : TODO_COLOR;
+    if (item.__type === 'assignment') return categoryColor(item.category, 'var(--text-muted)');
+    return item.course && item.course !== 'Personal' ? hashCourseColor(item.course) : todoColor();
 }
 
 /* ------------------------------------------------------------------ state */
@@ -424,11 +415,11 @@ function renderDetailRow(item) {
 // selected) and the always-visible toolbar strip (renderLegendStrip) -- one
 // source of labels/colors for both, so they can't drift out of sync.
 function legendEntries() {
-    const entries = Object.entries(CATEGORY_COLORS)
+    const entries = categoryEntries()
         .filter(([cat]) => cat !== 'TUTORIAL') // shares REMINDER's color, redundant in a legend
         .map(([cat, color]) => [cat, color]);
-    entries.push(['TO-DO (personal)', TODO_COLOR]);
-    entries.push(['TO-DO (by course)', COURSE_PALETTE[0]]);
+    entries.push(['TO-DO (personal)', todoColor()]);
+    entries.push(['TO-DO (by course)', (isLightTheme() ? COURSE_PALETTE_LIGHT : COURSE_PALETTE)[0]]);
     return entries;
 }
 

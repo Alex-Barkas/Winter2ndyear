@@ -1,5 +1,5 @@
 .grade-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface-1);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 1.5rem;
@@ -53,7 +53,7 @@
 }
 
 .grade-input {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-2);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     font-family: var(--font-mono);
@@ -65,7 +65,7 @@
 .grade-input:focus {
     outline: none;
     border-color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-3);
 }
 
 .grade-input.synced {
@@ -84,7 +84,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-1);
     border: 1px solid var(--border-color);
     border-radius: 0.75rem;
     padding: 1.5rem 2rem;
@@ -144,16 +144,16 @@
 }
 
 .grade-exclude-btn:hover {
-    border-color: #f87171;
-    color: #f87171;
+    border-color: var(--cat-red);
+    color: var(--cat-red);
 }
 
 /* Deliberately NOT var(--accent-color) -- that color means "positive/done"
    elsewhere in this app. Excluding a grade is a warning-toned action. */
 .grade-exclude-btn.checked {
-    background: #f87171;
+    background: var(--cat-red);
     color: #fff;
-    border-color: #f87171;
+    border-color: var(--cat-red);
 }
 
 /* Same line-through/dim recipe as .done-text in style.css */
@@ -173,15 +173,15 @@
     letter-spacing: 0.05em;
     margin-left: 0.4rem;
     /* explicit drop: amber, same family as .status-pending */
-    background-color: rgba(255, 171, 0, 0.1);
-    color: #ffab00;
+    background-color: color-mix(in srgb, var(--color-pending) 10%, transparent);
+    color: var(--color-pending);
 }
 
 /* auto-drop: distinct indigo tone so users can tell "I dropped this"
    from "the app auto-dropped this" at a glance */
 .grade-dropped-badge.auto {
-    background-color: rgba(129, 140, 248, 0.1);
-    color: #818cf8;
+    background-color: color-mix(in srgb, var(--color-indigo) 10%, transparent);
+    color: var(--color-indigo);
 }
 
 /* Step 2: Row grouping & badges */
@@ -309,7 +309,7 @@
    transition, matches this app's plain show/hide convention), this bar's width
    updates live as scores are entered, so a short transition is appropriate here. */
 .grade-progress-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-2);
     border-radius: 0.35rem;
     height: 6px;
     overflow: hidden;

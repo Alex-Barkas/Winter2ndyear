@@ -6,8 +6,8 @@ import { transcript, GRADE_POINTS } from '../data/transcript.js';
 
 <BaseLayout
     title="GPA Calculator - Alex's Dashboard"
-    favicon="/assets/ab_favicon.svg"
-    extraCss={["/css/list-ui.css?v=1", "/css/gpa.css?v=1"]}
+    favicon="/assets/queens_favicon.svg"
+    extraCss={["/css/list-ui.css?v=2", "/css/modal.css?v=2", "/css/gpa.css?v=2"]}
 >
     <Fragment slot="head">
         <script is:inline define:vars={{ transcript, GRADE_POINTS }}>
@@ -18,7 +18,25 @@ import { transcript, GRADE_POINTS } from '../data/transcript.js';
 
     <SignatureNav />
 
-    <main class="container">
+    <!-- Password gate. Client-side only -- this deters a casual look, it
+         isn't real access control (the transcript data above ships in the
+         page regardless). Unlock is remembered in localStorage so it's a
+         one-time thing per browser. -->
+    <div id="gpa-lock" class="modal-overlay">
+        <div class="modal-content">
+            <h3>This page is locked</h3>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="gpa-password-input" class="input-field" autocomplete="off" autofocus>
+            </div>
+            <p id="gpa-password-error" class="hidden" style="color:var(--color-danger); font-size:0.8rem; margin-top:-0.5rem; margin-bottom:1rem;">Incorrect password.</p>
+            <div class="modal-actions">
+                <button type="button" id="gpa-unlock-btn">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container" id="gpa-content" hidden>
         <header>
             <a href="/" class="back-link">← Back to Dashboard</a>
             <h1>GPA Calculator</h1>
@@ -29,6 +47,56 @@ import { transcript, GRADE_POINTS } from '../data/transcript.js';
 
         <div id="gpa-terms"></div>
     </main>
+
+    <script is:inline>
+        (function () {
+            var STORAGE_KEY = 'gpa_unlocked';
+            var PASSWORD = '18694006';
+
+            var lock = document.getElementById('gpa-lock');
+            var content = document.getElementById('gpa-content');
+            var input = document.getElementById('gpa-password-input');
+            var error = document.getElementById('gpa-password-error');
+            var unlockBtn = document.getElementById('gpa-unlock-btn');
+
+            function unlock() {
+                try { localStorage.setItem(STORAGE_KEY, 'true'); } catch (e) {}
+                lock.setAttribute('hidden', '');
+                content.removeAttribute('hidden');
+            }
+
+            var alreadyUnlocked = false;
+            try { alreadyUnlocked = localStorage.getItem(STORAGE_KEY) === 'true'; } catch (e) {}
+
+            if (alreadyUnlocked) {
+                unlock();
+            } else {
+                lock.removeAttribute('hidden');
+                input.focus();
+            }
+
+            function tryUnlock() {
+                if (input.value === PASSWORD) {
+                    unlock();
+                } else {
+                    error.classList.remove('hidden');
+                    input.value = '';
+                    input.focus();
+                }
+            }
+
+            // Auto-unlock the instant the typed value matches -- no need to
+            // hit Enter or click Unlock once the last correct digit lands.
+            input.addEventListener('input', function () {
+                if (input.value === PASSWORD) unlock();
+            });
+
+            unlockBtn.addEventListener('click', tryUnlock);
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') tryUnlock();
+            });
+        })();
+    </script>
 
     <script type="module" src="/js/gpa-page.js?v=1" is:inline></script>
 </BaseLayout>

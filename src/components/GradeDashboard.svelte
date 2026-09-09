@@ -17,7 +17,15 @@
 
     let { schemes } = $props();
 
-    const FINAL_GRADE_COLORS = {
+    // Same theme-attribute check as grade-math.js's getGradeColor(), which
+    // this mirrors -- both feed the same banner/row color spots.
+    const isLight = () => typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light';
+    const FINAL_GRADE_COLORS = () => isLight() ? {
+        'A+': '#15803d', 'A': '#15803d', 'A-': '#15803d',
+        'B+': '#a16207', 'B': '#a16207', 'B-': '#a16207',
+        'C+': '#c2410c', 'C': '#c2410c', 'C-': '#c2410c',
+        'D+': '#b91c1c', 'D': '#b91c1c', 'D-': '#b91c1c', 'F': '#b91c1c'
+    } : {
         'A+': '#4ade80', 'A': '#4ade80', 'A-': '#4ade80',
         'B+': '#facc15', 'B': '#facc15', 'B-': '#facc15',
         'C+': '#fb923c', 'C': '#fb923c', 'C-': '#fb923c',
@@ -102,7 +110,7 @@
     });
 
     function finalGradeColor() {
-        return FINAL_GRADE_COLORS[finalGrade] || 'var(--text-muted)';
+        return FINAL_GRADE_COLORS()[finalGrade] || 'var(--text-muted)';
     }
 
     async function handleFinalGradeChange(e) {

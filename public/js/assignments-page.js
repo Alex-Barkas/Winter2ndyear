@@ -22,8 +22,9 @@ import {
     makeTermScope,
     Prefs,
     toast,
-    hashCourseColor
-} from '/js/ui-utils.js?v=1';
+    hashCourseColor,
+    categoryColor
+} from '/js/ui-utils.js?v=2';
 
 const PREFS_KEY = 'ui_prefs_assignments';
 
@@ -33,19 +34,6 @@ const DEFAULT_PREFS = {
     density: 'comfortable',
     status: 'all',
     collapsed: []
-};
-
-// Mirrors the .category-* palette in style.css. Used for the card's accent
-// stripe, which CSS alone can't pick since the category is data, not markup.
-const CATEGORY_COLORS = {
-    ASSIGNMENT: '#60a5fa',
-    LAB: '#4ade80',
-    QUIZ: '#facc15',
-    MIDTERM: '#f87171',
-    FINAL: '#ef4444',
-    HOMEWORK: '#2dd4bf',
-    REMINDER: '#c084fc',
-    TUTORIAL: '#c084fc'
 };
 
 /* ------------------------------------------------------------------ state */
@@ -475,7 +463,7 @@ function renderSummary(items) {
 function card(item) {
     const status = effectiveStatus(item);
     const category = item.category || 'ASSIGNMENT';
-    const accent = CATEGORY_COLORS[category.toUpperCase()] || 'transparent';
+    const accent = categoryColor(category);
     const prefix = window.TERM_PREFIX || '';
 
     const undated = !item.date || item.date === 'TBD';

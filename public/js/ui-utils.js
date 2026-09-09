@@ -66,11 +66,14 @@ export function formatDate(dateStr) {
     return `${DAYS_SHORT[d.getDay()]}, ${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
 }
 
-// "Fri 14" -- the compact two-line date column on assignment cards.
+// Weekday over "Mon DD" -- the two-line date column on assignment cards.
+// A bare weekday + day number ("Sun 20") is ambiguous once a term's
+// assignments span several months, so the month rides along on its own line.
 export function formatDayCell(dateStr) {
     const d = parseLocalDate(dateStr);
     if (!d) return 'TBD';
-    return `${DAYS_SHORT[d.getDay()]} ${d.getDate()}`;
+    return `<span class="assign-day-name">${DAYS_SHORT[d.getDay()]}</span>`
+        + `<span class="assign-day-num">${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}</span>`;
 }
 
 // "in 3 days" / "yesterday" / "today". Pairs with formatDate.
@@ -215,17 +218,67 @@ export function makeTermScope(termRange, knownCourseCodes) {
     };
 }
 
+/* --------------------------------------------------------------- theming */
+
+// These palettes are inlined into element style="" attributes at render time
+// (course-group headers, calendar chips/dots), so they can't just be CSS
+// custom properties the way the rest of the app's colors are -- the browser
+// only re-resolves var() on repaint, not on re-render from a JS string
+// template. Reading the <html data-theme> attribute at render time and
+// picking the light-safe twin is the JS equivalent of style.css's
+// :root[data-theme="light"] override block, and it stays correct because the
+// theme toggle does a full page reload (see theme-toggle.js) rather than
+// flipping the attribute live.
+export function isLightTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'light';
+}
+
 /* ------------------------------------------------------------- course color */
 
 // No `color` field exists on course config objects, and adding one means
 // hand-editing 3 config files per course -- instead, hash each course code
 // deterministically into a fixed palette. Shared so a course's color is the
 // same wherever it shows up (calendar chips, assignment-list course groups).
+// The light array is index-aligned with the dark one -- same hash, same slot,
+// just a darker twin of the same hue so text set in that color stays legible
+// on a light page.
 export const COURSE_PALETTE = ['#60a5fa', '#4ade80', '#facc15', '#f87171', '#c084fc', '#2dd4bf', '#fb923c', '#818cf8', '#f472b6', '#a3e635'];
+export const COURSE_PALETTE_LIGHT = ['#1d4ed8', '#15803d', '#a16207', '#b91c1c', '#7e22ce', '#0f766e', '#c2410c', '#4338ca', '#be185d', '#4d7c0f'];
 
 export function hashCourseColor(code) {
     let h = 0;
     const str = String(code || '');
     for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-    return COURSE_PALETTE[h % COURSE_PALETTE.length];
+    const palette = isLightTheme() ? COURSE_PALETTE_LIGHT : COURSE_PALETTE;
+    return palette[h % palette.length];
+}
+
+/* ----------------------------------------------------------- category color */
+
+// Single source of truth for assignment-category colors -- previously
+// duplicated (and already drifting into a "keep these two lists in sync by
+// hand" comment) between assignments-page.js and calendar-page.js.
+const CATEGORY_COLORS = {
+    ASSIGNMENT: '#60a5fa', LAB: '#4ade80', QUIZ: '#facc15', MIDTERM: '#f87171',
+    FINAL: '#ef4444', HOMEWORK: '#2dd4bf', REMINDER: '#c084fc', TUTORIAL: '#c084fc',
+};
+const CATEGORY_COLORS_LIGHT = {
+    ASSIGNMENT: '#1d4ed8', LAB: '#15803d', QUIZ: '#a16207', MIDTERM: '#b91c1c',
+    FINAL: '#b91c1c', HOMEWORK: '#0f766e', REMINDER: '#7e22ce', TUTORIAL: '#7e22ce',
+};
+
+export function categoryColor(category, fallback = 'transparent') {
+    const map = isLightTheme() ? CATEGORY_COLORS_LIGHT : CATEGORY_COLORS;
+    return map[String(category || '').toUpperCase()] || fallback;
+}
+
+export function categoryEntries() {
+    return Object.entries(isLightTheme() ? CATEGORY_COLORS_LIGHT : CATEGORY_COLORS);
+}
+
+const TODO_COLOR = '#fb923c';
+const TODO_COLOR_LIGHT = '#c2410c';
+
+export function todoColor() {
+    return isLightTheme() ? TODO_COLOR_LIGHT : TODO_COLOR;
 }

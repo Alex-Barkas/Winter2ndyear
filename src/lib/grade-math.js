@@ -173,9 +173,15 @@ export function computeCourseTotals(course, scheme, assignments, overrides) {
     return { rows, currentPoints, currentWeight, totalWeight };
 }
 
+// Inlined into style="" attributes (banner figure, progress bar, per-row
+// score), so it can't be a CSS custom property -- same constraint as
+// ui-utils.js's categoryColor()/hashCourseColor(), and same fix: read the
+// theme attribute at call time and hand back the light-safe twin so the text
+// usages stay legible once the page background flips to near-white.
 export function getGradeColor(grade) {
-    if (grade >= 80) return '#4ade80';
-    if (grade >= 70) return '#facc15';
-    if (grade >= 60) return '#fb923c';
-    return '#f87171';
+    const light = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light';
+    if (grade >= 80) return light ? '#15803d' : '#4ade80';
+    if (grade >= 70) return light ? '#a16207' : '#facc15';
+    if (grade >= 60) return light ? '#c2410c' : '#fb923c';
+    return light ? '#b91c1c' : '#f87171';
 }

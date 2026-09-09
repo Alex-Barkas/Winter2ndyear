@@ -11,7 +11,7 @@ const {
     title,
     description,
     extraCss = [],
-    favicon = '/assets/ab_favicon.svg',
+    favicon = '/assets/queens_favicon.svg',
     bodyAttrs = {},
 } = Astro.props;
 
@@ -24,11 +24,29 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
+    {/* Blocking and inline on purpose: this has to run and set the attribute
+        before the browser paints anything, or the page flashes the wrong
+        theme for a frame. Resolves "no saved choice yet" against the OS
+        preference so style.css only ever needs a [data-theme="light"]
+        override block, never an @media(prefers-color-scheme) branch too. */}
+    <script is:inline>
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                var theme = saved === 'light' || saved === 'dark'
+                    ? saved
+                    : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="icon" type={faviconType} href={`${favicon}?v=4`}>
-    <link rel="stylesheet" href="/css/style.css?v=8">
+    <link rel="icon" type={faviconType} href={`${favicon}?v=5`}>
+    <link rel="stylesheet" href="/css/style.css?v=9">
     {extraCss.map((href) => <link rel="stylesheet" href={href} />)}
     {description && <meta name="description" content={description} />}
     <slot name="head" />
@@ -36,6 +54,7 @@ const faviconType = favicon.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
 
 <body {...bodyAttrs}>
     <slot />
+    <script type="module" src="/js/theme-toggle.js?v=1" is:inline></script>
 </body>
 
 </html>

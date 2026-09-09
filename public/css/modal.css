@@ -12,6 +12,9 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
+    /* Deliberately a fixed black scrim, not a theme token -- a modal backdrop
+       dims whatever's behind it regardless of page theme, the same way it
+       would on a light-mode website elsewhere. */
     background: rgba(0, 0, 0, 0.7);
     display: grid;
     place-items: center;
@@ -30,13 +33,13 @@
 }
 
 .modal-content {
-    background: #1a1a1a;
+    background: var(--surface-solid);
     border: 1px solid var(--border-color);
     padding: 2rem;
     border-radius: 1rem;
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px var(--shadow-strong);
 }
 
 .modal-content h3 {
@@ -58,7 +61,7 @@
 .input-field {
     width: 100%;
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-2);
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     color: var(--text-primary);
@@ -88,7 +91,7 @@
 
 .modal-actions button:not(.secondary) {
     background: var(--text-primary);
-    color: #000;
+    color: var(--bg-color);
 }
 
 .modal-actions button.danger {
@@ -115,7 +118,7 @@
         overflow-y: auto;
         border-radius: 1rem 1rem 0 0;
         padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 -10px 25px var(--shadow-strong);
     }
 
     .modal-actions {

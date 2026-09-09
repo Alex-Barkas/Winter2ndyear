@@ -1,4 +1,6 @@
 :root {
+    color-scheme: dark;
+
     --bg-color: #09090b;
     /* Zinc 950 */
     --text-primary: #fafafa;
@@ -8,6 +10,37 @@
     --text-faint: rgba(161, 161, 170, 0.4);
     --card-hover-bg: rgba(255, 255, 255, 0.03);
     --border-color: rgba(255, 255, 255, 0.05);
+
+    /* Generic surface/overlay tints, previously written as literal
+       rgba(255,255,255,X) throughout every stylesheet -- values that only
+       make sense painted over a dark page. Tokenizing them is what makes
+       light mode possible: each tier just gets redefined as an rgba(0,0,0,X)
+       of similar visual weight under [data-theme="light"]. */
+    --surface-1: rgba(255, 255, 255, 0.02);
+    --surface-2: rgba(255, 255, 255, 0.05);
+    --surface-3: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    /* Recessed form fields sit visually "below" the page -- darker than bg on
+       a dark page, but still darker-than-bg (not lighter) once bg flips to
+       near-white, so this needs its own token rather than reusing --surface-*. */
+    --input-bg: rgba(0, 0, 0, 0.2);
+
+    /* Opaque surfaces for things that float above content -- toasts, the
+       drag-ghost chip, native <select> option lists, the secondary button --
+       which previously hardcoded a Zinc shade that only reads correctly on a
+       dark page. */
+    --surface-solid: #18181b;
+    --surface-solid-hover: #27272a;
+    /* Native <option> list background/text can't inherit currentColor the way
+       author-styled elements do, so it gets its own pair mirroring
+       --surface-solid/--text-primary. */
+    --select-bg: #1a1a1a;
+    --select-text: #fff;
+
+    /* Drop shadows. Same idea as the surface tiers: a literal black shadow at
+       dark-page opacities is far too heavy once the page itself is light. */
+    --shadow-soft: rgba(0, 0, 0, 0.4);
+    --shadow-strong: rgba(0, 0, 0, 0.5);
 
     --font-sans: 'Charter', 'Bitstream Charter', 'Sitka Text', Cambria, serif;
     /* Switched to Charter stack */
@@ -27,10 +60,93 @@
     --color-success: #2ecc71;
     --color-info: #40c4ff;
 
+    /* Added alongside the four above -- same "vivid text + faint tint of the
+       same colour" badge recipe, just colours that didn't have a shared token
+       yet before this pass tied every badge/pill to a var(). */
+    --color-pending: #ffab00;
+    --color-done: #00e676;
+    --color-indigo: #818cf8;
+    --color-orange: #fb923c;
+
+    /* Category badge palette (assignment types + course-color hashing).
+       Same "vivid text, faint tint" recipe as the status colours above. */
+    --cat-blue: #60a5fa;
+    --cat-green: #4ade80;
+    --cat-yellow: #facc15;
+    --cat-red: #f87171;
+    --cat-teal: #2dd4bf;
+    --cat-purple: #c084fc;
+    --cat-pink: #f472b6;
+    --cat-lime: #a3e635;
+
     /* Height of the fixed bottom tab bar the nav becomes below 700px (see the
        responsive section at the end of this file). Other stylesheets that need
        to sit above it (list-ui.css's toast host) read this same variable. */
     --mobile-nav-height: 64px;
+
+    /* Height of the sticky top nav bar above 700px. Other stylesheets with
+       their own sticky elements (list-ui.css's control bar, calendar.css's
+       side panel) offset from this so nothing stacks under nothing. */
+    --nav-height: 60px;
+
+    /* Hero/course-card photography is graded for a dark page (see
+       .header-hero-image below); light mode swaps in a neutral grade instead
+       of inheriting a filter tuned for a near-black background. */
+    --hero-filter: sepia(10%) contrast(110%) brightness(90%);
+}
+
+/* Light theme. The blocking snippet in BaseLayout.astro resolves "system
+   preference" into one of these two attribute values before first paint, so
+   this is the only override block needed -- no @media(prefers-color-scheme)
+   branch to keep in sync with it. */
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --bg-color: #fafafa;
+    --text-primary: #18181b;
+    --text-muted: #52525b;
+    --text-faint: rgba(82, 82, 91, 0.45);
+    --card-hover-bg: rgba(0, 0, 0, 0.035);
+    --border-color: rgba(0, 0, 0, 0.08);
+
+    --surface-1: rgba(0, 0, 0, 0.025);
+    --surface-2: rgba(0, 0, 0, 0.045);
+    --surface-3: rgba(0, 0, 0, 0.07);
+    --border-strong: rgba(0, 0, 0, 0.12);
+    --input-bg: rgba(0, 0, 0, 0.035);
+
+    --surface-solid: #ffffff;
+    --surface-solid-hover: #f4f4f5;
+    --select-bg: #ffffff;
+    --select-text: #18181b;
+
+    --shadow-soft: rgba(24, 24, 27, 0.1);
+    --shadow-strong: rgba(24, 24, 27, 0.16);
+
+    --accent-color: #1b5e20;
+
+    /* Darkened so text set in these colours stays readable on a light/white
+       background -- the dark-theme values above are tuned to pop off
+       near-black instead and go washed-out here. */
+    --color-danger: #b91c1c;
+    --color-warning: #a16207;
+    --color-success: #15803d;
+    --color-info: #0284c7;
+    --color-pending: #a15c00;
+    --color-done: #047857;
+    --color-indigo: #4338ca;
+    --color-orange: #c2410c;
+
+    --cat-blue: #1d4ed8;
+    --cat-green: #15803d;
+    --cat-yellow: #a16207;
+    --cat-red: #b91c1c;
+    --cat-teal: #0f766e;
+    --cat-purple: #7e22ce;
+    --cat-pink: #be185d;
+    --cat-lime: #4d7c0f;
+
+    --hero-filter: contrast(102%) saturate(105%);
 }
 
 /* Removed local Latin Modern @font-face rules since we are switching to Charter (system/web stack) */
@@ -50,8 +166,8 @@ body {
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
-    padding: 4rem 2rem;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 ::view-transition-group(*) {
@@ -64,6 +180,12 @@ body {
     max-width: 1200px;
     /* Widened from 700px */
     margin: 0 auto;
+    /* Less top padding than the other sides -- the sticky nav bar above
+       already provides its own visual separation from the viewport edge,
+       so the old 4rem (sized back when nav was a floating corner badge
+       that didn't take up real layout space) stacked on top of it and
+       left a noticeably empty gap before any page content. */
+    padding: 1.5rem 2rem 4rem;
 }
 
 /* Header */
@@ -94,76 +216,94 @@ header {
     color: var(--text-primary);
 }
 
-/* Signature Badge (Absolute Top Right) */
-/* Signature Badge & Sidebar Nav (Absolute Top Right) */
-.signature-badge {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    /* Align to right */
-    gap: 0.5rem;
+/* Site nav: a conventional sticky top bar on desktop, matching how basically
+   every other dashboard/app does it (links + theme toggle, right-aligned).
+   Below 700px the exact same markup flips to a fixed bottom tab bar instead
+   -- same trick the rest of this file already uses for .list-controls, just
+   applied to nav instead of being a floating corner card that could overlap
+   page content. */
+.site-nav {
+    position: sticky;
+    top: 0;
     z-index: 1000;
-    pointer-events: auto;
-    /* Enable clicks for links */
-    background: transparent;
+    width: 100%;
+    background: color-mix(in srgb, var(--bg-color) 90%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.signature-row {
+.site-nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: var(--nav-height);
+    padding: 0 2rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: flex-end;
+    gap: 1.5rem;
 }
 
-.nav-divider {
-    width: 100%;
-    height: 1px;
-    background-color: var(--border-color);
-    margin: 0.25rem 0;
-    opacity: 0.5;
-}
-
-.side-nav {
+.site-nav-links {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: right;
+    align-items: center;
+    gap: 0.2rem;
 }
 
 .nav-link {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
     color: var(--text-muted);
     text-decoration: none;
-    opacity: 0.6;
-    transition: all 0.2s ease;
     text-transform: lowercase;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.4rem;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 
-.nav-link:hover,
+.nav-link:hover {
+    color: var(--text-primary);
+    background: var(--surface-2);
+}
+
 .nav-link.active {
     color: var(--accent-color);
-    opacity: 1;
+    background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+    font-weight: 600;
 }
 
-.signature-text {
-    font-family: 'JetBrains Mono', monospace;
-    /* Explicit font family */
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    opacity: 0.7;
-    text-transform: lowercase;
-}
-
-.signature-gif {
-    width: 25px;
-    /* Reduced from 48px to match text better (approx 2x text height) */
-    height: 25px;
-    border-radius: 50%;
-    object-fit: cover;
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
     border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: lowercase;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    margin-left: 0.6rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+    color: var(--text-primary);
+    background: var(--surface-2);
+}
+
+.theme-toggle .icon-moon {
+    display: none;
+}
+
+:root[data-theme="light"] .theme-toggle .icon-sun {
+    display: none;
+}
+
+:root[data-theme="light"] .theme-toggle .icon-moon {
+    display: inline-flex;
 }
 
 .header-titling {
@@ -180,7 +320,7 @@ header {
     overflow: hidden;
     border-radius: 0.75rem;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px var(--shadow-strong);
 }
 
 .header-hero-image {
@@ -188,8 +328,7 @@ header {
     height: auto;
     display: block;
     opacity: 0.9;
-    /* Optional: filter to blend better with dark mode */
-    filter: sepia(10%) contrast(110%) brightness(90%);
+    filter: var(--hero-filter);
 }
 
 h1 {
@@ -282,7 +421,7 @@ section {
     letter-spacing: 0.1em;
     color: var(--text-muted);
     opacity: 0.5;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-1);
     padding: 0.35rem 0.65rem;
     border-radius: 0.25rem;
 }
@@ -316,7 +455,7 @@ section {
 
 .assignment-item:hover {
     background-color: var(--card-hover-bg);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--border-strong);
 }
 
 /* Removed duplicate assign-link-wrapper */
@@ -327,11 +466,20 @@ section {
 }
 
 .assign-date {
+    display: flex;
+    flex-direction: column;
     font-family: var(--font-mono);
     color: var(--text-muted);
     font-size: 0.85rem;
     min-width: 60px;
     opacity: 0.8;
+}
+
+.assign-day-name {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
 }
 
 .assign-details {
@@ -375,33 +523,33 @@ section {
 }
 
 .status-pending {
-    background-color: rgba(255, 171, 0, 0.1);
-    color: #ffab00;
+    background-color: color-mix(in srgb, var(--color-pending) 10%, transparent);
+    color: var(--color-pending);
 }
 
 .status-upcoming {
-    background-color: rgba(64, 196, 255, 0.1);
-    color: #40c4ff;
+    background-color: color-mix(in srgb, var(--color-info) 10%, transparent);
+    color: var(--color-info);
 }
 
 .status-done {
-    background-color: rgba(0, 230, 118, 0.1);
-    color: #00e676;
+    background-color: color-mix(in srgb, var(--color-done) 10%, transparent);
+    color: var(--color-done);
 }
 
 .status-overdue {
-    background-color: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    background-color: color-mix(in srgb, var(--color-danger) 15%, transparent);
+    color: var(--color-danger);
 }
 
 .status-today {
-    background-color: rgba(241, 196, 15, 0.15);
-    color: #f1c40f;
+    background-color: color-mix(in srgb, var(--color-warning) 15%, transparent);
+    color: var(--color-warning);
 }
 
 .status-tomorrow {
-    background-color: rgba(46, 204, 113, 0.15);
-    color: #2ecc71;
+    background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
+    color: var(--color-success);
 }
 
 /* Week-group section divider for the assignments list -- same visual recipe
@@ -442,7 +590,20 @@ section {
 
 .course-card:hover {
     background-color: var(--card-hover-bg);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--border-strong);
+}
+
+/* Photo cards paint their own dark gradient scrim (script.js's bgStyle)
+   regardless of site theme, so the text and buttons on top of it can't
+   ride var(--text-primary) -- that flips to near-black in light mode and
+   goes invisible against the always-dark scrim. */
+.course-card.has-image .course-title,
+.course-card.has-image .action-btn.secondary {
+    color: #fff;
+}
+
+.course-card.has-image .action-btn.secondary:hover {
+    border-color: #fff;
 }
 
 .course-header {
@@ -513,16 +674,13 @@ section {
 }
 
 .action-btn.secondary {
-    background-color: #18181b;
-    /* Zinc 900 */
+    background-color: var(--surface-solid);
     color: var(--text-primary);
-    /* bright text */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-strong);
 }
 
 .action-btn.secondary:hover {
-    background-color: #27272a;
-    /* Zinc 800 */
+    background-color: var(--surface-solid-hover);
     border-color: var(--text-primary);
     transform: translateY(-1px);
 }
@@ -586,7 +744,7 @@ footer p {
 }
 
 .view-btn.active {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-3);
     color: var(--text-primary);
     font-weight: 600;
 }
@@ -602,20 +760,20 @@ footer p {
     position: absolute;
     top: -8px;
     left: 10px;
-    background: #ffab00;
+    background: var(--color-pending);
     color: #000;
     font-size: 0.6rem;
     font-weight: 800;
     padding: 0.1rem 0.4rem;
     border-radius: 0.2rem;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 4px var(--shadow-strong);
     letter-spacing: 0.05em;
 }
 
 .highlight-today {
-    border: 1px solid rgba(255, 171, 0, 0.3);
-    background: rgba(255, 171, 0, 0.03);
+    border: 1px solid color-mix(in srgb, var(--color-pending) 30%, transparent);
+    background: color-mix(in srgb, var(--color-pending) 3%, transparent);
 }
 
 .assign-link-wrapper {
@@ -679,8 +837,8 @@ footer p {
 
 .delete-btn:hover {
     opacity: 1;
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1) !important;
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
 }
 
 /* .delete-btn is only visible on :hover, which touch input never triggers --
@@ -701,49 +859,49 @@ footer p {
     letter-spacing: 0.05em;
     padding: 0.15rem 0.4rem;
     border-radius: 0.25rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-3);
     color: var(--text-muted);
 }
 
 .category-assignment {
-    color: #60a5fa;
-    background: rgba(96, 165, 250, 0.15);
+    color: var(--cat-blue);
+    background: color-mix(in srgb, var(--cat-blue) 15%, transparent);
 }
 
 .category-lab {
-    color: #4ade80;
-    background: rgba(74, 222, 128, 0.15);
+    color: var(--cat-green);
+    background: color-mix(in srgb, var(--cat-green) 15%, transparent);
 }
 
 .category-quiz {
-    color: #facc15;
-    background: rgba(250, 204, 21, 0.15);
+    color: var(--cat-yellow);
+    background: color-mix(in srgb, var(--cat-yellow) 15%, transparent);
 }
 
 .category-midterm {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.15);
+    color: var(--cat-red);
+    background: color-mix(in srgb, var(--cat-red) 15%, transparent);
 }
 
 .category-final {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
 }
 
 .category-homework {
-    color: #2dd4bf;
-    background: rgba(45, 212, 191, 0.15);
+    color: var(--cat-teal);
+    background: color-mix(in srgb, var(--cat-teal) 15%, transparent);
 }
 
 .category-reminder {
-    color: #c084fc;
-    background: rgba(192, 132, 252, 0.15);
+    color: var(--cat-purple);
+    background: color-mix(in srgb, var(--cat-purple) 15%, transparent);
 }
 
 .category-todo {
-    color: #fb923c;
-    background: rgba(251, 146, 60, 0.15);
+    color: var(--color-orange);
+    background: color-mix(in srgb, var(--color-orange) 15%, transparent);
 }
 
 
@@ -807,7 +965,7 @@ footer p {
 }
 
 #new-item-input {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-2);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 0.35rem 0.6rem;
@@ -818,7 +976,7 @@ footer p {
 
 .checklist-input-group button {
     background: var(--text-primary);
-    color: #000;
+    color: var(--bg-color);
     border: none;
     border-radius: 0.35rem;
     width: 2rem;
@@ -854,7 +1012,7 @@ footer p {
 
 #timer-btn {
     background: var(--text-primary);
-    color: #000;
+    color: var(--bg-color);
 }
 
 .timer-controls button.secondary {
@@ -879,7 +1037,7 @@ footer p {
 }
 
 #assignment-grade {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-2);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     padding: 0.5rem;
@@ -890,9 +1048,9 @@ footer p {
 
 .submit-btn {
     width: 100%;
-    background: rgba(0, 230, 118, 0.1);
-    color: #00e676;
-    border: 1px solid rgba(0, 230, 118, 0.2);
+    background: color-mix(in srgb, var(--color-done) 10%, transparent);
+    color: var(--color-done);
+    border: 1px solid color-mix(in srgb, var(--color-done) 20%, transparent);
     padding: 0.75rem;
     border-radius: 0.5rem;
     font-weight: 600;
@@ -913,7 +1071,7 @@ footer p {
    ========================================================================== */
 
 @media (max-width: 700px) {
-    body {
+    .container {
         padding: 2rem 1rem;
         /* Room for the fixed bottom tab bar so page content never sits under it. */
         padding-bottom: calc(var(--mobile-nav-height) + 1.5rem + env(safe-area-inset-bottom, 0px));
@@ -964,10 +1122,6 @@ footer p {
         grid-template-columns: 1fr;
     }
 
-    /* The corner badge becomes a fixed, app-like bottom tab bar on mobile --
-       thumb-reachable instead of a small top-corner target. The signature
-       text/gif and divider are dropped; there's no room for them in a bar and
-       they're not navigational. */
     /* Finger-sized controls, same rationale as list-ui.css's mobile block:
        these are 18-30px at desktop sizing, fine for a cursor but under what
        a thumb reliably hits. The round toggles keep their drawn size -- an
@@ -1002,50 +1156,57 @@ footer p {
         min-height: 38px;
     }
 
-    .signature-badge {
+    /* The top bar becomes a fixed, app-like bottom tab bar on mobile --
+       thumb-reachable instead of a small top target.
+       .site-nav-links collapses to display:contents so its
+       <a>/<button> children become direct flex children of
+       .site-nav-inner, sitting as equal-width tabs instead of being
+       squeezed into a nested sub-row. */
+    .site-nav {
         position: fixed;
         top: auto;
         bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        flex-direction: row;
-        align-items: stretch;
-        gap: 0;
-        height: var(--mobile-nav-height);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        background: color-mix(in srgb, var(--bg-color) 92%, transparent);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        border-bottom: none;
         border-top: 1px solid var(--border-color);
+        background: color-mix(in srgb, var(--bg-color) 92%, transparent);
     }
 
-    .signature-row,
-    .nav-divider {
-        display: none;
+    .site-nav-inner {
+        height: var(--mobile-nav-height);
+        padding: 0;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    .side-nav {
-        flex: 1;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        gap: 0;
-        text-align: center;
+    .site-nav-links {
+        display: contents;
     }
 
-    .nav-link {
+    .nav-link,
+    .theme-toggle {
         display: flex;
         align-items: center;
         justify-content: center;
         flex: 1;
         height: 100%;
         font-size: 0.8rem;
+        text-align: center;
+        border: none;
+        border-radius: 0;
+        margin: 0;
         /* "all semesters" is long enough to wrap onto a second line in a
            quarter of a phone-width bar, which knocks it out of alignment
            with the other three labels. */
         white-space: nowrap;
         padding: 0 0.15rem;
+    }
+
+    .nav-link.active {
+        background: transparent;
+        box-shadow: inset 0 2px 0 var(--accent-color);
+    }
+
+    .theme-toggle-label {
+        display: none;
     }
 
     /* Narrow phones (iPhone SE and similar) can't fit "all semesters" at

@@ -106,6 +106,7 @@ export default {
             code: "MTHE 326",
             name: "Functions of a Complex Variable",
             notes: "/syllabus/MTHE 326 - Course Outline F26.pdf",
+            textbook: "/textbooks/MTHE 326 Saff Snider - Fundamentals of Complex Analysis.pdf",
             assignments: "/fall2026/assignments?course=MTHE 326",
             image: "/course_images/mthe326.png"
         }

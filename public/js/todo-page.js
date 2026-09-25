@@ -17,7 +17,7 @@ import {
     dueBucket,
     Prefs,
     toast
-} from '/js/ui-utils.js?v=2';
+} from '/js/ui-utils.js?v=3';
 
 const PREFS_KEY = 'ui_prefs_todo';
 

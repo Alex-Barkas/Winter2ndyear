@@ -26,7 +26,7 @@ import {
     isLightTheme,
     COURSE_PALETTE,
     COURSE_PALETTE_LIGHT
-} from '/js/ui-utils.js?v=2';
+} from '/js/ui-utils.js?v=3';
 
 const PREFS_KEY = 'ui_prefs_calendar';
 const DEFAULT_PREFS = { view: 'month', term: 'all' };

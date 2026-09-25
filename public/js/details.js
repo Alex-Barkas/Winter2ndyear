@@ -1,5 +1,6 @@
 // details.js - Logic for Detail Page Modules
 import { DataService } from "./data-service.js";
+import { googleCalendarUrl } from "./ui-utils.js?v=3";
 
 // Make functions global for HTML onclick handlers
 // window.toggleDetailStatus is defined below
@@ -33,6 +34,13 @@ function renderDetails(item) {
     document.getElementById('detail-title').innerText = item.title;
     const dateObj = new Date(item.date + 'T' + item.time);
     document.getElementById('detail-date').innerText = dateObj.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const calLink = document.getElementById('gcal-btn');
+    const calUrl = googleCalendarUrl(item);
+    if (calLink && calUrl) {
+        calLink.href = calUrl;
+        calLink.style.display = '';
+    }
 
     // Category Styling
     const catElem = document.getElementById('detail-category');

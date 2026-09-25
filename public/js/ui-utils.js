@@ -282,3 +282,31 @@ const TODO_COLOR_LIGHT = '#c2410c';
 export function todoColor() {
     return isLightTheme() ? TODO_COLOR_LIGHT : TODO_COLOR;
 }
+
+/* --------------------------------------------------------- google calendar */
+
+// Prefilled "add event" link for Google Calendar. No API or sign-in: the link
+// opens Google's own event form with everything filled in and the user hits
+// Save. Times are floating (no Z) so they land in the user's own timezone.
+// The event is the 30 minutes leading up to the due time. Returns null for
+// undated/TBD items.
+export function googleCalendarUrl(item) {
+    const due = parseLocalDate(item && item.date);
+    if (!due) return null;
+
+    const [h, m] = String(item.time || '23:59').split(':').map(Number);
+    due.setHours(h || 0, m || 0, 0, 0);
+    const start = new Date(due.getTime() - 30 * 60 * 1000);
+
+    const p = n => String(n).padStart(2, '0');
+    const stamp = d => `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+
+    const details = item.details && item.details.type === 'text' ? item.details.content : '';
+    const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: `${item.course ? item.course + ' – ' : ''}${item.title || 'Assignment'} due`,
+        dates: `${stamp(start)}/${stamp(due)}`,
+        details: details || ''
+    });
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}

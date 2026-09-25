@@ -23,8 +23,9 @@ import {
     Prefs,
     toast,
     hashCourseColor,
-    categoryColor
-} from '/js/ui-utils.js?v=2';
+    categoryColor,
+    googleCalendarUrl
+} from '/js/ui-utils.js?v=3';
 
 const PREFS_KEY = 'ui_prefs_assignments';
 
@@ -488,6 +489,11 @@ function card(item) {
     const relative = (!undated && !status.done)
         ? `<span class="assign-relative">${formatRelative(item.date)}</span>` : '';
 
+    const calUrl = googleCalendarUrl(item);
+    const calBtn = calUrl
+        ? `<a class="gcal-btn" href="${escapeHtml(calUrl)}" target="_blank" rel="noopener"
+              title="Add to Google Calendar">+ Google Calendar</a>` : '';
+
     return `
         <div class="assignment-item ${status.done ? 'is-done' : ''} ${status.label === 'OVERDUE' ? 'is-overdue' : ''}"
              style="border-left-color:${accent}" data-id="${escapeHtml(item.id)}">
@@ -510,6 +516,7 @@ function card(item) {
             <div class="assign-right">
                 <span class="assign-time">${escapeHtml(item.time || '23:59')}</span>
                 ${badge}
+                ${calBtn}
                 <button class="status-toggle-btn ${status.done ? 'checked' : ''}"
                         data-action="toggle-done" data-id="${escapeHtml(item.id)}"
                         title="${status.done ? 'Mark as Pending' : 'Mark as Done'}">${status.done ? '✓' : ''}</button>

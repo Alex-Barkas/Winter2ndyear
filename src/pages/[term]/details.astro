@@ -227,6 +227,8 @@ const { term } = Astro.params;
 
                     <div id="status-container" style="display: flex; align-items: center; gap: 1rem;">
                         <span id="current-status-text" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+                        <a id="gcal-btn" class="gcal-btn" href="#" target="_blank" rel="noopener"
+                            style="display: none;">+ Google Calendar</a>
                         <button id="mark-done-btn" onclick="toggleDetailStatus()" class="action-btn primary small">
                             Mark as Done
                         </button>

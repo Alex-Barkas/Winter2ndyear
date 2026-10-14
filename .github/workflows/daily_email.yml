@@ -1,35 +1,59 @@
 name: Daily Agenda Email
 
 on:
+  # Primary trigger: cron-job.org calls the GitHub API at 7:00 AM Toronto time
+  # (workflow_dispatch). GitHub's own schedule runs hours late, so it's only a
+  # fallback in case that external trigger fails (e.g. the token expired).
   schedule:
-    # 10:07 UTC = 6:07 AM EDT (until Nov 1) / 5:07 AM EST (after)
-    - cron: '7 10 * * *'
+    # 15:23 UTC = 11:23 AM EDT / 10:23 AM EST. Skips itself if today's email already went out.
+    - cron: '23 15 * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      TZ: America/Toronto
 
     steps:
+    - name: Skip fallback if today's email already sent
+      id: guard
+      if: github.event_name == 'schedule'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        today=$(date +%F)
+        for ts in $(gh run list -R "$GITHUB_REPOSITORY" --workflow daily_email.yml --status success --limit 10 --json createdAt -q '.[].createdAt'); do
+          if [ "$(date -d "$ts" +%F)" = "$today" ]; then
+            echo "Email already sent today ($ts), skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+        done
+
     - name: Checkout code
+      if: steps.guard.outputs.skip != 'true'
       uses: actions/checkout@v4
 
     - name: Set up Python
+      if: steps.guard.outputs.skip != 'true'
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-        cache: pip
 
     - name: Install dependencies
+      if: steps.guard.outputs.skip != 'true'
       run: |
         python -m pip install --upgrade pip
         pip install requests firebase-admin
 
     - name: Create Service Account Key
+      if: steps.guard.outputs.skip != 'true'
       env:
         FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
       run: |
@@ -37,6 +61,7 @@ jobs:
         chmod 600 firebase_credentials.json
 
     - name: Run Auto Email Script (REST API)
+      if: steps.guard.outputs.skip != 'true'
       env:
         GOOGLE_APPLICATION_CREDENTIALS: firebase_credentials.json
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}

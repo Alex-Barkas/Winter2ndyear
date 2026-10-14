@@ -120,7 +120,8 @@ def fetch_collection(collection_name, token):
 BG, CARD, BORDER = "#09090b", "#18181b", "#27272a"
 TEXT, MUTED, DIM = "#fafafa", "#a1a1aa", "#71717a"
 RED, AMBER, VIOLET, BLUE, GREEN = "#f87171", "#fbbf24", "#a78bfa", "#60a5fa", "#34d399"
-COURSE_COLORS = ["#60a5fa", "#f472b6", "#34d399", "#fbbf24", "#a78bfa", "#22d3ee", "#fb923c", "#a3e635"]
+# No violet here: violet is reserved for exams.
+COURSE_COLORS = ["#60a5fa", "#f472b6", "#34d399", "#fbbf24", "#e879f9", "#22d3ee", "#fb923c", "#a3e635"]
 FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 CATEGORY_LABELS = {
@@ -257,94 +258,53 @@ def subject_line(b, today):
         parts.append(plural(len(b["todos"]), "to-do"))
     return " · ".join(parts)
 
-def stat_cell(value, label, color):
-    num_color = color if value else "#52525b"
-    return f"""<td width="25%" align="center" bgcolor="{CARD}" style="background:{CARD};border:1px solid {BORDER};border-radius:10px;padding:14px 4px;">
-      <div style="font:700 26px/1 {FONT};color:{num_color};">{value}</div>
-      <div style="font:600 10px/1.2 {FONT};color:{MUTED};letter-spacing:1px;text-transform:uppercase;padding-top:6px;">{label}</div>
-    </td>"""
+def st(size, weight=400, color=TEXT, lh=1.4, extra=""):
+    """Inline font style. Longhand on purpose: Outlook (mobile + web) drops the `font:` shorthand."""
+    return f"font-family:{FONT};font-size:{size}px;font-weight:{weight};line-height:{lh};color:{color};{extra}"
 
-def section_title(text, color):
-    return f"""<tr><td style="padding:26px 0 10px;font:700 11px/1 {FONT};color:{color};letter-spacing:1.5px;text-transform:uppercase;">{text}</td></tr>"""
+def day_header(label, sub, color=MUTED):
+    sub_html = f' <span style="color:{DIM};">&middot; {sub}</span>' if sub else ""
+    return f"""<tr><td colspan="2" style="padding:22px 0 6px;border-bottom:1px solid {BORDER};{st(12, 700, color, 1.2, 'letter-spacing:1px;text-transform:uppercase;')}">{label}{sub_html}</td></tr>"""
 
-def deadline_row(entry, accent):
+def item_row(entry, overdue=False):
     days, time, item, d = entry
     course = item.get('course', '')
-    category = CATEGORY_LABELS.get(item.get('category'), "")
-    rel = relative_label(days)
-    rel_color = RED if days < 0 else AMBER if days <= 1 else TEXT
-    time_txt = format_time(time)
-    meta = " · ".join(x for x in [category, time_txt] if x)
-    return f"""<tr><td style="padding:0 0 8px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{CARD}" style="background:{CARD};border:1px solid {BORDER};border-left:3px solid {accent};border-radius:10px;">
-        <tr>
-          <td width="54" align="center" valign="middle" style="padding:12px 0 12px 12px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="44" bgcolor="{BORDER}" style="background:{BORDER};border-radius:8px;">
-              <tr><td align="center" style="padding:6px 0 0;font:700 10px/1 {FONT};color:{MUTED};letter-spacing:1px;">{d.strftime('%a').upper()}</td></tr>
-              <tr><td align="center" style="padding:3px 0 6px;font:700 18px/1 {FONT};color:{TEXT};">{d.day}</td></tr>
-            </table>
-          </td>
-          <td valign="middle" style="padding:12px 12px;">
-            <div style="font:700 11px/1.2 {FONT};color:{course_color(course)};letter-spacing:.5px;">{esc(course)}</div>
-            <div style="font:600 15px/1.35 {FONT};color:{TEXT};padding-top:3px;">{esc(item.get('title', 'Untitled'))}</div>
-            <div style="font:400 12px/1.3 {FONT};color:{DIM};padding-top:3px;">{esc(meta)}</div>
-          </td>
-          <td align="right" valign="middle" style="padding:12px 14px 12px 0;white-space:nowrap;font:700 13px/1 {FONT};color:{rel_color};">{rel}</td>
-        </tr>
-      </table>
-    </td></tr>"""
-
-def exam_row(entry):
-    days, time, item, d = entry
-    course = item.get('course', '')
-    when = " · ".join(x for x in [short_date(d), format_time(time)] if x)
-    big, small = ("Today", "") if days == 0 else (str(days), "day" if days == 1 else "days")
-    return f"""<tr><td style="padding:0 0 8px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#1c1730" style="background:#1c1730;border:1px solid #3b2f63;border-radius:10px;">
-        <tr>
-          <td valign="middle" style="padding:16px;">
-            <div style="font:700 11px/1.2 {FONT};color:{VIOLET};letter-spacing:.5px;">{esc(course)} · {esc(CATEGORY_LABELS.get(item.get('category'), ''))}</div>
-            <div style="font:700 17px/1.3 {FONT};color:{TEXT};padding-top:3px;">{esc(item.get('title', 'Exam'))}</div>
-            <div style="font:400 13px/1.3 {FONT};color:{MUTED};padding-top:3px;">{esc(when)}</div>
-          </td>
-          <td width="76" align="center" valign="middle" style="padding:16px 16px 16px 0;">
-            <div style="font:800 30px/1 {FONT};color:{VIOLET};">{big}</div>
-            <div style="font:600 10px/1.2 {FONT};color:{MUTED};letter-spacing:1px;text-transform:uppercase;padding-top:4px;">{small}</div>
-          </td>
-        </tr>
-      </table>
-    </td></tr>"""
-
-def later_row(entry):
-    days, time, item, d = entry
-    course = item.get('course', '')
+    is_exam = item.get('category') in EXAM_CATEGORIES
+    dot = VIOLET if is_exam else course_color(course)
+    if overdue:
+        meta = [f"was due {short_date(d)}"]
+    elif is_exam:
+        meta = [format_time(time)]
+    else:
+        meta = [CATEGORY_LABELS.get(item.get('category'), ""), format_time(time)]
+    meta_html = esc(" · ".join(x for x in meta if x))
+    if is_exam:
+        meta_html = f'<span style="color:{VIOLET};font-weight:700;">EXAM</span> &middot; {meta_html}'
+    if overdue:
+        meta_html += f' &middot; <span style="color:{RED};font-weight:700;">{relative_label(days)}</span>'
     return f"""<tr>
-      <td width="74" valign="top" style="padding:9px 0;border-bottom:1px solid {BORDER};font:600 12px/1.4 {FONT};color:{MUTED};white-space:nowrap;">{short_date(d)}</td>
-      <td valign="top" style="padding:9px 8px;border-bottom:1px solid {BORDER};font:400 14px/1.4 {FONT};color:{TEXT};">
-        <span style="font-weight:700;color:{course_color(course)};">{esc(course)}</span>&nbsp; {esc(item.get('title', 'Untitled'))}
+      <td width="20" valign="top" style="padding:10px 0 0;{st(14, 400, dot, 1.4)}">&#9679;</td>
+      <td valign="top" style="padding:8px 0;">
+        <div style="{st(16, 400, TEXT, 1.4)}"><span style="color:{dot};font-weight:700;">{esc(course)}</span>&nbsp; {esc(item.get('title', 'Untitled'))}</div>
+        <div style="{st(13, 400, DIM, 1.4, 'padding-top:1px;')}">{meta_html}</div>
       </td>
-      <td align="right" valign="top" style="padding:9px 0;border-bottom:1px solid {BORDER};font:400 12px/1.4 {FONT};color:{DIM};white-space:nowrap;">{relative_label(days).lower()}</td>
     </tr>"""
 
-def todo_row(todo, today):
+def todo_item(todo, today):
     level = todo.get('urgency') or 3
     badge = ""
     if level >= 4:
         color = RED if level == 5 else AMBER
-        badge = f"""<span style="font:700 10px/1 {FONT};color:{color};border:1px solid {color};border-radius:4px;padding:2px 5px;letter-spacing:.5px;">{'CRITICAL' if level == 5 else 'HIGH'}</span>&nbsp; """
+        badge = f'<span style="color:{color};font-weight:700;">{"CRITICAL" if level == 5 else "HIGH"}</span> &middot; '
     d = parse_date(todo.get('date'))
-    due = f" · {short_date(d)} ({relative_label((d - today).days).lower()})" if d else ""
-    return f"""<tr><td style="padding:0 0 6px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{CARD}" style="background:{CARD};border:1px solid {BORDER};border-radius:10px;">
-        <tr>
-          <td width="22" valign="top" style="padding:12px 0 12px 14px;font:400 15px/1.3 {FONT};color:{GREEN};">&#9675;</td>
-          <td style="padding:12px 14px 12px 8px;">
-            <div style="font:600 14px/1.35 {FONT};color:{TEXT};">{badge}{esc(todo.get('title', 'Untitled'))}</div>
-            <div style="font:400 12px/1.3 {FONT};color:{DIM};padding-top:2px;">{esc(todo.get('course') or 'Personal')}{esc(due)}</div>
-          </td>
-        </tr>
-      </table>
-    </td></tr>"""
+    due = f" &middot; {short_date(d)} ({relative_label((d - today).days).lower()})" if d else ""
+    return f"""<tr>
+      <td width="20" valign="top" style="padding:9px 0 0;{st(14, 400, GREEN, 1.4)}">&#9675;</td>
+      <td valign="top" style="padding:7px 0;">
+        <div style="{st(15, 400, TEXT, 1.4)}">{esc(todo.get('title', 'Untitled'))}</div>
+        <div style="{st(13, 400, DIM, 1.4)}">{badge}{esc(todo.get('course') or 'Personal')}{due}</div>
+      </td>
+    </tr>"""
 
 def build_text(b, today, summary):
     lines = [f"Daily Agenda - {today.strftime('%A, %B')} {today.day}", "", summary, ""]
@@ -372,63 +332,48 @@ def build_email(assignments, todos, today):
     b = bucket_items(assignments, todos, today)
     summary = summary_line(b, today)
     subject = subject_line(b, today)
+    counts = subject.split(" · ", 1)[1] if " · " in subject else ""
 
     rows = []
     if b["overdue"]:
-        rows.append(section_title("Overdue", RED))
-        rows += [deadline_row(e, RED) for e in b["overdue"]]
-    if b["soon"]:
-        rows.append(section_title(f"Due in the next {NOTICE_DAYS} days", AMBER))
-        rows += [deadline_row(e, AMBER) for e in b["soon"]]
-    if b["exams"]:
-        rows.append(section_title("Exams", VIOLET))
-        rows += [exam_row(e) for e in b["exams"]]
-    if b["later"]:
-        rows.append(section_title("Coming up", BLUE))
-        rows.append(f"""<tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">{''.join(later_row(e) for e in b["later"])}</table></td></tr>""")
+        rows.append(day_header("Overdue", "", RED))
+        rows += [item_row(e, overdue=True) for e in b["overdue"]]
+
+    # Timeline: one group per day, exams mixed in on their day.
+    days = {}
+    for e in sorted(b["soon"] + b["exams"] + b["later"], key=lambda e: (e[0], e[1])):
+        days.setdefault(e[3], []).append(e)
+    for d, entries in days.items():
+        n = entries[0][0]
+        color = AMBER if n <= 1 else MUTED
+        rows.append(day_header(short_date(d), relative_label(n), color))
+        rows += [item_row(e) for e in entries]
+
     if b["todos"]:
-        rows.append(section_title("To-do", GREEN))
-        rows += [todo_row(t, today) for t in b["todos"]]
-    if not any(b[k] for k in ("overdue", "soon", "exams", "later", "todos")):
-        rows.append(f"""<tr><td align="center" style="padding:36px 0;font:600 16px/1.4 {FONT};color:{GREEN};">&#10024; All caught up</td></tr>""")
+        rows.append(day_header("To-do", "", GREEN))
+        rows += [todo_item(t, today) for t in b["todos"]]
+
+    if not rows:
+        rows.append(f"""<tr><td colspan="2" style="padding:32px 0;{st(16, 600, GREEN)}">All caught up. Nothing due in the next {LOOKAHEAD_DAYS} days.</td></tr>""")
 
     html_body = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark">
-<title>Daily Agenda</title></head>
+<title>Daily Agenda</title>
+<style>
+  /* Stop iOS Mail turning dates and times into blue links */
+  a[x-apple-data-detectors] {{ color: inherit !important; text-decoration: none !important; font: inherit !important; }}
+</style></head>
 <body style="margin:0;padding:0;background:{BG};" bgcolor="{BG}">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">{esc(summary)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{BG}" style="background:{BG};">
-<tr><td align="center" style="padding:28px 12px;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
-    <tr><td style="padding:0 6px 18px;">
-      <div style="font:700 11px/1 {FONT};color:{DIM};letter-spacing:2px;text-transform:uppercase;">Daily Agenda</div>
-      <div style="font:800 28px/1.2 {FONT};color:{TEXT};padding-top:8px;">{today.strftime('%A, %B')} {today.day}</div>
-      <div style="font:400 15px/1.5 {FONT};color:{MUTED};padding-top:8px;">{esc(summary)}</div>
-    </td></tr>
-    <tr><td>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="6" border="0">
-        <tr>
-          {stat_cell(len(b['overdue']), "Overdue", RED)}
-          {stat_cell(len(b['soon']), "Due soon", AMBER)}
-          {stat_cell(len(b['exams']), "Exams", VIOLET)}
-          {stat_cell(len(b['todos']), "To-dos", GREEN)}
-        </tr>
-      </table>
-    </td></tr>
-    <tr><td style="padding:0 6px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-        {''.join(rows)}
-      </table>
-    </td></tr>
-    <tr><td align="center" style="padding:28px 0 8px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-        <td bgcolor="{TEXT}" style="background:{TEXT};border-radius:8px;">
-          <a href="{DASHBOARD_URL}" style="display:inline-block;padding:12px 26px;font:700 14px/1 {FONT};color:{BG};text-decoration:none;">Open dashboard &rarr;</a>
-        </td>
-      </tr></table>
-    </td></tr>
-    <tr><td align="center" style="padding:14px 0 0;font:400 11px/1.5 {FONT};color:#52525b;">Stay focused.</td></tr>
+<tr><td align="center" style="padding:24px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+    <tr><td colspan="2" style="{st(24, 800, TEXT, 1.2)}">{today.strftime('%A, %B')} {today.day}</td></tr>
+    <tr><td colspan="2" style="padding-top:6px;{st(14, 400, MUTED, 1.4)}">{esc(counts)}</td></tr>
+    {''.join(rows)}
+    <tr><td colspan="2" style="padding:26px 0 0;{st(14, 600, MUTED, 1.2)}"><a href="{DASHBOARD_URL}" style="color:{MUTED};text-decoration:underline;">Open dashboard &rarr;</a></td></tr>
   </table>
 </td></tr>
 </table>

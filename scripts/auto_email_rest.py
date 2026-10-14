@@ -262,28 +262,40 @@ def st(size, weight=400, color=TEXT, lh=1.4, extra=""):
     """Inline font style. Longhand on purpose: Outlook (mobile + web) drops the `font:` shorthand."""
     return f"font-family:{FONT};font-size:{size}px;font-weight:{weight};line-height:{lh};color:{color};{extra}"
 
-def day_header(label, sub, color=DIM):
-    sub_html = f'&nbsp;&middot;&nbsp;{sub}' if sub else ""
-    return f"""<tr><td style="padding:26px 0 4px;{st(12, 600, color, 1.2, 'letter-spacing:1px;text-transform:uppercase;')}">{label}{sub_html}</td></tr>"""
+def day_header(label, sub, color=TEXT):
+    sub_html = f'<span style="color:{DIM};font-weight:400;">&nbsp;&middot;&nbsp;{sub}</span>' if sub else ""
+    return f"""<tr><td style="padding:28px 0 8px;border-bottom:1px solid {BORDER};{st(13, 700, color, 1.2, 'letter-spacing:.8px;text-transform:uppercase;')}">{label}{sub_html}</td></tr>"""
+
+def bar_row(bar_color, inner):
+    """One item: thin colored bar on the left, content to the right."""
+    return f"""<tr><td style="padding:10px 0 0;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td width="3" bgcolor="{bar_color}" style="background:{bar_color};width:3px;border-radius:2px;">&nbsp;</td>
+        <td style="padding:2px 0 2px 12px;">{inner}</td>
+      </tr></table>
+    </td></tr>"""
 
 def item_row(entry, overdue=False):
     days, time, item, d = entry
-    meta = [esc(item.get('course', ''))]
+    course = item.get('course', '')
+    is_exam = item.get('category') in EXAM_CATEGORIES
+    color = VIOLET if is_exam else course_color(course)
+    meta = [f'<span style="color:{color};font-weight:700;">{esc(course)}</span>']
     if overdue:
-        meta.append(f'<span style="color:{RED};">{relative_label(days).lower()}</span>')
+        meta.append(f'<span style="color:{RED};font-weight:600;">{relative_label(days).lower()}</span>')
     else:
         meta.append(esc(format_time(time)))
-    if item.get('category') in EXAM_CATEGORIES:
-        meta.append(f'<span style="color:{VIOLET};">Exam</span>')
-    return f"""<tr><td style="padding:8px 0;">
-      <div style="{st(16, 500, TEXT, 1.4)}">{esc(item.get('title', 'Untitled'))}</div>
-      <div style="{st(13, 400, DIM, 1.4)}">{' &middot; '.join(x for x in meta if x)}</div>
-    </td></tr>"""
+    if is_exam:
+        meta.append(f'<span style="color:{VIOLET};font-weight:700;">EXAM</span>')
+    inner = (f'<div style="{st(16, 600, TEXT, 1.35)}">{esc(item.get("title", "Untitled"))}</div>'
+             f'<div style="{st(13, 400, MUTED, 1.4, "padding-top:2px;")}">{" &middot; ".join(x for x in meta if x)}</div>')
+    return bar_row(RED if overdue else color, inner)
 
 def todo_item(todo, today):
     level = todo.get('urgency') or 3
-    flag = f' <span style="color:{RED if level == 5 else AMBER};">!</span>' if level >= 4 else ""
-    return f"""<tr><td style="padding:5px 0;{st(15, 400, MUTED, 1.4)}">{esc(todo.get('title', 'Untitled'))}{flag}</td></tr>"""
+    color = RED if level == 5 else AMBER if level == 4 else "#3f3f46"
+    flag = f' <span style="color:{color};font-weight:700;font-size:12px;">{"CRITICAL" if level == 5 else "HIGH"}</span>' if level >= 4 else ""
+    return bar_row(color, f'<div style="{st(15, 500, TEXT, 1.4)}">{esc(todo.get("title", "Untitled"))}{flag}</div>')
 
 def build_text(b, today, summary):
     lines = [f"Daily Agenda - {today.strftime('%A, %B')} {today.day}", "", summary, ""]
@@ -324,12 +336,12 @@ def build_email(assignments, todos, today):
         days.setdefault(e[3], []).append(e)
     for d, entries in days.items():
         n = entries[0][0]
-        color = AMBER if n <= 1 else DIM
+        color = AMBER if n <= 1 else TEXT
         rows.append(day_header(short_date(d), relative_label(n).lower(), color))
         rows += [item_row(e) for e in entries]
 
     if b["todos"]:
-        rows.append(day_header("To-do", ""))
+        rows.append(day_header("To-do", "", GREEN))
         rows += [todo_item(t, today) for t in b["todos"]]
 
     if not rows:
@@ -349,10 +361,10 @@ def build_email(assignments, todos, today):
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{BG}" style="background:{BG};">
 <tr><td align="center" style="padding:24px 16px;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
-    <tr><td style="{st(22, 700, TEXT, 1.2)}">{today.strftime('%A, %B')} {today.day}</td></tr>
-    <tr><td style="padding-top:4px;{st(14, 400, DIM, 1.4)}">{esc(counts)}</td></tr>
+    <tr><td style="{st(24, 800, TEXT, 1.2)}">{today.strftime('%A, %B')} {today.day}</td></tr>
+    <tr><td style="padding-top:6px;{st(14, 400, MUTED, 1.4)}">{esc(counts)}</td></tr>
     {''.join(rows)}
-    <tr><td style="padding:32px 0 0;{st(13, 400, DIM, 1.2)}"><a href="{DASHBOARD_URL}" style="color:{DIM};text-decoration:underline;">Open dashboard</a></td></tr>
+    <tr><td style="padding:32px 0 0;{st(14, 600, MUTED, 1.2)}"><a href="{DASHBOARD_URL}" style="color:{MUTED};text-decoration:underline;">Open dashboard &rarr;</a></td></tr>
   </table>
 </td></tr>
 </table>

@@ -428,7 +428,7 @@ def build_email(assignments, todos, today):
         </td>
       </tr></table>
     </td></tr>
-    <tr><td align="center" style="padding:14px 0 0;font:400 11px/1.5 {FONT};color:#52525b;">Sent every morning at 7:00 &middot; Stay focused.</td></tr>
+    <tr><td align="center" style="padding:14px 0 0;font:400 11px/1.5 {FONT};color:#52525b;">Stay focused.</td></tr>
   </table>
 </td></tr>
 </table>

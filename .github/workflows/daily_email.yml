@@ -1,12 +1,11 @@
 name: Daily Agenda Email
 
 on:
-  # Primary trigger: cron-job.org calls the GitHub API at 7:00 AM Toronto time
-  # (workflow_dispatch). GitHub's own schedule runs hours late, so it's only a
-  # fallback in case that external trigger fails (e.g. the token expired).
   schedule:
-    # 15:23 UTC = 11:23 AM EDT / 10:23 AM EST. Skips itself if today's email already went out.
-    - cron: '23 15 * * *'
+    # GitHub starts scheduled runs hours late (4-8h has been typical), so this is set
+    # for the middle of the night: 05:30 UTC = 1:30 AM EDT / 12:30 AM EST. Even a
+    # late start lands before morning. TZ below keeps "today" on Toronto's date.
+    - cron: '30 5 * * *'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +20,7 @@ jobs:
       TZ: America/Toronto
 
     steps:
-    - name: Skip fallback if today's email already sent
+    - name: Skip if today's email already sent
       id: guard
       if: github.event_name == 'schedule'
       env:

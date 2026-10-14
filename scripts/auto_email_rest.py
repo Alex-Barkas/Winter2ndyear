@@ -262,49 +262,28 @@ def st(size, weight=400, color=TEXT, lh=1.4, extra=""):
     """Inline font style. Longhand on purpose: Outlook (mobile + web) drops the `font:` shorthand."""
     return f"font-family:{FONT};font-size:{size}px;font-weight:{weight};line-height:{lh};color:{color};{extra}"
 
-def day_header(label, sub, color=MUTED):
-    sub_html = f' <span style="color:{DIM};">&middot; {sub}</span>' if sub else ""
-    return f"""<tr><td colspan="2" style="padding:22px 0 6px;border-bottom:1px solid {BORDER};{st(12, 700, color, 1.2, 'letter-spacing:1px;text-transform:uppercase;')}">{label}{sub_html}</td></tr>"""
+def day_header(label, sub, color=DIM):
+    sub_html = f'&nbsp;&middot;&nbsp;{sub}' if sub else ""
+    return f"""<tr><td style="padding:26px 0 4px;{st(12, 600, color, 1.2, 'letter-spacing:1px;text-transform:uppercase;')}">{label}{sub_html}</td></tr>"""
 
 def item_row(entry, overdue=False):
     days, time, item, d = entry
-    course = item.get('course', '')
-    is_exam = item.get('category') in EXAM_CATEGORIES
-    dot = VIOLET if is_exam else course_color(course)
+    meta = [esc(item.get('course', ''))]
     if overdue:
-        meta = [f"was due {short_date(d)}"]
-    elif is_exam:
-        meta = [format_time(time)]
+        meta.append(f'<span style="color:{RED};">{relative_label(days).lower()}</span>')
     else:
-        meta = [CATEGORY_LABELS.get(item.get('category'), ""), format_time(time)]
-    meta_html = esc(" · ".join(x for x in meta if x))
-    if is_exam:
-        meta_html = f'<span style="color:{VIOLET};font-weight:700;">EXAM</span> &middot; {meta_html}'
-    if overdue:
-        meta_html += f' &middot; <span style="color:{RED};font-weight:700;">{relative_label(days)}</span>'
-    return f"""<tr>
-      <td width="20" valign="top" style="padding:10px 0 0;{st(14, 400, dot, 1.4)}">&#9679;</td>
-      <td valign="top" style="padding:8px 0;">
-        <div style="{st(16, 400, TEXT, 1.4)}"><span style="color:{dot};font-weight:700;">{esc(course)}</span>&nbsp; {esc(item.get('title', 'Untitled'))}</div>
-        <div style="{st(13, 400, DIM, 1.4, 'padding-top:1px;')}">{meta_html}</div>
-      </td>
-    </tr>"""
+        meta.append(esc(format_time(time)))
+    if item.get('category') in EXAM_CATEGORIES:
+        meta.append(f'<span style="color:{VIOLET};">Exam</span>')
+    return f"""<tr><td style="padding:8px 0;">
+      <div style="{st(16, 500, TEXT, 1.4)}">{esc(item.get('title', 'Untitled'))}</div>
+      <div style="{st(13, 400, DIM, 1.4)}">{' &middot; '.join(x for x in meta if x)}</div>
+    </td></tr>"""
 
 def todo_item(todo, today):
     level = todo.get('urgency') or 3
-    badge = ""
-    if level >= 4:
-        color = RED if level == 5 else AMBER
-        badge = f'<span style="color:{color};font-weight:700;">{"CRITICAL" if level == 5 else "HIGH"}</span> &middot; '
-    d = parse_date(todo.get('date'))
-    due = f" &middot; {short_date(d)} ({relative_label((d - today).days).lower()})" if d else ""
-    return f"""<tr>
-      <td width="20" valign="top" style="padding:9px 0 0;{st(14, 400, GREEN, 1.4)}">&#9675;</td>
-      <td valign="top" style="padding:7px 0;">
-        <div style="{st(15, 400, TEXT, 1.4)}">{esc(todo.get('title', 'Untitled'))}</div>
-        <div style="{st(13, 400, DIM, 1.4)}">{badge}{esc(todo.get('course') or 'Personal')}{due}</div>
-      </td>
-    </tr>"""
+    flag = f' <span style="color:{RED if level == 5 else AMBER};">!</span>' if level >= 4 else ""
+    return f"""<tr><td style="padding:5px 0;{st(15, 400, MUTED, 1.4)}">{esc(todo.get('title', 'Untitled'))}{flag}</td></tr>"""
 
 def build_text(b, today, summary):
     lines = [f"Daily Agenda - {today.strftime('%A, %B')} {today.day}", "", summary, ""]
@@ -345,16 +324,16 @@ def build_email(assignments, todos, today):
         days.setdefault(e[3], []).append(e)
     for d, entries in days.items():
         n = entries[0][0]
-        color = AMBER if n <= 1 else MUTED
-        rows.append(day_header(short_date(d), relative_label(n), color))
+        color = AMBER if n <= 1 else DIM
+        rows.append(day_header(short_date(d), relative_label(n).lower(), color))
         rows += [item_row(e) for e in entries]
 
     if b["todos"]:
-        rows.append(day_header("To-do", "", GREEN))
+        rows.append(day_header("To-do", ""))
         rows += [todo_item(t, today) for t in b["todos"]]
 
     if not rows:
-        rows.append(f"""<tr><td colspan="2" style="padding:32px 0;{st(16, 600, GREEN)}">All caught up. Nothing due in the next {LOOKAHEAD_DAYS} days.</td></tr>""")
+        rows.append(f"""<tr><td style="padding:28px 0;{st(15, 400, MUTED)}">Nothing due in the next {LOOKAHEAD_DAYS} days.</td></tr>""")
 
     html_body = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -370,10 +349,10 @@ def build_email(assignments, todos, today):
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="{BG}" style="background:{BG};">
 <tr><td align="center" style="padding:24px 16px;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
-    <tr><td colspan="2" style="{st(24, 800, TEXT, 1.2)}">{today.strftime('%A, %B')} {today.day}</td></tr>
-    <tr><td colspan="2" style="padding-top:6px;{st(14, 400, MUTED, 1.4)}">{esc(counts)}</td></tr>
+    <tr><td style="{st(22, 700, TEXT, 1.2)}">{today.strftime('%A, %B')} {today.day}</td></tr>
+    <tr><td style="padding-top:4px;{st(14, 400, DIM, 1.4)}">{esc(counts)}</td></tr>
     {''.join(rows)}
-    <tr><td colspan="2" style="padding:26px 0 0;{st(14, 600, MUTED, 1.2)}"><a href="{DASHBOARD_URL}" style="color:{MUTED};text-decoration:underline;">Open dashboard &rarr;</a></td></tr>
+    <tr><td style="padding:32px 0 0;{st(13, 400, DIM, 1.2)}"><a href="{DASHBOARD_URL}" style="color:{DIM};text-decoration:underline;">Open dashboard</a></td></tr>
   </table>
 </td></tr>
 </table>

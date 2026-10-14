@@ -2,22 +2,27 @@ name: Daily Agenda Email
 
 on:
   schedule:
-    # Runs at 13:00 UTC, which is 8:00 AM EST (standard time) / 9:00 AM EDT (daylight savings)
-    - cron: '0 13 * * *'
-  workflow_dispatch: # Allows manual triggering from GitHub UI
+    # 10:07 UTC = 6:07 AM EDT (until Nov 1) / 5:07 AM EST (after)
+    - cron: '7 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 10
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
+        cache: pip
 
     - name: Install dependencies
       run: |
@@ -28,16 +33,15 @@ jobs:
       env:
         FIREBASE_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
       run: |
-        echo "$FIREBASE_KEY" > firebase_credentials.json
+        printf '%s' "$FIREBASE_KEY" > firebase_credentials.json
+        chmod 600 firebase_credentials.json
 
     - name: Run Auto Email Script (REST API)
       env:
         GOOGLE_APPLICATION_CREDENTIALS: firebase_credentials.json
         EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-        # SENDER_EMAIL and RECEIVER_EMAIL will use defaults defined in auto_email.py
+        # SENDER_EMAIL and RECEIVER_EMAIL use defaults in auto_email_rest.py
         # unless you add them to secrets and uncomment below:
         # SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
         # RECEIVER_EMAIL: ${{ secrets.TARGET_EMAIL }}
-      run: |
-        # Run with unbuffered output
-        python -u scripts/auto_email_rest.py
+      run: python -u scripts/auto_email_rest.py

@@ -9,9 +9,10 @@ export function findAssignment(assignments, course, componentName, index) {
     let targetCategory = "";
     const nameLower = componentName.toLowerCase();
 
-    if (nameLower.includes("lab")) targetCategory = "LAB";
+    // "quiz" must be checked before "lab" so "Pre-Lab Quizzes" isn't treated as a lab.
+    if (nameLower.includes("quiz")) targetCategory = "QUIZ";
+    else if (nameLower.includes("lab")) targetCategory = "LAB";
     else if (nameLower.includes("tutorial") || nameLower.includes("active learning")) targetCategory = "TUTORIAL";
-    else if (nameLower.includes("quiz")) targetCategory = "QUIZ";
     else if (nameLower.includes("midterm") || nameLower.includes("test")) targetCategory = "MIDTERM";
     else if (nameLower.includes("homework") || nameLower.includes("assignment")) targetCategory = "ASSIGNMENT";
 
@@ -24,9 +25,24 @@ export function findAssignment(assignments, course, componentName, index) {
 
             // Refine by title if possible (e.g. "Midterm 1" should specifically match "Midterm 1" title)
             // This helps when multiple components share a category but have specific names
-            const refinedMatches = matches.filter(a => a.title.toLowerCase().includes(nameLower));
+            const singular = nameLower.replace(/s$/, '');
+            let refinedMatches = matches.filter(a => a.title.toLowerCase().includes(nameLower));
+            // "Jupyter Assignments" should still find "Jupyter Assignment 1"
+            if (refinedMatches.length === 0) refinedMatches = matches.filter(a => a.title.toLowerCase().includes(singular));
             if (refinedMatches.length > 0) {
                 matches = refinedMatches;
+            } else if (/\d/.test(nameLower)) {
+                // A numbered component (e.g. "Midterm Test 1") that has no matching
+                // title must not fall back to a sibling's assignment.
+                matches = [];
+            } else {
+                // Components sharing a category (e.g. "In-Lab TA Assessment" and
+                // "Lab Reports" are both LAB) are told apart by a title keyword.
+                const keyword = nameLower.includes("in-lab") ? "in-lab" : nameLower.includes("report") ? "report" : "";
+                if (keyword) {
+                    const keywordMatches = matches.filter(a => a.title.toLowerCase().includes(keyword));
+                    if (keywordMatches.length > 0) matches = keywordMatches;
+                }
             }
         } else {
             const titleMatches = matches.filter(a => a.title.toLowerCase().includes(nameLower.replace(/s$/, '')));

@@ -120,19 +120,6 @@
     }
 
     async function handleScoreChange(row, course, value, inputEl) {
-        const originalVal = row.score !== null && row.score !== undefined ? String(row.score) : '';
-
-        // Guard against misclicks/accidental edits: require explicit confirmation
-        // before any score change is persisted. Cancelling reverts the input to
-        // its last saved value instead of silently discarding the keystroke.
-        if (value !== originalVal) {
-            const confirmed = window.confirm('Are you sure you want to change this grade?');
-            if (!confirmed) {
-                inputEl.value = originalVal;
-                return;
-            }
-        }
-
         const newScore = value === '' ? null : parseFloat(value);
 
         if (row.isSynced) {
